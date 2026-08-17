@@ -18,10 +18,9 @@ jobs:
         shell: powershell
         run: |
           $ErrorActionPreference = "Stop"
-          $target = "${{ secrets.DEPLOY_APP_PATH }}"
-          if ([string]::IsNullOrWhiteSpace($target)) {
-            throw "DEPLOY_APP_PATH is not configured"
-          }
+          $composeRoot = "C:\Users\matte\research-space\researchspace-docker-desktop-main"
+          $target = Join-Path $composeRoot "researchspace\runtime-data\apps\lynx-app"
+
           if (!(Test-Path $target)) {
             New-Item -ItemType Directory -Path $target -Force | Out-Null
           }
@@ -36,15 +35,12 @@ jobs:
         shell: powershell
         run: |
           $ErrorActionPreference = "Stop"
-          $container = "${{ secrets.DEPLOY_CONTAINER_NAME }}"
-          if ([string]::IsNullOrWhiteSpace($container)) {
-            throw "DEPLOY_CONTAINER_NAME is not configured"
-          }
+          $container = "localhost-researchspace-1"
 
           docker version
           $exists = docker ps -a --format "{{.Names}}" | Select-String -SimpleMatch "^$container$"
           if (-not $exists) {
-            throw "Container '$container' not found. Check DEPLOY_CONTAINER_NAME secret."
+            throw "Container '$container' not found. Check the hardcoded container name."
           }
 
           docker restart $container

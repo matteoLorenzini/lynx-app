@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -17,10 +17,10 @@ jobs:
       - name: Sync app files to local ResearchSpace app volume
         shell: powershell
         run: |
+          $ErrorActionPreference = "Stop"
           $target = "${{ secrets.DEPLOY_APP_PATH }}"
           if ([string]::IsNullOrWhiteSpace($target)) {
-            Write-Error "DEPLOY_APP_PATH is not configured"
-            exit 1
+            throw "DEPLOY_APP_PATH is not configured"
           }
           if (!(Test-Path $target)) {
             New-Item -ItemType Directory -Path $target -Force | Out-Null
@@ -28,17 +28,26 @@ jobs:
 
           robocopy "$env:GITHUB_WORKSPACE" $target /E /XD "$env:GITHUB_WORKSPACE\.git" "$env:GITHUB_WORKSPACE\.github" /R:2 /W:5
           if ($LASTEXITCODE -gt 7) {
-            Write-Error "Sync failed with robocopy exit code $LASTEXITCODE"
-            exit $LASTEXITCODE
+            throw "Sync failed with robocopy exit code $LASTEXITCODE"
           }
           $global:LASTEXITCODE = 0
 
       - name: Restart ResearchSpace container
         shell: powershell
         run: |
+          $ErrorActionPreference = "Stop"
           $container = "${{ secrets.DEPLOY_CONTAINER_NAME }}"
           if ([string]::IsNullOrWhiteSpace($container)) {
-            Write-Error "DEPLOY_CONTAINER_NAME is not configured"
-            exit 1
+            throw "DEPLOY_CONTAINER_NAME is not configured"
           }
+
+          docker version
+          $exists = docker ps -a --format "{{.Names}}" | Select-String -SimpleMatch "^$container$"
+          if (-not $exists) {
+            throw "Container '$container' not found. Check DEPLOY_CONTAINER_NAME secret."
+          }
+
           docker restart $container
+          if ($LASTEXITCODE -ne 0) {
+            throw "docker restart failed with code $LASTEXITCODE"
+          }

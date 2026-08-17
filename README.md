@@ -22,19 +22,16 @@ lynx-app/
 
 ## Deployment
 
-On every push to `main`, [.github/workflows/deploy.yml](.github/workflows/deploy.yml) syncs this repo to the
-production host's app volume via `rsync` over SSH and restarts the ResearchSpace container so the app is reloaded.
+On every push to `main` (or from **Run workflow**), [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
+runs on the configured self-hosted Windows runner, syncs this repo to the local app volume with `robocopy`, and
+restarts the ResearchSpace container so the app is reloaded.
 
 ### Required repository secrets
 
 | Secret | Description |
 | --- | --- |
-| `DEPLOY_SSH_HOST` | Hostname/IP of the production server |
-| `DEPLOY_SSH_PORT` | SSH port (e.g. `22`) |
-| `DEPLOY_SSH_USER` | SSH user with write access to the app path |
-| `DEPLOY_SSH_KEY` | Private key for the above user (add the matching public key to the server's `authorized_keys`) |
-| `DEPLOY_APP_PATH` | Absolute path to this app's folder on the server (e.g. `/apps/lynx-app`), mounted as a docker volume into the platform container |
-| `DEPLOY_CONTAINER_NAME` | Name of the running ResearchSpace docker container to restart after sync |
+| `DEPLOY_APP_PATH` | Absolute Windows path to this app's local folder (e.g. `C:\apps\lynx-app`) |
+| `DEPLOY_CONTAINER_NAME` | Name of the local ResearchSpace Docker container to restart after sync |
 
 Note: config file changes (repositories, services, page-layout) require the platform restart performed by the
 workflow. Changes under `data/templates` and `assets` are picked up immediately without a restart.

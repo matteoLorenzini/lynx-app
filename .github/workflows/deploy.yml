@@ -3,33 +3,42 @@ name: Deploy app to ResearchSpace platform
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    timeout-minutes: 5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
-
-      - name: Add remote host to known_hosts
+      - name: Sync app files to local ResearchSpace app volume
+        shell: powershell
         run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -p "${{ secrets.DEPLOY_SSH_PORT }}" -H "${{ secrets.DEPLOY_SSH_HOST }}" >> ~/.ssh/known_hosts
+          $target = "${{ secrets.DEPLOY_APP_PATH }}"
+          if ([string]::IsNullOrWhiteSpace($target)) {
+            Write-Error "DEPLOY_APP_PATH is not configured"
+            exit 1
+          }
+          if (!(Test-Path $target)) {
+            New-Item -ItemType Directory -Path $target -Force | Out-Null
+          }
 
-      - name: Sync app files to prod (/apps/lynx-app volume)
-        run: |
-          rsync -az --delete \
-            --exclude='.git' \
-            --exclude='.github' \
-            -e "ssh -p ${{ secrets.DEPLOY_SSH_PORT }}" \
-            ./ "${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }}:${{ secrets.DEPLOY_APP_PATH }}/"
+          robocopy "$env:GITHUB_WORKSPACE" $target /E /XD "$env:GITHUB_WORKSPACE\.git" "$env:GITHUB_WORKSPACE\.github" /R:2 /W:5
+          if ($LASTEXITCODE -gt 7) {
+            Write-Error "Sync failed with robocopy exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+          $global:LASTEXITCODE = 0
 
-      - name: Restart ResearchSpace container to pick up changes
+      - name: Restart ResearchSpace container
+        shell: powershell
         run: |
-          ssh -p "${{ secrets.DEPLOY_SSH_PORT }}" "${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }}" \
-            "docker restart ${{ secrets.DEPLOY_CONTAINER_NAME }}"
+          $container = "${{ secrets.DEPLOY_CONTAINER_NAME }}"
+          if ([string]::IsNullOrWhiteSpace($container)) {
+            Write-Error "DEPLOY_CONTAINER_NAME is not configured"
+            exit 1
+          }
+          docker restart $container

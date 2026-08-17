@@ -1,0 +1,504 @@
+[[#if (urlParam "details")]]
+<div class="details-content">
+  <bs-tabs class="details-tabs">
+    <bs-tab title='Site Description' event-key='site-description' mount-on-enter=true class="rawdata-tab">
+      <mp-field-visualization
+        subject='[[this]]'
+        fields='[[fieldDefinitionsFromQuery (setQueryBindings "SELECT DISTINCT ?field WHERE {?resource ?field ?o . ?field a <http://www.researchspace.org/resource/system/fields/Field> } ORDER BY DESC(?field)" resource=this.iri) ]]'
+        template='{{> template}}'>
+        <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+      </mp-field-visualization>
+    </bs-tab>
+  </bs-tabs>
+</div>
+[[else]]
+<with-types fixed-key='resource-[[this]]' iri='[[this]]' template='{{> resource}}' [[> rsp:TypeMappings]]>
+  <template id='resource'>
+    <div class="rs-resource-container">
+      [[#block "resourceHeader"]]
+      <!-- Resource Header -->
+      <div class="rs-resource-header {{getValueByKey entityBgColor allTypes 'rs-entity-bg-thing'}}">
+        <!-- Header top with draggable link -->
+        <div class="rs-resource-header-topContainer">
+          [[#block "resourceHeaderTop"]]
+          <!-- (Popover code removed) -->
+          [[/block]]
+          <div class="rs-resource-header-topButtons">
+            <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='knowledge-map' urlqueryparam-resource='[[this]]'>
+              <button type="button" title="Author Resource in Knowledge Map">
+                <rs-icon icon-type="round" icon-name="account_tree"></rs-icon>
+              </button>
+            </semantic-link-container>
+            <mp-event-trigger id='details-view-trigger' type='Component.TemplateUpdate' data='{"iri": "{{iri}}"}' targets='["details-view", "open-details-sidebar"]'>
+              <button type="button" title="Resource Details">
+                <rs-icon icon-type="rounded" icon-name="info" symbol="true"></rs-icon>
+              </button>
+            </mp-event-trigger>
+            <mp-has-permission permission="api:ldp:*">
+              <semantic-link-container uri='http://www.researchspace.org/resource/ResourceContentEditE18' urlqueryparam-resource='[[this]]'>
+                <button type="button" title="Author Resource in Form">
+                  <rs-icon icon-type="rounded" icon-name="edit_note" symbol="true"></rs-icon>
+                </button>
+              </semantic-link-container>
+            </mp-has-permission>
+          </div>
+        </div>
+        <!-- Header content with image (if available) and resource primary information -->
+        <div class="rs-resource-header-content-container">
+          <div class="rs-resource-header--image-container">
+            <!-- Always run working preview query and render header preview (if any) -->
+            <semantic-query query='
+PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+PREFIX arco: <https://w3id.org/arco/ontology/arco/>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX rs: <http://www.researchspace.org/ontology/>
+
+SELECT DISTINCT ?subject ?document ?preview ?previewIiif
+WHERE {
+  BIND(<[[this]]> AS ?subject)
+
+  {
+    ?subject a crm:E18_Physical_Thing ;
+             crm:P70i_is_documented_in ?document .
+    ?document a crm:E31_Document .
+    OPTIONAL {
+      ?document pico:preview ?preview .
+      BIND(STRAFTER(STR(?preview), "") AS ?previewStr)
+      BIND(
+        IF(
+          REGEX(?previewStr, "/resource/EX_File/", "i"),
+          "",
+          IF(REGEX(?previewStr, "\\.(jpg|jpeg|png|gif|webp)$", "i"), ?previewStr, "")
+        )
+        AS ?previewImageStr
+      )
+    }
+  }
+
+  UNION
+
+  {
+    ?subject rdf:type arco:ArchitecturalOrLandscapeHeritage ;
+             pico:preview ?preview .
+  }
+
+  BIND(
+    IF(
+      STRSTARTS(STR(?preview), "http://"),
+      IRI(CONCAT("https://", STRAFTER(STR(?preview), "http://"))),
+      ?preview
+    ) AS ?previewSafe
+  )
+  OPTIONAL { ?preview rs:PX_has_file_name ?previewFileName . }
+  BIND(STR(?preview) AS ?previewStr)
+  BIND(STR(?previewSafe) AS ?previewSafeStr)
+  BIND(IF(REGEX(?previewStr, "/resource/EX_File/", "i"), REPLACE(?previewStr, "^.*/EX_File/", ""), "") AS ?previewFileFromIri)
+  BIND(COALESCE(STR(?previewFileName), ?previewFileFromIri, "") AS ?previewFileAny)
+  BIND(
+    IF(
+      STRLEN(?previewFileAny) > 0,
+      CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?previewFileAny), "/full/!700,700/0/default.jpg"),
+      IF(REGEX(?previewSafeStr, "^https://", "i"), ?previewSafeStr, "")
+    ) AS ?previewIiif
+  )
+}
+ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
+          <template id="headerPreview">
+            {{#with bindings.[0]}}
+              {{#if preview.value}}
+                <div class="detail-thumb" style="margin-bottom:8px;">
+                  {{#if previewIiif.value}}
+                    <a href="{{previewIiif.value}}" target="_blank" rel="noopener">
+                      <img src="{{previewIiif.value}}" alt="Preview" style="max-width:240px; max-height:160px; object-fit:cover; border-radius:4px; display:block;" />
+                    </a>
+                  {{else}}
+                    <a href="{{preview.value}}" target="_blank" rel="noopener">
+                      <mp-resource-thumbnail iri='{{preview.value}}' no-image-uri='/images/help/thenounproject/noun_1113333.svg' style="max-width:240px; max-height:160px; display:block;" />
+                    </a>
+                  {{/if}}
+                </div>
+              {{/if}}
+            {{/with}}
+          </template>
+        </semantic-query>
+
+            <div class="rs-resource-img__btngroup">
+              {{#if (hasKey allTypes "http://www.researchspace.org/ontology/EX_Digital_Image_Region")}}
+                <!-- no media icon for image regions -->
+              {{else}}
+                <mp-overlay-dialog title="Resource Media" type="modal" class="modal-xlSize">
+                  <mp-overlay-dialog-trigger>
+                    <button type="button" class="btn btn-icon" title="Explore Media">
+                      <rs-icon icon-type="rounded" icon-name="fullscreen" symbol="true"></rs-icon>
+                    </button>
+                  </mp-overlay-dialog-trigger>
+                  <mp-overlay-dialog-content>
+                    <mp-page-loader urlqueryparam-frame=true iri='http://www.researchspace.org/resource/ItemCardMedia' context='[[this]]'></mp-page-loader>
+                  </mp-overlay-dialog-content>
+                </mp-overlay-dialog>
+              {{/if}}
+              <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='iiif' urlqueryparam-resource='[[this]]'>
+                <button type="button" class="btn btn-icon" title="Explore Images in high resolution Viewer">
+                  <rs-icon icon-type="rounded" icon-name="image" symbol="true"></rs-icon>
+                </button>
+              </semantic-link-container>
+              [[#if (hasPermission "forms:ldp:*")]]
+                {{#if (hasKey allTypes "http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing")}}
+                  {{#if (hasKey allTypes "http://www.researchspace.org/ontology/EX_Digital_Image_Region")}}
+                    <!-- no annotation icon for image regions -->
+                  {{else}}
+                    <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='image-annotation' urlqueryparam-resource='[[this]]'>
+                      <button type="button" class="btn btn-icon" title="Annotate Images">
+                        <rs-icon icon-type="round" icon-name="photo_size_select_large"></rs-icon>
+                      </button>
+                    </semantic-link-container>
+                  {{/if}}
+                {{/if}}
+              [[/if]]
+            </div>
+          </div>
+          <div style="padding: 1.8% 1.5% 1.5% 5%;">
+            [[> resourceHeaderData image=true]]
+            <!-- Inline map next to the image -->
+            <div style="margin-top: 8px;">
+              <semantic-if
+                query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P55_has_current_location> ?c }'
+                then='{{> mapBlock}}' else='{{> mapNoLocation}}'>
+                <template id='mapBlock'>
+                  <div style="height:220px;">
+                    <semantic-map
+                      id='map-result'
+                      query='
+                        PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                        PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
+                        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                        SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
+                          BIND(<[[this]]> AS ?subject)
+                          ?subject base:P1_is_identified_by ?appellation ; base:P55_has_current_location ?coords .
+                          ?appellation a base:E41_Appellation ; skos:prefLabel ?label .
+                        }
+                      '
+                      tuple-template='{{> mapTupleTemplate }}'>
+                      <template id='mapTupleTemplate'>
+                        <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                      </template>
+                    </semantic-map>
+                  </div>
+                </template>
+                <template id='mapNoLocation'>
+                  <div style="font-size:0.8rem;color:#666;">No geolocation available.</div>
+                </template>
+              </semantic-if>
+            </div>
+          </div>
+        </div>
+      </div>
+      [[/block]]
+      <!-- Tabs: Site Description, Related Places, Nara Grid -->
+      <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="site-description">
+        <div>
+          <bs-nav bs-style="tabs">
+            <bs-nav-item event-key="site-description">Site Description</bs-nav-item>
+            <bs-nav-item event-key="nara-grid">Nara Grid</bs-nav-item>
+            <bs-nav-item event-key="risk-analysis">Risk Analysis</bs-nav-item>
+            <bs-nav-item event-key="places">Magnitude Scale</bs-nav-item>
+            <bs-nav-item event-key="site-pictures">Site Pictures</bs-nav-item>
+            <bs-nav-item event-key="cartographic-docs">Cartographic Documentation</bs-nav-item>
+          </bs-nav>
+          <bs-tab-content animation="true">
+            <bs-tab-pane event-key="site-description">
+              <div class="rs-resource-tab-container">
+                <div>
+                  <hr class="rs-resource-section--headerLine">
+                  [[#block "instituteHeader"]]
+                  <span class="h1 rs-resource-section--header">Dataset</span>
+                  [[/block]]
+                  <span class="text-underline rs-resource-section--header">Latest confirmed data set from [[currentDateTime format="dd-MM-yyyy"]].</span>
+                </div>
+                <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions denominazione="http://www.siriusplatform-risk-assessment/field/denominazione"  tipologia="http://www.siriusplatform-risk-assessment/field/tipologia" descrizione="http://www.siriusplatform-risk-assessment/field/descrizione" cronologia="http://www.siriusplatform-risk-assessment/field/cronologia" contesto-socio-culturale="http://www.siriusplatform-risk-assessment/field/contesto-socio-culturale" contesto-amministrativo="http://www.siriusplatform-risk-assessment/field/contesto-amministrativo" contesto-finanziario="http://www.siriusplatform-risk-assessment/field/contesto-finanziario" contesto-legale="http://www.siriusplatform-risk-assessment/field/contesto-legale" stakeholders="http://www.siriusplatform-risk-assessment/field/stakeholders" ]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="site-pictures" mount-on-enter=true>
+              <div class="rs-resource-tab-container">
+                <h3>Site Pictures</h3>
+                <semantic-query query='
+PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX rs: <http://www.researchspace.org/ontology/>
+PREFIX a-cd: <https://w3id.org/arco/ontology/context-description/>
+
+SELECT DISTINCT ?preview ?previewIiif WHERE {
+  BIND(<[[this]]> AS ?subject)
+  ?subject a crm:E18_Physical_Thing .
+  OPTIONAL {
+    {
+      ?subject crm:P70i_is_documented_in ?document .
+      ?document a crm:E31_Document ;
+                pico:preview ?preview .
+    }
+    UNION
+    {
+      ?subject crm:P138i_has_representation ?preview .
+      FILTER NOT EXISTS { ?preview rdf:type a-cd:GraphicOrCartographicDocumentation . }
+      FILTER NOT EXISTS { ?preview crm:P2_has_type a-cd:GraphicOrCartographicDocumentation . }
+    }
+  }
+  FILTER(BOUND(?preview))
+  BIND(
+    IF(
+      STRSTARTS(STR(?preview), "http://"),
+      IRI(CONCAT("https://", STRAFTER(STR(?preview), "http://"))),
+      ?preview
+    ) AS ?previewSafe
+  )
+  OPTIONAL { ?preview rs:PX_has_file_name ?previewFileName . }
+  BIND(STR(?preview) AS ?previewStr)
+  BIND(STR(?previewSafe) AS ?previewSafeStr)
+  BIND(IF(REGEX(?previewStr, "/resource/EX_File/", "i"), REPLACE(?previewStr, "^.*/EX_File/", ""), "") AS ?previewFileFromIri)
+  BIND(COALESCE(STR(?previewFileName), ?previewFileFromIri, "") AS ?previewFileAny)
+  BIND(
+    IF(
+      STRLEN(?previewFileAny) > 0,
+      CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?previewFileAny), "/full/!700,700/0/default.jpg"),
+      IF(REGEX(?previewSafeStr, "^https://", "i"), ?previewSafeStr, "")
+    ) AS ?previewIiif
+  )
+} ORDER BY ?preview'
+                  template='{{> picturesGrid}}'>
+                  <template id="picturesGrid">
+                    <style>
+                      .site-pictures-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                        gap: 12px;
+                        align-items: start;
+                      }
+                      .site-picture-item {
+                        background: #fafafa;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        padding: 6px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+                      }
+                      /* Image respects intrinsic aspect ratio */
+                      .site-picture-item img {
+                        width: 100%;
+                        height: auto;
+                        display: block;
+                        max-height: 480px; /* cap extremely tall images */
+                        object-fit: contain;
+                        border-radius: 4px;
+                      }
+                      /* optional: make thumbnails slightly taller on wide screens */
+                      @media (min-width: 1200px) {
+                        .site-picture-item img { max-height: 560px; }
+                      }
+                    </style>
+
+                    {{#if bindings}}
+                      <div class="site-pictures-grid">
+                        {{#each bindings}}
+                          {{#if preview.value}}
+                            <div class="site-picture-item">
+                              {{#if previewIiif.value}}
+                                <a href="{{previewIiif.value}}" target="_blank" rel="noopener">
+                                  <img src="{{previewIiif.value}}" alt="Preview" loading="lazy" style="max-width:100%; max-height:480px; display:block;" />
+                                </a>
+                              {{else}}
+                                <a href="{{preview.value}}" target="_blank" rel="noopener">
+                                  <mp-resource-thumbnail iri='{{preview.value}}' no-image-uri='/images/help/thenounproject/noun_1113333.svg' style="max-width:100%; max-height:480px; display:block;" />
+                                </a>
+                              {{/if}}
+                            </div>
+                          {{/if}}
+                        {{/each}}
+                      </div>
+                    {{else}}
+                      <div style="color:#666">No pictures available.</div>
+                    {{/if}}
+                  </template>
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="places" mount-on-enter=true>
+              <div class="rs-resource-tab-container">
+                [[> sirius:tornado-graph]]
+              </div>
+            </bs-tab-pane>
+            [[#if (hasPermission "forms:ldp:*")]]
+              <bs-tab-pane event-key="nara-grid" mount-on-enter=true>
+                <div class="rs-resource-tab-container">
+                  [[> sirius:nara-grid]]
+                </div>
+              </bs-tab-pane>
+            [[/if]]
+            <bs-tab-pane event-key="risk-analysis">
+              <div class="rs-resource-tab-container">
+                [[> sirius:risk-analysis]]
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="cartographic-docs" mount-on-enter=true>
+              <div class="rs-resource-tab-container">
+                <h3>Cartographic Documentation</h3>
+                <semantic-query query='
+PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX a-cd: <https://w3id.org/arco/ontology/context-description/>
+PREFIX smapit: <https://w3id.org/italia/onto/SM/>
+PREFIX rs: <http://www.researchspace.org/ontology/>
+
+SELECT DISTINCT ?doc ?docIiif WHERE {
+  BIND(<[[this]]> AS ?subject)
+  ?subject a crm:E18_Physical_Thing .
+
+  {
+    ?subject a-cd:hasDocumentation ?docNode .
+    ?docNode rdf:type <https://w3id.org/arco/ontology/context-description/GraphicOrCartographicDocumentation> ;
+             smapit:URL ?doc .
+  }
+  UNION
+  {
+    ?subject crm:P70i_is_documented_in ?document .
+    ?document a crm:E31_Document ;
+              a-cd:hasDocumentation ?docNode .
+    ?docNode rdf:type <https://w3id.org/arco/ontology/context-description/GraphicOrCartographicDocumentation> ;
+             smapit:URL ?doc .
+  }
+  UNION
+  {
+    ?subject crm:P138i_has_representation ?doc .
+    {
+      ?doc rdf:type <https://w3id.org/arco/ontology/context-description/GraphicOrCartographicDocumentation> .
+    }
+    UNION
+    {
+      ?doc crm:P2_has_type <https://w3id.org/arco/ontology/context-description/GraphicOrCartographicDocumentation> .
+    }
+    {
+      ?subject a-cd:hasDocumentation ?docNode .
+      ?docNode smapit:URL ?doc .
+    }
+    UNION
+    {
+      ?subject crm:P70i_is_documented_in ?document2 .
+      ?document2 a-cd:hasDocumentation ?docNode .
+      ?docNode smapit:URL ?doc .
+    }
+    UNION
+    {
+      ?docNode a-cd:isDocumentationOf ?subject ;
+               smapit:URL ?doc .
+    }
+  }
+
+  BIND(
+    IF(
+      STRSTARTS(STR(?doc), "http://"),
+      IRI(CONCAT("https://", STRAFTER(STR(?doc), "http://"))),
+      ?doc
+    ) AS ?docSafe
+  )
+  OPTIONAL { ?doc rs:PX_has_file_name ?docFileName . }
+  BIND(STR(?doc) AS ?docStr)
+  BIND(STR(?docSafe) AS ?docSafeStr)
+  BIND(IF(REGEX(?docStr, "/resource/EX_File/", "i"), REPLACE(?docStr, "^.*/EX_File/", ""), "") AS ?docFileFromIri)
+  BIND(COALESCE(STR(?docFileName), ?docFileFromIri, "") AS ?docFileAny)
+  BIND(
+    IF(
+      STRLEN(?docFileAny) > 0,
+      CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?docFileAny), "/full/!700,700/0/default.jpg"),
+      IF(REGEX(?docSafeStr, "^https://", "i"), ?docSafeStr, "")
+    ) AS ?docIiif
+  )
+}
+ORDER BY ?doc LIMIT 50' template='{{> cartoGrid}}'>
+                   <template id="cartoGrid">
+                     <style>
+                       .carto-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
+                       .carto-item { background:#fafafa;border-radius:6px;overflow:hidden;padding:6px;display:flex;flex-direction:column;align-items:stretch; }
+                       .carto-thumb { height:140px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; border-radius:4px; overflow:hidden; }
+                       .carto-thumb img { width:100%; height:auto; max-height:140px; object-fit:contain; display:block; }
+                       .carto-thumb mp-resource-thumbnail { max-width:100%; max-height:140px; display:block; }
+                       .carto-label { padding-top:8px; font-size:0.95rem; color:#000; text-align:center; height:44px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+                     </style>
+ 
+                     {{#if bindings}}
+                       <div class="carto-grid">
+                         {{#each bindings}}
+                           <div class="carto-item">
+                             {{#with this}}
+                               <div class="carto-thumb">
+                                 {{#if docIiif.value}}
+                                   <a href="{{docIiif.value}}" target="_blank" rel="noopener">
+                                     <img src="{{docIiif.value}}" alt="Cartographic doc" loading="lazy"
+                                          onerror="this.onerror=null;this.src='/images/help/thenounproject/noun_1113333.svg';" />
+                                   </a>
+                                 {{else}}
+                                   {{#if doc.value}}
+                                     <a href="{{doc.value}}" target="_blank" rel="noopener">
+                                       <mp-resource-thumbnail iri="{{doc.value}}" no-image-uri="/images/help/thenounproject/noun_1113333.svg" />
+                                     </a>
+                                   {{else}}
+                                     <img src="/images/help/thenounproject/noun_1113333.svg" alt="No doc" style="width:72px;height:72px;object-fit:contain;" />
+                                   {{/if}}
+                                 {{/if}}
+                               </div>
+                               <div class="carto-label">
+                                 <semantic-link iri="{{doc.value}}">{{#if doc.value}}{{doc.value}}{{else}}Document{{/if}}</semantic-link>
+                               </div>
+                             {{/with}}
+                           </div>
+                         {{/each}}
+                       </div>
+                     {{else}}
+                       <div style="color:#666">No cartographic documentation available.</div>
+                     {{/if}}
+                   </template>
+                 </semantic-query>
+              </div>
+             </bs-tab-pane>
+          </bs-tab-content>
+        </div>
+      </bs-tab-container>
+    </div>
+  </template>
+</with-types>
+[[/if]]
+
+[[#*inline "resourceHeaderData"]]
+  [[#block "headerData"]]
+  <!-- RESOURCE LABEL -->
+  <div class="rs-resource-header--singletitle">
+    <div class="rs-resource-header--title" style="text-transform: capitalize;">
+      <mp-label iri='[[this]]'></mp-label>
+    </div>
+    <div style="display: flex;">
+      <mp-copy-to-clipboard text='[[this]]'>
+        <div class="rs-copy-IRI">Copy IRI</div>
+      </mp-copy-to-clipboard>
+      <mp-sparql-download
+        query='CONSTRUCT { ?s ?p ?o } WHERE { BIND(<[[this]]> AS ?root) { ?root ?p ?o . BIND(?root AS ?s) } UNION { ?s ?p ?root . BIND(?root AS ?o) } UNION { ?n ?p1 ?root . ?n ?p ?o . BIND(?n AS ?s) } UNION { ?root ?p1 ?n . ?n ?p ?o . BIND(?n AS ?s) } }'
+        header='application/ld+json'
+        filename='resource-graph.jsonld'>
+        <button class="btn btn-default">Download JSON-LD</button>
+      </mp-sparql-download>
+      <div class="statements">Statements</div>
+    </div>
+  </div>
+  <!-- Removed headerDefaultData block as requested -->
+  [[/block]]
+[[/inline]]
+<!-- noop: deploy trigger to ensure reverted header is deployed -->

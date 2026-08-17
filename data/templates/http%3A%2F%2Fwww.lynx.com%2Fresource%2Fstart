@@ -1,0 +1,8 @@
+<div class="test-template">
+  <h1>Test Template</h1>
+  <p>This is a sample template for testing.</p>
+  <ul>
+    <li>Template loaded successfully</li>
+    <li>Ready for custom content</li>
+  </ul>
+</div>

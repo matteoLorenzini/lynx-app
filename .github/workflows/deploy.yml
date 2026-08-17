@@ -1,49 +1,70 @@
-name: Deploy app to ResearchSpace platform
+name: Deploy ResearchSpace
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: self-hosted
-    timeout-minutes: 10
-
+    timeout-minutes: 5
+    
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Sync app files to local ResearchSpace app volume
+      - name: Set paths
         shell: powershell
         run: |
-          $ErrorActionPreference = "Stop"
           $composeRoot = "C:\Users\matte\research-space\researchspace-docker-desktop-main"
-          $target = Join-Path $composeRoot "researchspace\runtime-data\apps\lynx-app"
+          $runtimeTarget = Join-Path $composeRoot "researchspace\runtime-data"
+          
+          "COMPOSE_ROOT=$composeRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "RUNTIME_TARGET=$runtimeTarget" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "SERVICE_NAME=researchspace" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-          if (!(Test-Path $target)) {
-            New-Item -ItemType Directory -Path $target -Force | Out-Null
+      - name: Sync changed files only
+        shell: powershell
+        run: |
+          $target = $env:RUNTIME_TARGET
+          Write-Host "Syncing changed files to: $target"
+          
+          if (!(Test-Path $target)) { 
+            Write-Error "Runtime directory not found: $target"
+            exit 1
           }
-
-          robocopy "$env:GITHUB_WORKSPACE" $target /E /XD "$env:GITHUB_WORKSPACE\.git" "$env:GITHUB_WORKSPACE\.github" /R:2 /W:5
-          if ($LASTEXITCODE -gt 7) {
-            throw "Sync failed with robocopy exit code $LASTEXITCODE"
+          
+          # Sync only changed files, don't delete anything
+          # /XO = exclude older (don't overwrite newer files)
+          # /XX = exclude extra (don't delete files that don't exist in source)
+          robocopy "$PWD\data" "$target\data" /E /XO /XX /NFL /NDL /NJH /NJS /NP
+          robocopy "$PWD\ldp" "$target\ldp" /E /XO /XX /NFL /NDL /NJH /NJS /NP
+          
+          if (Test-Path "$PWD\file") { 
+            robocopy "$PWD\file" "$target\file" /E /XO /XX /NFL /NDL /NJH /NJS /NP 
+          }
+          if (Test-Path "$PWD\images") { 
+            robocopy "$PWD\images" "$target\images" /E /XO /XX /NFL /NDL /NJH /NJS /NP 
+          }
+          
+          if ($LASTEXITCODE -gt 7) { 
+            Write-Error "Sync failed with code $LASTEXITCODE"
+            exit 1
           }
           $global:LASTEXITCODE = 0
+          
+          Write-Host "Sync complete - only changed files updated"
 
-      - name: Restart ResearchSpace container
+      - name: Verify deployment
         shell: powershell
         run: |
-          $ErrorActionPreference = "Stop"
-          $container = "localhost-researchspace-1"
-
-          docker version
-          $exists = docker ps -a --format "{{.Names}}" | Select-String -SimpleMatch "^$container$"
-          if (-not $exists) {
-            throw "Container '$container' not found. Check the hardcoded container name."
-          }
-
-          docker restart $container
-          if ($LASTEXITCODE -ne 0) {
-            throw "docker restart failed with code $LASTEXITCODE"
+          $url = "http://localhost:10214/"
+          try {
+            $response = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 5
+            Write-Host "Service is responding (HTTP $($response.StatusCode))"
+            Write-Host "Deployment successful - files updated without restart"
+          } catch {
+            Write-Error "Service is not responding at $url"
+            exit 1
           }

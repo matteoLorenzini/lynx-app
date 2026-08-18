@@ -220,7 +220,7 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
                 <div class="rs-resource-data-table">
                   <mp-field-visualization
                     subject='[[this]]'
-                    fields='[[fieldDefinitions denominazione="http://www.siriusplatform-risk-assessment/field/denominazione"  tipologia="http://www.siriusplatform-risk-assessment/field/tipologia" descrizione="http://www.siriusplatform-risk-assessment/field/descrizione" cronologia="http://www.siriusplatform-risk-assessment/field/cronologia" contesto-socio-culturale="http://www.siriusplatform-risk-assessment/field/contesto-socio-culturale" contesto-amministrativo="http://www.siriusplatform-risk-assessment/field/contesto-amministrativo" contesto-finanziario="http://www.siriusplatform-risk-assessment/field/contesto-finanziario" contesto-legale="http://www.siriusplatform-risk-assessment/field/contesto-legale" stakeholders="http://www.siriusplatform-risk-assessment/field/stakeholders" ]]'
+                    [[!--  fields='[[fieldDefinitions denominazione="http://www.siriusplatform-risk-assessment/field/denominazione"  tipologia="http://www.siriusplatform-risk-assessment/field/tipologia" descrizione="http://www.siriusplatform-risk-assessment/field/descrizione" cronologia="http://www.siriusplatform-risk-assessment/field/cronologia" contesto-socio-culturale="http://www.siriusplatform-risk-assessment/field/contesto-socio-culturale" contesto-amministrativo="http://www.siriusplatform-risk-assessment/field/contesto-amministrativo" contesto-finanziario="http://www.siriusplatform-risk-assessment/field/contesto-finanziario" contesto-legale="http://www.siriusplatform-risk-assessment/field/contesto-legale" stakeholders="http://www.siriusplatform-risk-assessment/field/stakeholders" ]]' --]]
                     template='{{> template}}'>
                     <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
                   </mp-field-visualization>
@@ -334,19 +334,19 @@ SELECT DISTINCT ?preview ?previewIiif WHERE {
             </bs-tab-pane>
             <bs-tab-pane event-key="places" mount-on-enter=true>
               <div class="rs-resource-tab-container">
-                [[> sirius:tornado-graph]]
+             [[!-- [[> sirius:tornado-graph]] --]]
               </div>
             </bs-tab-pane>
             [[#if (hasPermission "forms:ldp:*")]]
               <bs-tab-pane event-key="nara-grid" mount-on-enter=true>
                 <div class="rs-resource-tab-container">
-                  [[> sirius:nara-grid]]
+                [[!--  [[> sirius:nara-grid]] --]]
                 </div>
               </bs-tab-pane>
             [[/if]]
             <bs-tab-pane event-key="risk-analysis">
               <div class="rs-resource-tab-container">
-                [[> sirius:risk-analysis]]
+              [[!--  [[> sirius:risk-analysis]] --]]
               </div>
             </bs-tab-pane>
             <bs-tab-pane event-key="cartographic-docs" mount-on-enter=true>

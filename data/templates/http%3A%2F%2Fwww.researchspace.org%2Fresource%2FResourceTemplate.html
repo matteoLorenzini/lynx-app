@@ -19,7 +19,7 @@
   <semantic-query query='PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT  ?label
+SELECT  ?type ?label
 WHERE {
     <[[this]]> a base:E18_Physical_Thing ;
             base:P2_has_type ?type.
@@ -30,7 +30,7 @@ WHERE {
     <template id='breadcrumbTmpl'>
       <li class="active">
         {{#each bindings}}
-          {{label.value}}{{#if @last}}{{else}}; {{/if}}
+          {{type.value}}: {{label.value}}{{#if @last}}{{else}}; {{/if}}
         {{/each}}
       </li>
     </template>

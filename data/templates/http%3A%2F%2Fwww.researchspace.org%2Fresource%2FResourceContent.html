@@ -158,6 +158,41 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
               [[/if]]
             </div>
           </div>
+          <div style="padding: 1.8% 1.5% 1.5% 5%;">
+            [[> resourceHeaderData image=true]]
+            <!-- Inline map next to the image -->
+            <div style="margin-top: 8px;">
+              <semantic-if
+                query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P55_has_current_location> ?c }'
+                then='{{> mapBlock}}' else='{{> mapNoLocation}}'>
+                <template id='mapBlock'>
+                  <div style="height:220px;">
+                    <semantic-map
+                      id='map-result'
+                      query='
+                        PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                        PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
+                        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                        SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
+                          BIND(<[[this]]> AS ?subject)
+                          ?subject base:P1_is_identified_by ?appellation ; base:P55_has_current_location ?coords .
+                          ?appellation a base:E41_Appellation ; skos:prefLabel ?label .
+                        }
+                      '
+                      tuple-template='{{> mapTupleTemplate }}'>
+                      <template id='mapTupleTemplate'>
+                        <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                      </template>
+                    </semantic-map>
+                  </div>
+                </template>
+                <template id='mapNoLocation'>
+                  <div style="font-size:0.8rem;color:#666;">No geolocation available.</div>
+                </template>
+              </semantic-if>
+            </div>
+          </div>
         </div>
       </div>
       [[/block]]
@@ -165,7 +200,14 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
       <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="site-description">
         <div>
           <bs-nav bs-style="tabs">
+            <bs-nav bs-style="tabs">
             <bs-nav-item event-key="site-description">Site Description</bs-nav-item>
+            <bs-nav-item event-key="nara-grid">Nara Grid</bs-nav-item>
+            <bs-nav-item event-key="risk-analysis">Risk Analysis</bs-nav-item>
+            <bs-nav-item event-key="places">Magnitude Scale</bs-nav-item>
+            <bs-nav-item event-key="site-pictures">Site Pictures</bs-nav-item>
+            <bs-nav-item event-key="cartographic-docs">Cartographic Documentation</bs-nav-item>
+          </bs-nav>
           </bs-nav>
           <bs-tab-content animation="true">
             <bs-tab-pane event-key="site-description">
@@ -180,7 +222,7 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
                 <div class="rs-resource-data-table">
                   <mp-field-visualization
                     subject='[[this]]'
-                      fields='[[fieldDefinitions Classification="http://www.lynx-platform.com/field/Classification"  tipologia="http://www.lynx-platform.com/field/Description"  ]]'
+                    fields='[[fieldDefinitions Classification="http://www.lynx-platform.com/field/Classification"  tipologia="http://www.lynx-platform.com/field/Description"  ]]'
                     template='{{> template}}'>
                     <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
                   </mp-field-visualization>

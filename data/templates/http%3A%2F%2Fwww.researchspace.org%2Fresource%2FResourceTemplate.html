@@ -16,25 +16,21 @@
     </li>
 
    [[#block "activeBreadcrumb"]]
-  <semantic-query query='PREFIX rso: <http://www.researchspace.org/ontology/>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-SELECT ?value_appellation ?value_type WHERE {
-  <[[this]]> a base:E18_Physical_Thing ;
-          base:P1_is_identified_by ?appellation ;
-          base:P2_has_type ?type .
-  ?type a crm:E55_Type ;
-      skos:prefLabel ?value_type .
-  ?appellation a crm:E41_Appellation ;
-          skos:prefLabel ?value_appellation .
+  <semantic-query query='PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT  ?label
+WHERE {
+    <[[this]]> a base:E18_Physical_Thing ;
+            base:P2_has_type ?type.
+    ?type base:P2_has_type <http://www.lynx.com/resource/classification> ;
+            rdfs:label ?label .
 }'
     template='{{> breadcrumbTmpl}}'>
     <template id='breadcrumbTmpl'>
       <li class="active">
         {{#each bindings}}
-          {{value_type.value}}: {{value_appellation.value}}{{#if @last}}{{else}}; {{/if}}
+          {{label.value}}{{#if @last}}{{else}}; {{/if}}
         {{/each}}
       </li>
     </template>

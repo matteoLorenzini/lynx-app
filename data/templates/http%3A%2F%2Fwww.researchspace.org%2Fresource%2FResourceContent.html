@@ -158,41 +158,6 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
               [[/if]]
             </div>
           </div>
-          <div style="padding: 1.8% 1.5% 1.5% 5%;">
-            [[> resourceHeaderData image=true]]
-            <!-- Inline map next to the image -->
-            <div style="margin-top: 8px;">
-              <semantic-if
-                query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P55_has_current_location> ?c }'
-                then='{{> mapBlock}}' else='{{> mapNoLocation}}'>
-                <template id='mapBlock'>
-                  <div style="height:220px;">
-                    <semantic-map
-                      id='map-result'
-                      query='
-                        PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                        PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
-                        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                        SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
-                          BIND(<[[this]]> AS ?subject)
-                          ?subject base:P1_is_identified_by ?appellation ; base:P55_has_current_location ?coords .
-                          ?appellation a base:E41_Appellation ; skos:prefLabel ?label .
-                        }
-                      '
-                      tuple-template='{{> mapTupleTemplate }}'>
-                      <template id='mapTupleTemplate'>
-                        <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
-                      </template>
-                    </semantic-map>
-                  </div>
-                </template>
-                <template id='mapNoLocation'>
-                  <div style="font-size:0.8rem;color:#666;">No geolocation available.</div>
-                </template>
-              </semantic-if>
-            </div>
-          </div>
         </div>
       </div>
       [[/block]]

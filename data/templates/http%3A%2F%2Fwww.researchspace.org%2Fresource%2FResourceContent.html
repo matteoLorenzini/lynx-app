@@ -220,7 +220,7 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
                 <div class="rs-resource-data-table">
                   <mp-field-visualization
                     subject='[[this]]'
-                    [[!--  fields='[[fieldDefinitions denominazione="http://www.siriusplatform-risk-assessment/field/denominazione"  tipologia="http://www.siriusplatform-risk-assessment/field/tipologia" descrizione="http://www.siriusplatform-risk-assessment/field/descrizione" cronologia="http://www.siriusplatform-risk-assessment/field/cronologia" contesto-socio-culturale="http://www.siriusplatform-risk-assessment/field/contesto-socio-culturale" contesto-amministrativo="http://www.siriusplatform-risk-assessment/field/contesto-amministrativo" contesto-finanziario="http://www.siriusplatform-risk-assessment/field/contesto-finanziario" contesto-legale="http://www.siriusplatform-risk-assessment/field/contesto-legale" stakeholders="http://www.siriusplatform-risk-assessment/field/stakeholders" ]]' --]]
+                      fields='[[fieldDefinitions Classification="http://www.lynx-platform.com/field/Classification"  tipologia="http://www.lynx-platform.com/field/Description"  ]]' 
                     template='{{> template}}'>
                     <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
                   </mp-field-visualization>

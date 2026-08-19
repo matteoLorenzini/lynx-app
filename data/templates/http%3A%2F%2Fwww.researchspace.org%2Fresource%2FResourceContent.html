@@ -196,21 +196,19 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
         </div>
       </div>
       [[/block]]
-      <!-- Tabs: Site Description, Related Places, Nara Grid -->
-      <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="site-description">
+      <!-- Tabs: Identification, Description, Dimensions & Diagnostic, Provenance, Current Storage Location, Bibliography -->
+      <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="identification">
         <div>
           <bs-nav bs-style="tabs">
-            <bs-nav bs-style="tabs">
-            <bs-nav-item event-key="site-description">Site Description</bs-nav-item>
-            <bs-nav-item event-key="nara-grid">Nara Grid</bs-nav-item>
-            <bs-nav-item event-key="risk-analysis">Risk Analysis</bs-nav-item>
-            <bs-nav-item event-key="places">Magnitude Scale</bs-nav-item>
-            <bs-nav-item event-key="site-pictures">Site Pictures</bs-nav-item>
-            <bs-nav-item event-key="cartographic-docs">Cartographic Documentation</bs-nav-item>
-          </bs-nav>
+            <bs-nav-item event-key="identification">Identification</bs-nav-item>
+            <bs-nav-item event-key="object-description">Description</bs-nav-item>
+            <bs-nav-item event-key="dimensions-diagnostic">Dimensions & Diagnostic</bs-nav-item>
+            <bs-nav-item event-key="provenance">Provenance</bs-nav-item>
+            <bs-nav-item event-key="current-storage-location">Current Storage Location</bs-nav-item>
+            <bs-nav-item event-key="bibliography">Bibliography</bs-nav-item>
           </bs-nav>
           <bs-tab-content animation="true">
-            <bs-tab-pane event-key="site-description">
+            <bs-tab-pane event-key="identification">
               <div class="rs-resource-tab-container">
                 <div>
                   <hr class="rs-resource-section--headerLine">
@@ -222,12 +220,34 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
                 <div class="rs-resource-data-table">
                   <mp-field-visualization
                     subject='[[this]]'
-                    fields='[[fieldDefinitions Classification="http://www.lynx-platform.com/field/Classification"  tipologia="http://www.lynx-platform.com/field/Description"  ]]'
+                    fields='[[fieldDefinitions Unique_ID="http://www.lynx-platform.com/field/Unique_ID"  project_id="http://www.lynx-platform.com/field/project_id" inventory_id="http://www.lynx-platform.com/field/inventory_id"  ]]'
                     template='{{> template}}'>
                     <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
                   </mp-field-visualization>
                 </div>
               </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="object-description">
+              <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions Classification="http://www.lynx-platform.com/field/Classification"  tipologia="http://www.lynx-platform.com/field/Description"  ]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="dimensions-diagnostic">
+              <div class="rs-resource-tab-container"></div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="provenance">
+              <div class="rs-resource-tab-container"></div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="current-storage-location">
+              <div class="rs-resource-tab-container"></div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="bibliography">
+              <div class="rs-resource-tab-container"></div>
             </bs-tab-pane>
           </bs-tab-content>
         </div>

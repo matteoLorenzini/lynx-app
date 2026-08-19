@@ -231,7 +231,7 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
               <div class="rs-resource-data-table">
                   <mp-field-visualization
                     subject='[[this]]'
-                    fields='[[fieldDefinitions Classification="http://www.lynx-platform.com/field/Classification"  tipologia="http://www.lynx-platform.com/field/Description"  ]]'
+                    fields='[[fieldDefinitions Classification="http://www.lynx-platform.com/field/Classification"  tipologia="http://www.lynx-platform.com/field/Description" status="http://www.lynx-platform.com/field/status" material="http://www.lynx-platform.com/field/material" stylistic-notes="http://www.lynx-platform.com/field/stylistic-notes"  ]]'
                     template='{{> template}}'>
                     <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
                   </mp-field-visualization>

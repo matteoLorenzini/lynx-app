@@ -238,7 +238,14 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
                 </div>
             </bs-tab-pane>
             <bs-tab-pane event-key="dimensions-diagnostic">
-              <div class="rs-resource-tab-container"></div>
+              <div class="rs-resource-tab-container">
+                <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions height="http://www.lynx-platform.com/field/height" length="http://www.lynx-platform.com/field/length" width="http://www.lynx-platform.com/field/width" depth="http://www.lynx-platform.com/field/depth" diameter="http://www.lynx-platform.com/field/diameter" TechnicalDiagnosticFeatures="http://www.lynx-platform.com/field/TechnicalDiagnosticFeatures" stateofpreservation="http://www.lynx-platform.com/field/stateofpreservation" ]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+              </div>
             </bs-tab-pane>
             <bs-tab-pane event-key="provenance">
               <div class="rs-resource-tab-container"></div>

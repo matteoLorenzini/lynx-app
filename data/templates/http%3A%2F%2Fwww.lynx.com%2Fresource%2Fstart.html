@@ -17,16 +17,17 @@
                                 rdfs:label ?label .
                     BIND("Object" AS ?typelabel)
                   } UNION {
-                    # Places (E53_Place) - top-level place, labelled via skos:prefLabel
+                    # Places (E53_Place) - typed as cultural-heritage-place/place, labelled via skos:prefLabel
                     ?resource a crm:E53_Place ;
+                              crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
                               crm:P1_is_identified_by ?appellation .
                     ?appellation a crm:E41_Appellation ;
                                  skos:prefLabel ?label .
                     BIND("Place" AS ?typelabel)
                   } UNION {
-                    # Sites (E53_Place) - the place a Place falls within, labelled via rdfs:label
-                    ?place crm:P89_falls_within ?resource .
+                    # Sites (E53_Place) - typed as cultural-heritage-place/site, labelled via rdfs:label
                     ?resource a crm:E53_Place ;
+                              crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
                               crm:P1_is_identified_by ?siteAppellation .
                     ?siteAppellation a crm:E41_Appellation ;
                                      rdfs:label ?label .
@@ -184,8 +185,7 @@ SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previe
                 query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                        SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
                            ?subject a crm:E53_Place ;
-                                   crm:P168_place_is_defined_by ?coords ;
-                                   crm:P89_falls_within ?site .
+                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> .
                        }"
                 template="{{#each bindings}}Found {{num.value}} places{{/each}}"
             ></semantic-query>
@@ -202,8 +202,7 @@ SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previe
                        
                        SELECT DISTINCT ?subject ?label WHERE {
                            ?subject a crm:E53_Place ;
-                                   crm:P168_place_is_defined_by ?coords ;
-                                   crm:P89_falls_within ?site ;
+                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
                                    crm:P1_is_identified_by ?appellation .
                            ?appellation a crm:E41_Appellation ;
                                        skos:prefLabel ?label .
@@ -223,8 +222,8 @@ SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previe
             <semantic-query
                 query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                        SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
-                           ?place crm:P89_falls_within ?subject .
-                           ?subject a crm:E53_Place .
+                           ?subject a crm:E53_Place ;
+                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> .
                        }"
                 template="{{#each bindings}}Found {{num.value}} sites{{/each}}"
             ></semantic-query>
@@ -240,9 +239,8 @@ SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previe
                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                        
                        SELECT DISTINCT ?subject ?label WHERE {
-                           ?place crm:P89_falls_within ?subject .
                            ?subject a crm:E53_Place ;
-                                   crm:P168_place_is_defined_by ?coords ;
+                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
                                    crm:P1_is_identified_by ?appellation .
                            ?appellation a crm:E41_Appellation ;
                                        rdfs:label ?label .

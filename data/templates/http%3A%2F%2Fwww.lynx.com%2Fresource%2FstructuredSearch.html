@@ -71,23 +71,23 @@
   relations='{
     "<http://www.lynx.com/resource/field/material>": [{
       "kind": "resource",
-      "queryPattern": "{$subject a base:E18_Physical_Thing ; base:P45_consists_of ?__value__ . ?__value__ a base:E57_Material .}"
+      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P45_consists_of ?__value__ . ?__value__ a crm:E57_Material .}"
     }],
     "<http://www.lynx.com/resource/field/status>": [{
       "kind": "resource",
-      "queryPattern": "{$subject a base:E18_Physical_Thing ; base:P2_has_type ?__value__ . ?__value__ base:P2_has_type <http://www.lynx.com/resource/status> .}"
+      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P2_has_type ?__value__ . ?__value__ crm:P2_has_type <http://www.lynx.com/resource/status> .}"
     }],
     "<http://www.lynx.com/resource/field/condition_state>": [{
       "kind": "resource",
-      "queryPattern": "{$subject a base:E18_Physical_Thing ; base:P44_has_condition ?__value__ . ?__value__ a base:E3_Condition_State .}"
+      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P44_has_condition ?__value__ . ?__value__ a crm:E3_Condition_State .}"
     }],
     "<http://www.lynx.com/resource/field/depth>": [{
       "kind": "numeric-range",
       "datatype": "http://www.w3.org/2001/XMLSchema#decimal",
       "queryPattern": "{
-        $subject a base:E18_Physical_Thing ;
-                 base:P43_has_dimension ?dimension .
-        ?dimension base:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/depth> ;
+        $subject a crm:E18_Physical_Thing ;
+                 crm:P43_has_dimension ?dimension .
+        ?dimension crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/depth> ;
                    rdfs:label ?dimensionLabel .
         BIND(<http://www.w3.org/2001/XMLSchema#decimal>(REPLACE(STR(?dimensionLabel), \",\", \".\")) AS ?score)
         FILTER(?score <= ?__numericRangeEndValue__) .
@@ -98,9 +98,9 @@
       "kind": "numeric-range",
       "datatype": "http://www.w3.org/2001/XMLSchema#decimal",
       "queryPattern": "{
-        $subject a base:E18_Physical_Thing ;
-                 base:P43_has_dimension ?dimension .
-        ?dimension base:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/height> ;
+        $subject a crm:E18_Physical_Thing ;
+                 crm:P43_has_dimension ?dimension .
+        ?dimension crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/height> ;
                    rdfs:label ?dimensionLabel .
         BIND(<http://www.w3.org/2001/XMLSchema#decimal>(REPLACE(STR(?dimensionLabel), \",\", \".\")) AS ?score)
         FILTER(?score <= ?__numericRangeEndValue__) .
@@ -111,9 +111,9 @@
       "kind": "numeric-range",
       "datatype": "http://www.w3.org/2001/XMLSchema#decimal",
       "queryPattern": "{
-        $subject a base:E18_Physical_Thing ;
-                 base:P43_has_dimension ?dimension .
-        ?dimension base:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/lenght> ;
+        $subject a crm:E18_Physical_Thing ;
+                 crm:P43_has_dimension ?dimension .
+        ?dimension crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/lenght> ;
                    rdfs:label ?dimensionLabel .
         BIND(<http://www.w3.org/2001/XMLSchema#decimal>(REPLACE(STR(?dimensionLabel), \",\", \".\")) AS ?score)
         FILTER(?score <= ?__numericRangeEndValue__) .

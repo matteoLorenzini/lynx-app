@@ -163,26 +163,30 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
             <!-- Inline map next to the image -->
             <div style="margin-top: 8px;">
               <semantic-if
-                query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P55_has_current_location> ?c }'
+                query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P53_has_former_or_current_location> ?c }'
                 then='{{> mapBlock}}' else='{{> mapNoLocation}}'>
                 <template id='mapBlock'>
                   <div style="height:220px;">
                     <semantic-map
                       id='map-result'
                       query='
-                        PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                        PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
+                        PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
                         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                        SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+                        SELECT (CONCAT("Point(", STR(?label), ")") AS ?wkt) ?site ?label WHERE {
                           BIND(<[[this]]> AS ?subject)
-                          ?subject base:P1_is_identified_by ?appellation ; base:P55_has_current_location ?coords .
-                          ?appellation a base:E41_Appellation ; skos:prefLabel ?label .
+                          ?subject a crm:E18_Physical_Thing ;
+                                   crm:P53_has_former_or_current_location ?site.
+                          ?site a crm:E53_Place;
+                                crm:P2_has_type <http://www.lynx.com/resource/site-of-discovery>;
+                                crm:P168_place_is_defined_by ?literal.
+                          ?literal rdfs:label ?label
                         }
                       '
                       tuple-template='{{> mapTupleTemplate }}'>
                       <template id='mapTupleTemplate'>
-                        <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                        <semantic-link iri="{{site.value}}">{{label.value}}</semantic-link>
                       </template>
                     </semantic-map>
                   </div>

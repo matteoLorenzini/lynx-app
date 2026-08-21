@@ -77,31 +77,65 @@
         </div>
       </div>
       
-      <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="place-description">
-        <div>
-          <bs-nav bs-style="tabs">
-            <bs-nav-item event-key="place-description">Place Description</bs-nav-item>
-          </bs-nav>
-          <bs-tab-content animation="true">
-            <bs-tab-pane event-key="place-description">
-              <div class="rs-resource-tab-container">
-                <div>
-                  <hr class="rs-resource-section--headerLine">
-                  <span class="h1 rs-resource-section--header">Place Information</span>
-                </div>
-                <div class="rs-resource-data-table">
-                  <mp-field-visualization
-                    subject='[[this]]'
-                    fields='[[fieldDefinitions fallswithin="http://www.lynx-platform.com/field/fallswithin"]]'
-                    template='{{> template}}'>
-                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
-                  </mp-field-visualization>
-                </div>
-              </div>
-            </bs-tab-pane>
-          </bs-tab-content>
-        </div>
-      </bs-tab-container>
+      <!-- E53_Place covers both Place and Site instances; branch on P2_has_type since rdf:type alone can't tell them apart -->
+      <semantic-if
+        query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> <http://www.lynx.com/resource/cultural-heritage-place/site> }'
+        then='{{> siteTabs}}' else='{{> placeTabs}}'>
+        <template id='placeTabs'>
+          <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="place-description">
+            <div>
+              <bs-nav bs-style="tabs">
+                <bs-nav-item event-key="place-description">Place Description</bs-nav-item>
+              </bs-nav>
+              <bs-tab-content animation="true">
+                <bs-tab-pane event-key="place-description">
+                  <div class="rs-resource-tab-container">
+                    <div>
+                      <hr class="rs-resource-section--headerLine">
+                      <span class="h1 rs-resource-section--header">Place Information</span>
+                    </div>
+                    <div class="rs-resource-data-table">
+                      <mp-field-visualization
+                        subject='[[this]]'
+                        fields='[[fieldDefinitions fallswithin="http://www.lynx-platform.com/field/fallswithin"]]'
+                        template='{{> template}}'>
+                        <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                      </mp-field-visualization>
+                    </div>
+                  </div>
+                </bs-tab-pane>
+              </bs-tab-content>
+            </div>
+          </bs-tab-container>
+        </template>
+        <template id='siteTabs'>
+          <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="site-description">
+            <div>
+              <bs-nav bs-style="tabs">
+                <bs-nav-item event-key="site-description">Site Description</bs-nav-item>
+              </bs-nav>
+              <bs-tab-content animation="true">
+                <bs-tab-pane event-key="site-description">
+                  <div class="rs-resource-tab-container">
+                    <div>
+                      <hr class="rs-resource-section--headerLine">
+                      <span class="h1 rs-resource-section--header">Site Information</span>
+                    </div>
+                    <div class="rs-resource-data-table">
+                      <mp-field-visualization
+                        subject='[[this]]'
+                        fields='[[fieldDefinitions fallswithin="http://www.lynx-platform.com/field/fallswithin"]]'
+                        template='{{> template}}'>
+                        <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                      </mp-field-visualization>
+                    </div>
+                  </div>
+                </bs-tab-pane>
+              </bs-tab-content>
+            </div>
+          </bs-tab-container>
+        </template>
+      </semantic-if>
     </div>
   </template>
 </with-types>

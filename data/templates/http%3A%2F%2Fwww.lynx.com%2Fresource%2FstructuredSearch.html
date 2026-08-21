@@ -1,0 +1,362 @@
+<semantic-search
+  search-profile='{
+    "categories": [
+      {
+        "iri":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "label":"Object",
+        "thumbnail": "../assets/images/icons/rs-icons/place.svg"
+      },
+      {
+        "iri":"<http://www.cidoc-crm.org/cidoc-crm/E57_Material>",
+        "label":"Material",
+        "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
+      },
+      {
+        "iri":"<http://www.cidoc-crm.org/cidoc-crm/E55_Type>",
+        "label":"Status",
+        "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
+      },
+      {
+        "iri":"<http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State>",
+        "label":"Condition State",
+        "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
+      },
+      {
+        "iri": "<http://www.w3.org/2001/XMLSchema#decimal>",
+        "label": "Measurement",
+        "thumbnail": "../assets/images/icons/rs-icons/height.svg"
+      }
+    ],
+
+    "relations": [
+      {
+        "iri":"<http://www.lynx.com/resource/field/material>",
+        "label":"Material",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E57_Material>"
+      },
+      {
+        "iri":"<http://www.lynx.com/resource/field/status>",
+        "label":"Status",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E55_Type>"
+      },
+      {
+        "iri":"<http://www.lynx.com/resource/field/condition_state>",
+        "label":"Condition State",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State>"
+      },
+      {
+        "iri":"<http://www.lynx.com/resource/field/depth>",
+        "label":"Depth (cm)",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.w3.org/2001/XMLSchema#decimal>"
+      },
+      {
+        "iri":"<http://www.lynx.com/resource/field/height>",
+        "label":"Height (cm)",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.w3.org/2001/XMLSchema#decimal>"
+      },
+      {
+        "iri":"<http://www.lynx.com/resource/field/lenght>",
+        "label":"Length (cm)",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.w3.org/2001/XMLSchema#decimal>"
+      }
+    ]
+  }'
+
+  relations='{
+    "<http://www.lynx.com/resource/field/material>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a base:E18_Physical_Thing ; base:P45_consists_of ?__value__ . ?__value__ a base:E57_Material .}"
+    }],
+    "<http://www.lynx.com/resource/field/status>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a base:E18_Physical_Thing ; base:P2_has_type ?__value__ . ?__value__ base:P2_has_type <http://www.lynx.com/resource/status> .}"
+    }],
+    "<http://www.lynx.com/resource/field/condition_state>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a base:E18_Physical_Thing ; base:P44_has_condition ?__value__ . ?__value__ a base:E3_Condition_State .}"
+    }],
+    "<http://www.lynx.com/resource/field/depth>": [{
+      "kind": "numeric-range",
+      "datatype": "http://www.w3.org/2001/XMLSchema#decimal",
+      "queryPattern": "{
+        $subject a base:E18_Physical_Thing ;
+                 base:P43_has_dimension ?dimension .
+        ?dimension base:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/depth> ;
+                   rdfs:label ?dimensionLabel .
+        BIND(<http://www.w3.org/2001/XMLSchema#decimal>(REPLACE(STR(?dimensionLabel), \",\", \".\")) AS ?score)
+        FILTER(?score <= ?__numericRangeEndValue__) .
+        FILTER(?score >= ?__numericRangeBeginValue__) .
+      }"
+    }],
+    "<http://www.lynx.com/resource/field/height>": [{
+      "kind": "numeric-range",
+      "datatype": "http://www.w3.org/2001/XMLSchema#decimal",
+      "queryPattern": "{
+        $subject a base:E18_Physical_Thing ;
+                 base:P43_has_dimension ?dimension .
+        ?dimension base:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/height> ;
+                   rdfs:label ?dimensionLabel .
+        BIND(<http://www.w3.org/2001/XMLSchema#decimal>(REPLACE(STR(?dimensionLabel), \",\", \".\")) AS ?score)
+        FILTER(?score <= ?__numericRangeEndValue__) .
+        FILTER(?score >= ?__numericRangeBeginValue__) .
+      }"
+    }],
+    "<http://www.lynx.com/resource/field/lenght>": [{
+      "kind": "numeric-range",
+      "datatype": "http://www.w3.org/2001/XMLSchema#decimal",
+      "queryPattern": "{
+        $subject a base:E18_Physical_Thing ;
+                 base:P43_has_dimension ?dimension .
+        ?dimension base:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/lenght> ;
+                   rdfs:label ?dimensionLabel .
+        BIND(<http://www.w3.org/2001/XMLSchema#decimal>(REPLACE(STR(?dimensionLabel), \",\", \".\")) AS ?score)
+        FILTER(?score <= ?__numericRangeEndValue__) .
+        FILTER(?score >= ?__numericRangeBeginValue__) .
+      }"
+    }]
+  }'
+  >
+  
+  <semantic-search-query-keyword domain='<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>' query='
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    
+    SELECT ?subject 
+    WHERE {
+      ?subject a crm:E18_Physical_Thing ; 
+               crm:P1_is_identified_by ?name_identifier . 
+      ?name_identifier a crm:E41_Appellation ;
+                       skos:prefLabel ?label .
+      FILTER REGEX(STR(?label), ?__token__, "i") 
+    } 
+  ' default-query='
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    
+    SELECT DISTINCT ?subject ?label 
+    WHERE { 
+      ?subject a crm:E18_Physical_Thing
+    }
+  ' debounce=500></semantic-search-query-keyword>
+  
+  <div data-flex-layout="row stretch-stretch">
+    <div data-flex-self="size-1of3" style="flex: 0 0 20px;">
+      <semantic-search-facet></semantic-search-facet>
+    </div>
+    
+    <semantic-search-result-holder>
+      <div data-flex-self="md-full">
+        <semantic-search-result id='result-count'>
+          <mp-sparql-result-counts id='query-count' query="SELECT DISTINCT * {}" template='{{#if hasLimit}} <bs-alert bs-style="warning">
+            Showing {{numberOfResults}} of {{totalNumberOfResults}} matches. <strong>Please, refine your search.</strong> </bs-alert>
+            {{else}}<span> found {{numberOfResults}} matches </span>{{/if}}'>
+          </mp-sparql-result-counts>
+        </semantic-search-result>
+        
+        <bs-tabs unmount-on-exit=true id='search-results' animation=false>
+          <bs-tab event-key="2" title="Grid">
+            <semantic-search-result id='grid-result'>
+              <div class="card-container">
+                <semantic-table
+                  id="grid-table"
+                  prefetch-labels="false"
+                  query='
+                    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+
+                    SELECT ?subject ?value ?label_type ?note ?preview ?previewStr ?previewImageStr WHERE {
+                      {
+                        SELECT ?subject ?value (SAMPLE(?preview_) AS ?preview) (SAMPLE(?rand_) AS ?rand_) WHERE {
+                          ?subject a crm:E18_Physical_Thing ;
+                                   crm:P1_is_identified_by ?appellation .
+                          ?appellation a crm:E41_Appellation ;
+                                      skos:prefLabel ?value .
+                          OPTIONAL { ?subject crm:P3_has_note ?note_ . }
+                          OPTIONAL {
+                            ?subject crm:P2_has_type ?type .
+                            ?type a crm:E55_Type ;
+                                  skos:prefLabel ?label_type .
+                          }
+                          # collect previews from documents but SAMPLE ensures only one preview per subject
+                          OPTIONAL {
+                            ?subject crm:P70i_is_documented_in ?document .
+                            ?document a crm:E31_Document .
+                            OPTIONAL { ?document pico:preview ?preview_ . }
+                          }
+                          BIND(DAY(NOW()) AS ?day)
+                          BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?rand_)
+                        }
+                        GROUP BY ?subject ?value
+                      }
+
+                      OPTIONAL { BIND(STRAFTER(STR(?preview), "") AS ?previewStr) }
+                      BIND( IF( BOUND(?preview) && REGEX(STR(?preview), "\\.(jpg|jpeg|png|gif|webp)$", "i"), STR(?preview), "" ) AS ?previewImageStr )
+                    }
+                    ORDER BY ?value
+                  '
+                  tuple-template="{{> cardTemplate}}"
+                  number-of-displayed-rows="12"
+                  no-result-template='<bs-panel class="info">No matches found</bs-panel>'
+                  options='{"showFilter":false,"pageSizeSelection":[6,12,24,48]}'>
+                  <template id="cardTemplate">
+                    <bs-col sm="4" style="margin-bottom: 20px;">
+                      <div class="panel panel-default" style="height: 380px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
+                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 15px;">
+                          
+                          <div style="height:140px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
+                            {{#if previewImageStr.value}}
+                              <a href="{{preview.value}}" target="_blank" rel="noopener">
+                                <img src="{{preview.value}}" alt="{{value.value}}"
+                                     style="max-width:100%; max-height:140px; object-fit:cover; border-radius:4px;"
+                                     onerror="this.onerror=null;this.src='../assets/images/icons/rs-icons/place.svg';" />
+                              </a>
+                            {{else}}
+                              {{#if preview.value}}
+                                <a href="{{preview.value}}" target="_blank" rel="noopener">
+                                  <mp-resource-thumbnail iri="{{preview.value}}"
+                                                        no-image-uri="../assets/images/icons/rs-icons/place.svg"
+                                                        style="max-width:100%; max-height:140px; display:block;" />
+                                </a>
+                              {{else}}
+                                <img src="../assets/images/icons/rs-icons/place.svg" alt="No image"
+                                     style="width:72px;height:72px;object-fit:contain;border-radius:4px;" />
+                              {{/if}}
+                            {{/if}}
+                          </div>
+
+                          <h4 style="margin: 0 0 10px 0; color: #337ab7; min-height: 50px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3;">
+                            <semantic-link iri="{{subject.value}}">
+                              {{value.value}}
+                            </semantic-link>
+                          </h4>
+                          
+                          {{#if label_type.value}}
+                          <p style="margin: 5px 0;">
+                            <strong>Type:</strong> 
+                            <span class="label label-info" style="font-size: 11px;">{{label_type.value}}</span>
+                          </p>
+                          {{/if}}
+                          
+                          <p style="margin: 5px 0; color: #666; flex: 1; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; font-size: 12px; line-height: 1.4;">
+                            <strong>Description:</strong><br/>
+                            {{#if note.value}}
+                              {{note.value}}
+                            {{else}}
+                              <em>No description available</em>
+                            {{/if}}
+                          </p>
+                          
+                          <div style="margin-top: auto; padding-top: 10px;">
+                            <semantic-link iri="{{subject.value}}" class="btn btn-primary btn-sm btn-block">
+                              View Details
+                            </semantic-link>
+                          </div>
+                        </div>
+                      </div>
+                    </bs-col>
+                  </template>
+                </semantic-table>
+              </div>
+            </semantic-search-result>
+          </bs-tab>
+          
+          <bs-tab event-key="3" title="Table">
+            <semantic-search-result id='table-result-wrapper'>
+              <semantic-table id='table-result' query="
+              PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+              PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+              
+              SELECT DISTINCT ?subject ?value ?label_type ?note
+              WHERE { 
+                ?subject a crm:E18_Physical_Thing ;
+                         crm:P1_is_identified_by ?identifier .
+                ?identifier a crm:E42_Identifier ;
+                            crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
+                            rdfs:label ?value .
+                
+                OPTIONAL {
+                  ?subject crm:P67i_is_referred_to_by ?description .
+                  ?description a crm:E33_Linguistic_Object ;
+                               crm:P2_has_type <http://www.lynx.com/resource/description-notes> ;
+                               rdfs:label ?note .
+                }
+                
+                OPTIONAL {
+                  ?subject crm:P2_has_type ?type .
+                  ?type a crm:E55_Type ;
+                        crm:P2_has_type <http://www.lynx.com/resource/classification> ;
+                        rdfs:label ?label_type .
+                }
+              }
+              ORDER BY ?value
+              " column-configuration='[
+              {
+                "displayName": "Site", 
+                "cellTemplate": "<semantic-link iri=\"{{subject.value}}\">{{value.value}}</semantic-link>" 
+              },
+              {
+                "displayName": "Type", 
+                "cellTemplate": "<div>{{label_type.value}}</div>" 
+              },
+              {
+                "displayName": "Description", 
+                "cellTemplate": "<div>{{note.value}}</div>" 
+              }]' options='{"showFilter":true, "resultsPerPage":10}'>
+              </semantic-table>
+            </semantic-search-result>
+          </bs-tab>
+          
+          <bs-tab event-key="4" title="Map">
+            <semantic-search-result id='map-result-wrapper'>
+              <div style='height: 30vw;'>
+                <semantic-map id='map-result' query='
+                PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                
+                SELECT DISTINCT (CONCAT("Point(", STR(?label), ")") AS ?wkt) ?label ?subject WHERE {
+                  ?subject a crm:E18_Physical_Thing ;
+                           crm:P53_has_former_or_current_location ?site .
+                  ?site a crm:E53_Place ;
+                        crm:P2_has_type <http://www.lynx.com/resource/site-of-discovery> ;
+                        crm:P168_place_is_defined_by ?literal .
+                  ?literal rdfs:label ?label
+                }
+                ' tuple-template='{{> template }}'>
+                <template id='template'>
+                  <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                </template>
+              </semantic-map>
+            </div>
+          </semantic-search-result>
+        </bs-tab>
+      </bs-tabs>
+
+      <bs-panel>
+        <semantic-search-result id='csv-download-wrapper'>
+          <mp-sparql-download id='csv-download' query="SELECT * WHERE { }" header="text/csv"
+          filename="csv-result.csv">
+          <button class="btn btn-default">Download CSV</button>
+        </mp-sparql-download>
+      </semantic-search-result>
+      <semantic-search-result id='json-download-wrapper'>
+        <mp-sparql-download id='json-download' query="SELECT * WHERE { }" header="application/sparql-results+json"
+        filename="json-result.json">
+        <button class="btn btn-default">Download JSON</button>
+      </mp-sparql-download>
+    </semantic-search-result>
+  </bs-panel>
+</div>

@@ -268,7 +268,14 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
               </div>
             </bs-tab-pane>
             <bs-tab-pane event-key="bibliography">
-              <div class="rs-resource-tab-container"></div>
+              <div class="rs-resource-tab-container">
+                <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions  bibliography="http://www.lynx-platform.com/field/bibliography"  ]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+              </div>
             </bs-tab-pane>
           </bs-tab-content>
         </div>

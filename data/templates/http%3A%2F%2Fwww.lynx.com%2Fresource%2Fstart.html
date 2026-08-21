@@ -1,7 +1,447 @@
-<div class="test-template">
-  <h1>Test Template</h1>
-  <p>This is a sample template for testing.</p>
-  <ul>
-    <li>Template loaded successfully</li>
-   </ul>
+<div class="bso-component home-search">
+    <bs-col md="10" md-offset="1">
+        <div class="bso-component simple-search">
+            <semantic-simple-search
+              query='
+                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                
+                SELECT DISTINCT ?resource ?label ?typelabel WHERE {
+                  {
+                    # Objects (E18_Physical_Thing) - labelled by their general-id E42_Identifier
+                    ?resource a crm:E18_Physical_Thing ;
+                              crm:P1_is_identified_by ?identifier .
+                    ?identifier a crm:E42_Identifier ;
+                                crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
+                                rdfs:label ?label .
+                    BIND("Object" AS ?typelabel)
+                  } UNION {
+                    # Places (E53_Place) - top-level place, labelled via skos:prefLabel
+                    ?resource a crm:E53_Place ;
+                              crm:P1_is_identified_by ?appellation .
+                    ?appellation a crm:E41_Appellation ;
+                                 skos:prefLabel ?label .
+                    BIND("Place" AS ?typelabel)
+                  } UNION {
+                    # Sites (E53_Place) - the place a Place falls within, labelled via rdfs:label
+                    ?place crm:P89_falls_within ?resource .
+                    ?resource a crm:E53_Place ;
+                              crm:P1_is_identified_by ?siteAppellation .
+                    ?siteAppellation a crm:E41_Appellation ;
+                                     rdfs:label ?label .
+                    BIND("Site" AS ?typelabel)
+                  } UNION {
+                    # Agents (E39_Actor)
+                    ?resource a crm:E39_Actor ;
+                              rdfs:label ?label .
+                    BIND("Agent" AS ?typelabel)
+                  } UNION {
+                    # Events (E5_Event)
+                    ?resource a crm:E5_Event ;
+                              rdfs:label ?label .
+                    BIND("Event" AS ?typelabel)
+                  } UNION {
+                    # Object Types (E55_Type classification)
+                    ?resource a crm:E55_Type ;
+                              crm:P2_has_type <http://www.lynx.com/resource/classification> ;
+                              rdfs:label ?label .
+                    BIND("Object Type" AS ?typelabel)
+                  }
+                  
+                  FILTER REGEX(?label, ?__token__, "i")
+                } 
+                LIMIT 10'
+              template='<span style="color: blue;" title="{{resource.value}}">{{label.value}} <em style="color: #999;">({{typelabel.value}})</em></span>'
+              input-placeholder='Search for objects, sites, places, agents, events, types...'
+            >
+            </semantic-simple-search>
+        </div>
+    </bs-col>
+</div>
+
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Objects</h3>
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       SELECT (COUNT(?subject) as ?num) WHERE {
+                           ?subject a crm:E18_Physical_Thing .
+                       }"
+                template="{{#each bindings}}Found {{num.value}} objects{{/each}}"
+            ></semantic-query>
+            <div class="bottom">
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search">
+                    See all
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                   PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                   PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+                   PREFIX rs: <http://www.researchspace.org/ontology/>
+                   PREFIX a-cd: <https://w3id.org/arco/ontology/context-description/>
+
+SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previewImageStr ?rand WHERE {
+  {
+    SELECT ?subject ?label (SAMPLE(?preview_) AS ?preview) (SAMPLE(?rand_) AS ?rand) WHERE {
+      ?subject a crm:E18_Physical_Thing ;
+               crm:P1_is_identified_by ?identifier .
+      ?identifier a crm:E42_Identifier ;
+                  crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
+                  rdfs:label ?label .
+      OPTIONAL {
+        {
+          ?subject crm:P70i_is_documented_in ?document .
+          ?document a crm:E31_Document .
+          OPTIONAL { ?document pico:preview ?preview_ . }
+        }
+        UNION
+        {
+          ?subject crm:P138i_has_representation ?preview_ .
+          FILTER NOT EXISTS { ?preview_ rdf:type a-cd:GraphicOrCartographicDocumentation . }
+          FILTER NOT EXISTS { ?preview_ crm:P2_has_type a-cd:GraphicOrCartographicDocumentation . }
+        }
+      }
+      BIND(DAY(NOW()) AS ?day)
+      BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?rand_)
+    }
+    GROUP BY ?subject ?label
+  }
+
+  BIND(IF(BOUND(?preview), STR(?preview), "") AS ?previewStr)
+  BIND(
+    IF(
+      STRSTARTS(?previewStr, "http://"),
+      CONCAT("https://", STRAFTER(?previewStr, "http://")),
+      ?previewStr
+    ) AS ?previewSafeStr
+  )
+  OPTIONAL { ?preview rs:PX_has_file_name ?previewFileName . }
+  BIND(IF(REGEX(?previewStr, "/resource/EX_File/", "i"), REPLACE(?previewStr, "^.*/EX_File/", ""), "") AS ?previewFileFromIri)
+  BIND(COALESCE(STR(?previewFileName), ?previewFileFromIri, "") AS ?previewFileAny)
+  BIND(
+    IF(
+      STRLEN(?previewFileAny) > 0,
+      CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?previewFileAny), "/full/!700,700/0/default.jpg"),
+      IF(REGEX(?previewSafeStr, "^https://", "i"), ?previewSafeStr, "")
+    ) AS ?previewIiif
+  )
+  BIND(IF(STRLEN(?previewIiif) > 0, ?previewIiif, "") AS ?previewImageStr)
+} ORDER BY ?rand LIMIT 10' template='{{> siteCardGrid}}'>
+              <template id="siteCardGrid">
+              <style>
+                .site-grid { display:flex; flex-wrap:wrap; gap:12px; }
+                .site-card { width:200px; border:1px solid #ddd; border-radius:6px; overflow:hidden; background:#fff; text-align:center; }
+                .site-card .thumb { height:140px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; }
+                .site-card img { max-width:100%; max-height:140px; object-fit:contain; display:block; border-radius:4px; }
+                .site-card mp-resource-thumbnail { max-width:100%; max-height:140px; display:block; }
+                .site-card .label { padding:10px 8px; font-size:.95rem; line-height:1.2em; height:48px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; color:#000; }
+                .site-card .label a, .site-card .label semantic-link { color:#000; text-decoration:none; }
+                .site-card a { color:inherit; text-decoration:none; }
+              </style>
+
+              {{#if bindings}}
+                <div class="site-grid">
+                  {{#each bindings}}
+                    <div class="site-card">
+                      <div class="thumb">
+                        {{#with this}}
+                          {{#if previewImageStr.value}}
+                            <a href="{{previewSafeStr.value}}" target="_blank" rel="noopener">
+                              <img src="{{previewIiif.value}}" alt="{{label.value}}" loading="lazy"
+                                   onerror="this.onerror=null;this.src='/images/help/thenounproject/noun_1113333.svg';this.style.objectFit='contain';" />
+                            </a>
+                          {{else}}
+                            {{#if preview.value}}
+                              <!-- preview exists but is not a direct image URL: use platform thumbnail rendering -->
+                              <a href="{{subject.value}}">
+                                <mp-resource-thumbnail iri="{{preview.value}}" no-image-uri="/images/help/thenounproject/noun_1113333.svg" />
+                              </a>
+                            {{else}}
+                              <!-- no preview at all: show static icon to avoid fetch/errors -->
+                              <a href="{{subject.value}}">
+                                <img src="/images/help/thenounproject/noun_1113333.svg" alt="No image" style="width:72px;height:72px;object-fit:contain;" />
+                              </a>
+                            {{/if}}
+                          {{/if}}
+                        {{/with}}
+                      </div>
+                      <div class="label">
+                        <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                      </div>
+                    </div>
+                  {{/each}}
+                </div>
+              {{else}}
+                <div style="color:#666">No objects</div>
+              {{/if}}
+            </template>
+            </semantic-query>
+        </bs-col>
+    </bs-row>
+</div>
+
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Places</h3>
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
+                           ?subject a crm:E53_Place ;
+                                   crm:P168_place_is_defined_by ?coords ;
+                                   crm:P89_falls_within ?site .
+                       }"
+                template="{{#each bindings}}Found {{num.value}} places{{/each}}"
+            ></semantic-query>
+            <div class="bottom">
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-place">
+                    See all
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                       
+                       SELECT DISTINCT ?subject ?label WHERE {
+                           ?subject a crm:E53_Place ;
+                                   crm:P168_place_is_defined_by ?coords ;
+                                   crm:P89_falls_within ?site ;
+                                   crm:P1_is_identified_by ?appellation .
+                           ?appellation a crm:E41_Appellation ;
+                                       skos:prefLabel ?label .
+                           BIND(DAY(NOW()) as ?day)
+                           BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
+                       } ORDER BY ?random LIMIT 10"
+                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; align-items: center; justify-content: center;'><h5 style='margin: 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;'><semantic-link iri='{{subject.value}}'>{{label.value}}</semantic-link></h5></div></div>{{/each}}"
+            ></semantic-query>
+        </bs-col>
+    </bs-row>
+</div>
+
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Sites</h3>
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
+                           ?place crm:P89_falls_within ?subject .
+                           ?subject a crm:E53_Place .
+                       }"
+                template="{{#each bindings}}Found {{num.value}} sites{{/each}}"
+            ></semantic-query>
+            <div class="bottom">
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-site">
+                    See all
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                       
+                       SELECT DISTINCT ?subject ?label WHERE {
+                           ?place crm:P89_falls_within ?subject .
+                           ?subject a crm:E53_Place ;
+                                   crm:P168_place_is_defined_by ?coords ;
+                                   crm:P1_is_identified_by ?appellation .
+                           ?appellation a crm:E41_Appellation ;
+                                       rdfs:label ?label .
+                           BIND(DAY(NOW()) as ?day)
+                           BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
+                       } ORDER BY ?random LIMIT 10"
+                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; align-items: center; justify-content: center;'><h5 style='margin: 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;'><semantic-link iri='{{subject.value}}'>{{label.value}}</semantic-link></h5></div></div>{{/each}}"
+            ></semantic-query>
+        </bs-col>
+    </bs-row>
+</div>
+
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Object Typology</h3>
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
+                           ?subject a crm:E55_Type ;
+                                   crm:P2_has_type <http://www.lynx.com/resource/classification> .
+                           ?object crm:P2_has_type ?subject .
+                           ?object a crm:E18_Physical_Thing .
+                       }"
+                template="{{#each bindings}}Found {{num.value}} types{{/each}}"
+            ></semantic-query>
+            <div class="bottom">
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search">
+                    See all objects
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                       
+                       SELECT DISTINCT ?subject ?label (COUNT(?object) as ?objectCount) WHERE {
+                           ?subject a crm:E55_Type ;
+                                   crm:P2_has_type <http://www.lynx.com/resource/classification> ;
+                                   rdfs:label ?label .
+                           ?object a crm:E18_Physical_Thing ;
+                                   crm:P2_has_type ?subject .
+                           BIND(DAY(NOW()) as ?day)
+                           BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
+                       } 
+                       GROUP BY ?subject ?label ?random
+                       ORDER BY ?random 
+                       LIMIT 10"
+                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;'><h5 style='margin: 0 0 5px 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;'><semantic-link iri='{{subject.value}}'>{{label.value}}</semantic-link></h5><small style='color: #666;'>{{objectCount.value}} objects</small></div></div>{{/each}}"
+            ></semantic-query>
+        </bs-col>
+    </bs-row>
+</div>
+
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Events</h3>
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
+                           ?subject a crm:E5_Event .
+                       }"
+                template="{{#each bindings}}Found {{num.value}} events{{/each}}"
+            ></semantic-query>
+            <div class="bottom">
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-event">
+                    See all
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                       
+                       SELECT DISTINCT ?subject ?label (COUNT(?site) as ?siteCount) WHERE {
+                           ?subject a crm:E5_Event ;
+                                   rdfs:label ?label .
+                           OPTIONAL {
+                               ?subject crm:P31_has_modified ?site .
+                               ?site a crm:E18_Physical_Thing .
+                           }
+                           BIND(DAY(NOW()) as ?day)
+                           BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
+                       } 
+                       GROUP BY ?subject ?label ?random
+                       ORDER BY ?random 
+                       LIMIT 10"
+                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;'><h5 style='margin: 0 0 5px 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;'><semantic-link iri='{{subject.value}}'>{{label.value}}</semantic-link></h5><small style='color: #666;'>{{siteCount.value}} sites</small></div></div>{{/each}}"
+            ></semantic-query>
+        </bs-col>
+    </bs-row>
+</div>
+
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Agents</h3>
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
+                           ?subject a crm:E39_Actor .
+                       }"
+                template="{{#each bindings}}Found {{num.value}} actors{{/each}}"
+            ></semantic-query>
+            <div class="bottom">
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-actor">
+                    See all
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+                       SELECT DISTINCT ?subject ?label ?icon (COUNT(?event) as ?eventCount) WHERE {
+                           ?subject a crm:E39_Actor ;
+                                   rdfs:label ?label .
+                           OPTIONAL {
+                               ?event a crm:E5_Event ;
+                                     crm:P11_had_participant ?subject .
+                           }
+
+                           BIND(
+                             IF(?label = 'Physical_Forces', '/assets/images/icons/rs-icons/seismometer-square-svgrepo-com.svg',
+                               IF(?label = 'Fire', '/assets/images/icons/rs-icons/fire-svgrepo-com.svg',
+                                 IF(?label = 'Water', '/assets/images/icons/rs-icons/water-fee-svgrepo-com.svg',
+                                   IF(?label = 'Pests', '/assets/images/icons/rs-icons/bug-svgrepo-com.svg',
+                                     IF(?label = 'Pollutants', '/assets/images/icons/rs-icons/gas-mask-svgrepo-com.svg',
+                                       IF(?label = 'Light_UV_IR', '/assets/images/icons/rs-icons/light-bulb-1-svgrepo-com.svg',
+                                         IF(?label = 'Dissociation', '/assets/images/icons/rs-icons/split-branch-svgrepo-com.svg',
+                                           IF(?label = 'Incorrect_RH', '/assets/images/icons/rs-icons/humidity-svgrepo-com.svg',
+                                             '/assets/images/icons/rs-icons/default.svg'
+                                           )
+                                         )
+                                       )
+                                     )
+                                   )
+                                 )
+                               )
+                             ) AS ?icon
+                           )
+
+                           BIND(DAY(NOW()) as ?day)
+                           BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
+                       }
+                       GROUP BY ?subject ?label ?icon ?random
+                       ORDER BY ?random
+                       LIMIT 10"
+                template="{{> agentCardGrid}}"
+            >
+  <template id="agentCardGrid">
+    <style>
+      .agent-grid { display:flex; flex-wrap:wrap; gap:12px; }
+      .agent-card { width:200px; border:1px solid #ddd; border-radius:6px; overflow:hidden; background:#fff; text-align:center; padding:12px; }
+      .agent-card .thumb { height:72px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; }
+      .agent-card .thumb mp-resource-thumbnail, .agent-card .thumb img { width:56px; height:56px; object-fit:contain; display:block; }
+      .agent-card .label { padding:10px 8px; font-size:.95rem; line-height:1.2em; height:48px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; color:#000; }
+      .agent-card .meta { padding:0 8px 10px; color:#666; font-size:.85rem; }
+      .agent-card .label a, .agent-card .label semantic-link { color:#000; text-decoration:none; }
+    </style>
+
+    {{#if bindings}}
+      <div class="agent-grid">
+        {{#each bindings}}
+          <div class="agent-card">
+            <div class="thumb">
+              <!-- use mp-resource-thumbnail so ResearchSpace renders resource thumbnail and uses ?icon as fallback -->
+              <mp-resource-thumbnail iri="{{subject.value}}"
+                                    no-image-uri="{{icon.value}}"
+                                    style="max-width:56px; max-height:56px; display:block;" />
+            </div>
+            <div class="label">
+              <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+            </div>
+            <div class="meta">
+              {{eventCount.value}} events
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div style="color:#666">No actors</div>
+    {{/if}}
+  </template>
+</semantic-query>
+        </bs-col>
+    </bs-row>
 </div>

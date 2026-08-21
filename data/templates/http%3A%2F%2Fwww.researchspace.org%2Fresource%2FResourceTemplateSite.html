@@ -1,0 +1,46 @@
+[[#if (urlParam "frame")]]
+<style>
+  .rs-application .page.page-local-overwrite {
+    padding-top: 0;
+  }
+</style>
+<div class="page page-local-overwrite">
+    [[> crm:E53_Place]]
+</div>
+
+[[else]]
+[[!-- Breadcrumb --]]
+<ol class="page-breadcrumb">
+    <li>
+        <mp-link title="Home" url="/">Home</mp-link>
+    </li>
+
+   [[#block "activeBreadcrumb"]]
+  <semantic-query query='PREFIX rso: <http://www.researchspace.org/ontology/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+SELECT ?value_appellation ?value_type WHERE {
+  <[[this]]> a crm:E53_Place ;
+          crmgeo:P1_is_identified_by ?appellation .
+  ?appellation a crmgeo:E44_Place_Appellation ;
+          skos:prefLabel ?value_appellation .
+}'
+    template='{{> breadcrumbTmpl}}'>
+    <template id='breadcrumbTmpl'>
+      <li class="active">
+        {{#each bindings}}
+          {{value_type.value}}: {{value_appellation.value}}{{#if @last}}{{else}}; {{/if}}
+        {{/each}}
+      </li>
+    </template>
+   </semantic-query>
+   [[/block]]
+</ol>
+
+[[!-- Resource Page --]]
+<div class="page">
+  [[> crm:E53_Place]]
+</div>
+[[/if]]

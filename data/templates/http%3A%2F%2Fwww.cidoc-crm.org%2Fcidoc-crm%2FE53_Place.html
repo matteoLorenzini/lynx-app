@@ -1,0 +1,109 @@
+[[#*inline "resource"]]
+<with-types fixed-key='resource-[[this]]' iri='[[this]]' template='{{> page}}' [[> rsp:TypeMappings]]>
+  <template id='page'>
+    <div class="rs-resource-container">
+      <div class="rs-resource-header {{getValueByKey entityBgColor allTypes 'rs-entity-bg-thing'}}" style="min-height: 400px;">
+        <div class="rs-resource-header-topContainer">
+          <div class="rs-resource-header-topButtons">
+            <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='knowledge-map' urlqueryparam-resource='[[this]]'>
+              <button type="button" title="Author Resource in Knowledge Map">
+                <rs-icon icon-type="round" icon-name="account_tree"></rs-icon>
+              </button>
+            </semantic-link-container>
+            <mp-event-trigger id='details-view-trigger' type='Component.TemplateUpdate' data='{"iri": "{{iri}}"}' targets='["details-view", "open-details-sidebar"]'>
+              <button type="button" title="Resource Details">
+                <rs-icon icon-type="rounded" icon-name="info" symbol="true"></rs-icon>
+              </button>
+            </mp-event-trigger>
+            <semantic-link-container uri='http://www.researchspace.org/resource/ResourceContentEditE18' urlqueryparam-resource='[[this]]'>
+              <button type="button" title="Author Resource in Form">
+                <rs-icon icon-type="rounded" icon-name="edit_note" symbol="true"></rs-icon>
+              </button>
+            </semantic-link-container>
+          </div>
+        </div>
+        <div class="rs-resource-header-content-container">
+          <div class="rs-resource-header--image-container" style="min-height: 350px; flex: 1.5;">
+            <semantic-if
+              query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P168_place_is_defined_by> ?coords }'
+              then='{{> mapBlock}}' else='{{> noMapBlock}}'>
+              <template id='mapBlock'>
+                <div style="height: 350px; width: 100%;">
+                  <semantic-map
+                    id='map-result'
+                    query='
+                      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                      PREFIX crmgeo: <http://www.ics.forth.gr/isl/CRMgeo/>
+                      PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                      PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                      
+                      SELECT (CONCAT("Point(", STR(?label), ")") AS ?wkt) ?label ?subject WHERE {
+                        BIND(<[[this]]> AS ?subject)
+                        ?subject a crm:E53_Place;
+                                 crm:P168_place_is_defined_by ?coordinates.
+                        ?coordinates rdfs:label ?label
+                      }
+                    '
+                    tuple-template='{{> mapTupleTemplate}}'>
+                    <template id='mapTupleTemplate'>
+                      <semantic-link iri="{{subject.value}}">
+                        <mp-label iri="{{subject.value}}"></mp-label>
+                      </semantic-link>
+                    </template>
+                  </semantic-map>
+                </div>
+              </template>
+              <template id='noMapBlock'>
+                <div class="object-representations__image--focused">
+                  <span class="rs-icon {{getValueByKey typeToImage allTypes 'rs-icon-entity_no-image'}} {{getValueByKey entityIconColor allTypes 'rs-icon-entity_no-image'}}"></span>
+                </div>
+              </template>
+            </semantic-if>
+          </div>
+          <div style="padding: 1.8% 1.5% 1.5% 5%; flex: 1;">
+            <div class="rs-resource-header--singletitle">
+              <div class="rs-resource-header--title" style="text-transform: capitalize;">
+                <mp-label iri='[[this]]'></mp-label>
+              </div>
+              <div style="display: flex;">
+                <mp-copy-to-clipboard text='[[this]]'>
+                  <div class="rs-copy-IRI">Copy IRI</div>
+                </mp-copy-to-clipboard>
+                <div class="statements">Statements</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="place-description">
+        <div>
+          <bs-nav bs-style="tabs">
+            <bs-nav-item event-key="place-description">Place Description</bs-nav-item>
+          </bs-nav>
+          <bs-tab-content animation="true">
+            <bs-tab-pane event-key="place-description">
+              <div class="rs-resource-tab-container">
+                <div>
+                  <hr class="rs-resource-section--headerLine">
+                  <span class="h1 rs-resource-section--header">Place Information</span>
+                </div>
+                <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions place="http://www.siriusplatform-risk-assessment/field/place" Siti="http://www.siriusplatform-risk-assessment/field/place_site_inverse"]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+              </div>
+            </bs-tab-pane>
+          </bs-tab-content>
+        </div>
+      </bs-tab-container>
+    </div>
+  </template>
+</with-types>
+[[/inline]]
+[[> resource]]

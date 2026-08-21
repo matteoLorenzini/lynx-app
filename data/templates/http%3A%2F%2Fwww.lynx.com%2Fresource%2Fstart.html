@@ -261,9 +261,11 @@ SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previe
             <h3>Object Typology</h3>
             <semantic-query
                 query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
+                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                       SELECT (COUNT(DISTINCT ?label) as ?num) WHERE {
                            ?subject a crm:E55_Type ;
-                                   crm:P2_has_type <http://www.lynx.com/resource/classification> .
+                                   crm:P2_has_type <http://www.lynx.com/resource/classification> ;
+                                   rdfs:label ?label .
                            ?object crm:P2_has_type ?subject .
                            ?object a crm:E18_Physical_Thing .
                        }"
@@ -280,19 +282,19 @@ SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previe
                 query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                        
-                       SELECT DISTINCT ?subject ?label (COUNT(?object) as ?objectCount) WHERE {
+                       SELECT ?label (SAMPLE(?subject) AS ?repSubject) (COUNT(DISTINCT ?object) as ?objectCount) WHERE {
                            ?subject a crm:E55_Type ;
                                    crm:P2_has_type <http://www.lynx.com/resource/classification> ;
                                    rdfs:label ?label .
                            ?object a crm:E18_Physical_Thing ;
                                    crm:P2_has_type ?subject .
                            BIND(DAY(NOW()) as ?day)
-                           BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
+                           BIND(SHA512(CONCAT(STR(?day), STR(?label))) AS ?random)
                        } 
-                       GROUP BY ?subject ?label ?random
+                       GROUP BY ?label ?random
                        ORDER BY ?random 
                        LIMIT 10"
-                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;'><h5 style='margin: 0 0 5px 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;'><semantic-link iri='{{subject.value}}'>{{label.value}}</semantic-link></h5><small style='color: #666;'>{{objectCount.value}} objects</small></div></div>{{/each}}"
+                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;'><h5 style='margin: 0 0 5px 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;'><semantic-link iri='{{repSubject.value}}'>{{label.value}}</semantic-link></h5><small style='color: #666;'>{{objectCount.value}} objects</small></div></div>{{/each}}"
             ></semantic-query>
         </bs-col>
     </bs-row>

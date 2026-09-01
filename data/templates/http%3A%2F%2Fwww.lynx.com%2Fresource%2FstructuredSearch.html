@@ -21,8 +21,11 @@
         "label":"Condition State",
         "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
       },
-      {
-        "iri": "<http://www.w3.org/2001/XMLSchema#decimal>",
+      {        "iri":"<http://www.cidoc-crm.org/cidoc-crm/E53_Place>",
+        "label":"Place",
+        "thumbnail": "../assets/images/icons/rs-icons/place.svg"
+      },
+      {        "iri": "<http://www.w3.org/2001/XMLSchema#decimal>",
         "label": "Measurement",
         "thumbnail": "../assets/images/icons/rs-icons/height.svg"
       }
@@ -46,6 +49,12 @@
         "label":"Condition State",
         "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
         "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State>"
+      },
+      {
+        "iri":"<http://www.lynx.com/resource/field/place>",
+        "label":"Place",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
       },
       {
         "iri":"<http://www.lynx.com/resource/field/depth>",
@@ -80,6 +89,10 @@
     "<http://www.lynx.com/resource/field/condition_state>": [{
       "kind": "resource",
       "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P44_has_condition ?__value__ . ?__value__ a crm:E3_Condition_State .}"
+    }],
+    "<http://www.lynx.com/resource/field/place>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P53_has_former_or_current_location ?__value__ . ?__value__ a crm:E53_Place .}"
     }],
     "<http://www.lynx.com/resource/field/depth>": [{
       "kind": "numeric-range",

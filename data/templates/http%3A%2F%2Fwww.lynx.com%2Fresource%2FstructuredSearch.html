@@ -150,56 +150,7 @@
   
   <div data-flex-layout="row stretch-stretch">
     <div data-flex-self="size-1of3" style="flex: 0 0 20px;">
-      <semantic-search-facet value-relations='{
-        "<http://www.lynx.com/resource/field/material>": {
-          "kind": "resource",
-          "valuesQuery": "
-            SELECT ?value ?label ?count WHERE {
-              {
-                SELECT ?label (SAMPLE(?value) AS ?repValue) (COUNT(DISTINCT $subject) AS ?count) WHERE {
-                  FILTER(?__facetRelationPattern__)
-                  ?value skos:prefLabel ?label .
-                }
-                GROUP BY ?label
-              }
-              BIND(?repValue AS ?value)
-            }
-            ORDER BY ?label
-          "
-        },
-        "<http://www.lynx.com/resource/field/status>": {
-          "kind": "resource",
-          "valuesQuery": "
-            SELECT ?value ?label ?count WHERE {
-              {
-                SELECT ?label (SAMPLE(?value) AS ?repValue) (COUNT(DISTINCT $subject) AS ?count) WHERE {
-                  FILTER(?__facetRelationPattern__)
-                  ?value skos:prefLabel ?label .
-                }
-                GROUP BY ?label
-              }
-              BIND(?repValue AS ?value)
-            }
-            ORDER BY ?label
-          "
-        },
-        "<http://www.lynx.com/resource/field/condition_state>": {
-          "kind": "resource",
-          "valuesQuery": "
-            SELECT ?value ?label ?count WHERE {
-              {
-                SELECT ?label (SAMPLE(?value) AS ?repValue) (COUNT(DISTINCT $subject) AS ?count) WHERE {
-                  FILTER(?__facetRelationPattern__)
-                  ?value skos:prefLabel ?label .
-                }
-                GROUP BY ?label
-              }
-              BIND(?repValue AS ?value)
-            }
-            ORDER BY ?label
-          "
-        }
-      }'></semantic-search-facet>
+      <semantic-search-facet></semantic-search-facet>
     </div>
     
     <semantic-search-result-holder>

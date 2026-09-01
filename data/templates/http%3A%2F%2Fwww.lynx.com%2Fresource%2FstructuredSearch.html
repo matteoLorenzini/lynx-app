@@ -71,7 +71,7 @@
   relations='{
     "<http://www.lynx.com/resource/field/material>": [{
       "kind": "resource",
-      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P45_consists_of ?__value__ . ?__value__ a crm:E57_Material .}"
+      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P45_consists_of ?material . ?material a crm:E57_Material; rdfs:label ?__value__ .}"
     }],
     "<http://www.lynx.com/resource/field/status>": [{
       "kind": "resource",

@@ -51,8 +51,20 @@
         "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State>"
       },
       {
-        "iri":"<http://www.lynx.com/resource/field/place>",
-        "label":"Place",
+        "iri":"<http://www.lynx.com/resource/field/provenance>",
+        "label":"Provenance",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
+      },
+      {
+        "iri":"<http://www.lynx.com/resource/field/place_of_discovery>",
+        "label":"Place of Discovery",
+        "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
+      },
+      {
+        "iri":"<http://www.lynx.com/resource/field/site_of_discovery>",
+        "label":"Site of Discovery",
         "hasDomain":"<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
         "hasRange":"<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
       },
@@ -90,9 +102,17 @@
       "kind": "resource",
       "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P44_has_condition ?__value__ . ?__value__ a crm:E3_Condition_State .}"
     }],
-    "<http://www.lynx.com/resource/field/place>": [{
+    "<http://www.lynx.com/resource/field/provenance>": [{
       "kind": "resource",
-      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P53_has_former_or_current_location ?__value__ . ?__value__ a crm:E53_Place .}"
+      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P53_has_former_or_current_location ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/provenance> .}"
+    }],
+    "<http://www.lynx.com/resource/field/place_of_discovery>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P53_has_former_or_current_location ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/place-of-discovery> .}"
+    }],
+    "<http://www.lynx.com/resource/field/site_of_discovery>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crm:E18_Physical_Thing ; crm:P53_has_former_or_current_location ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/site-of-discovery> .}"
     }],
     "<http://www.lynx.com/resource/field/depth>": [{
       "kind": "numeric-range",

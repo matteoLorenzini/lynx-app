@@ -23,14 +23,22 @@ lynx-app/
 ## Deployment
 
 On every push to `main` (or from **Run workflow**), [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
-runs on the configured self-hosted Linux runner, syncs this repo to the local app folder with `rsync`, and
-restarts the ResearchSpace container so the app is reloaded.
+runs on the configured self-hosted Linux runner, syncs this repo into the ResearchSpace container, and
+restarts the container so the app is reloaded.
 
 ### Required repository secrets
 
 | Secret | Description |
 | --- | --- |
-| `DEPLOY_APP_PATH` | Absolute Linux path to this app's local folder (e.g. `/opt/researchspace/apps/lynx-app`) |
 | `DEPLOY_CONTAINER_NAME` | Name of the local ResearchSpace Docker container to restart after sync |
+| `DEPLOY_CONTAINER_APP_PATH` | Absolute app path inside the container (e.g. `/apps/lynx-app`) |
+
+### Optional fallback secret
+
+| Secret | Description |
+| --- | --- |
+| `DEPLOY_APP_PATH` | Absolute Linux host path to this app's local folder when the container uses a bind mount |
+
+The workflow prefers direct container sync when `DEPLOY_CONTAINER_APP_PATH` is set. Use `DEPLOY_APP_PATH` only if you explicitly want to sync through a bind-mounted host folder.
 
 

@@ -12,6 +12,7 @@ jobs:
     env:
       DEPLOY_APP_PATH: ${{ secrets.DEPLOY_APP_PATH }}
       DEPLOY_CONTAINER_NAME: ${{ secrets.DEPLOY_CONTAINER_NAME }}
+      DEPLOY_CONTAINER_APP_PATH: ${{ secrets.DEPLOY_CONTAINER_APP_PATH }}
     
     steps:
       - name: Checkout repository
@@ -22,14 +23,24 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [[ -z "$DEPLOY_APP_PATH" ]]; then
-            echo "DEPLOY_APP_PATH secret is not set"
-            exit 1
-          fi
-
           if [[ -z "$DEPLOY_CONTAINER_NAME" ]]; then
             echo "DEPLOY_CONTAINER_NAME secret is not set"
             exit 1
+          fi
+
+          if [[ -z "${DEPLOY_APP_PATH:-}" && -z "${DEPLOY_CONTAINER_APP_PATH:-}" ]]; then
+            echo "Set either DEPLOY_APP_PATH for host-path sync or DEPLOY_CONTAINER_APP_PATH for direct container sync"
+            exit 1
+          fi
+
+          if ! docker inspect "$DEPLOY_CONTAINER_NAME" >/dev/null 2>&1; then
+            echo "Container not found: $DEPLOY_CONTAINER_NAME"
+            exit 1
+          fi
+
+          if [[ -n "${DEPLOY_CONTAINER_APP_PATH:-}" ]]; then
+            echo "Using direct container sync to: $DEPLOY_CONTAINER_APP_PATH"
+            exit 0
           fi
 
           if [[ ! -d "$DEPLOY_APP_PATH" ]]; then
@@ -39,11 +50,6 @@ jobs:
 
           if [[ ! -w "$DEPLOY_APP_PATH" ]]; then
             echo "Deploy target directory is not writable: $DEPLOY_APP_PATH"
-            exit 1
-          fi
-
-          if ! docker inspect "$DEPLOY_CONTAINER_NAME" >/dev/null 2>&1; then
-            echo "Container not found: $DEPLOY_CONTAINER_NAME"
             exit 1
           fi
 
@@ -72,9 +78,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "Syncing app files to: $DEPLOY_APP_PATH"
-
           paths=(plugin.properties assets config data images lib)
+
+          if [[ -n "${DEPLOY_CONTAINER_APP_PATH:-}" ]]; then
+            echo "Syncing app files directly into container: $DEPLOY_CONTAINER_NAME:$DEPLOY_CONTAINER_APP_PATH"
+            docker exec "$DEPLOY_CONTAINER_NAME" mkdir -p "$DEPLOY_CONTAINER_APP_PATH"
+            tar -cf - "${paths[@]}" | docker exec -i "$DEPLOY_CONTAINER_NAME" tar -xf - -C "$DEPLOY_CONTAINER_APP_PATH"
+            echo "Sync complete - files copied into container"
+            exit 0
+          fi
+
+          echo "Syncing app files to: $DEPLOY_APP_PATH"
           for path in "${paths[@]}"; do
             if [[ -e "$path" ]]; then
               if [[ -d "$path" ]]; then

@@ -73,13 +73,22 @@ jobs:
       - name: Verify deployment
         shell: bash
         run: |
-          url="http://localhost:10214/"
-          status_code=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 5 "$url")
+          set -euo pipefail
 
-          if [[ "$status_code" =~ ^[23][0-9][0-9]$ ]]; then
-            echo "Service is responding (HTTP $status_code)"
-            echo "Deployment successful - files synced and container restarted"
-          else
-            echo "Service is not responding at $url (HTTP $status_code)"
-            exit 1
-          fi
+          url="http://localhost:10214/"
+          for attempt in {1..12}; do
+            status_code=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 5 "$url" || true)
+
+            if [[ "$status_code" =~ ^[23][0-9][0-9]$ ]]; then
+              echo "Service is responding (HTTP $status_code)"
+              echo "Deployment successful - files synced and container restarted"
+              exit 0
+            fi
+
+            echo "Attempt $attempt/12: service not ready yet at $url (HTTP ${status_code:-curl-error})"
+            sleep 5
+          done
+
+          echo "Service did not become ready at $url after restart"
+          docker ps --filter "name=$DEPLOY_CONTAINER_NAME"
+          exit 1

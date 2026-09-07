@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 jobs:
@@ -12,140 +13,417 @@ jobs:
     timeout-minutes: 10
 
     steps:
+
+      # ---------------------------------------------------------
+      # 1. Checkout repository
+      # ---------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Configure deployment paths
+
+      # ---------------------------------------------------------
+      # 2. Configure paths
+      # ---------------------------------------------------------
+      - name: Set paths
         shell: bash
         run: |
           set -euo pipefail
 
-          COMPOSE_ROOT="/home/matteo/researchspace-docker-desktop-main"
-          RUNTIME_TARGET="${COMPOSE_ROOT}/researchspace/runtime-data"
+          compose_root="/home/matteo/researchspace-docker-desktop-main"
+          runtime_target="${compose_root}/researchspace/runtime-data"
 
-          echo "COMPOSE_ROOT=$COMPOSE_ROOT" >> "$GITHUB_ENV"
-          echo "RUNTIME_TARGET=$RUNTIME_TARGET" >> "$GITHUB_ENV"
+          echo "COMPOSE_ROOT=${compose_root}" >> "$GITHUB_ENV"
+          echo "RUNTIME_TARGET=${runtime_target}" >> "$GITHUB_ENV"
+          echo "SERVICE_NAME=researchspace" >> "$GITHUB_ENV"
 
-          echo "Compose root: $COMPOSE_ROOT"
-          echo "Runtime target: $RUNTIME_TARGET"
+          echo "=========================================="
+          echo "Deployment configuration"
+          echo "=========================================="
+          echo "COMPOSE_ROOT   = ${compose_root}"
+          echo "RUNTIME_TARGET = ${runtime_target}"
+          echo "SERVICE_NAME   = researchspace"
+          echo "=========================================="
 
-      - name: Check deployment directory
+
+      # ---------------------------------------------------------
+      # 3. Diagnose runner and filesystem
+      # ---------------------------------------------------------
+      - name: Diagnose deployment environment
         shell: bash
         run: |
           set -euo pipefail
 
-          echo "Runner user:"
+          echo "=========================================="
+          echo "Runner information"
+          echo "=========================================="
+
+          echo "User:"
           whoami
 
           echo
-          echo "Target directory:"
-          ls -ld "$RUNTIME_TARGET"
+          echo "UID / GID:"
+          id
 
           echo
-          echo "Testing write permission..."
+          echo "Hostname:"
+          hostname
 
-          test -w "$RUNTIME_TARGET" || {
-            echo "ERROR: GitHub Actions runner cannot write to $RUNTIME_TARGET"
-            exit 1
-          }
+          echo
+          echo "Current directory:"
+          pwd
 
-          echo "Write permission OK"
+          echo
+          echo "GitHub workspace:"
+          echo "$GITHUB_WORKSPACE"
 
-      - name: Sync repository to ResearchSpace runtime
+          echo
+          echo "=========================================="
+          echo "Deployment directories"
+          echo "=========================================="
+
+          echo "COMPOSE_ROOT:"
+          echo "$COMPOSE_ROOT"
+
+          if [[ -e "$COMPOSE_ROOT" ]]; then
+            ls -ld "$COMPOSE_ROOT"
+          else
+            echo "WARNING: COMPOSE_ROOT does not exist"
+          fi
+
+          echo
+          echo "RUNTIME_TARGET:"
+          echo "$RUNTIME_TARGET"
+
+          if [[ -e "$RUNTIME_TARGET" ]]; then
+            ls -ld "$RUNTIME_TARGET"
+          else
+            echo "WARNING: RUNTIME_TARGET does not exist"
+          fi
+
+          echo
+          echo "=========================================="
+          echo "Parent directory permissions"
+          echo "=========================================="
+
+          ls -ld /home
+          ls -ld /home/matteo || true
+          ls -ld "$COMPOSE_ROOT" || true
+          ls -ld "$(dirname "$RUNTIME_TARGET")" || true
+          ls -ld "$RUNTIME_TARGET" || true
+
+          echo
+          echo "=========================================="
+          echo "Write permission test"
+          echo "=========================================="
+
+          if [[ -d "$RUNTIME_TARGET" ]]; then
+
+            test_file="$RUNTIME_TARGET/.github-actions-write-test"
+
+            if touch "$test_file"; then
+              echo "SUCCESS: Runner can write to $RUNTIME_TARGET"
+
+              rm -f "$test_file"
+
+              echo "SUCCESS: Runner can delete files from $RUNTIME_TARGET"
+            else
+              echo "ERROR: Runner CANNOT write to $RUNTIME_TARGET"
+              exit 1
+            fi
+
+          else
+            echo "Runtime directory does not exist yet."
+            echo "It will be created during deployment."
+          fi
+
+
+      # ---------------------------------------------------------
+      # 4. Sync files
+      # ---------------------------------------------------------
+      - name: Sync changed files only
         shell: bash
         run: |
           set -euo pipefail
 
           target="$RUNTIME_TARGET"
 
-          echo "Deploying to: $target"
+          echo
+          echo "=========================================="
+          echo "Starting deployment"
+          echo "=========================================="
+
+          echo "Source:"
+          echo "$GITHUB_WORKSPACE"
+
+          echo
+          echo "Destination:"
+          echo "$target"
+
+          echo
+          echo "=========================================="
+          echo "Checking rsync"
+          echo "=========================================="
+
+          if command -v rsync >/dev/null 2>&1; then
+            echo "rsync found:"
+            command -v rsync
+
+            echo
+            echo "rsync version:"
+            rsync --version | head -5
+          else
+            echo "ERROR: rsync is not installed."
+            exit 1
+          fi
+
+          echo
+          echo "=========================================="
+          echo "Checking source files"
+          echo "=========================================="
+
+          echo
+          echo "plugin.properties:"
+          if [[ -f "$GITHUB_WORKSPACE/plugin.properties" ]]; then
+            ls -l "$GITHUB_WORKSPACE/plugin.properties"
+          else
+            echo "Not present"
+          fi
+
+          for directory in assets config data images lib; do
+            echo
+            echo "$directory:"
+
+            if [[ -d "$GITHUB_WORKSPACE/$directory" ]]; then
+              ls -ld "$GITHUB_WORKSPACE/$directory"
+
+              echo "Contents:"
+              find "$GITHUB_WORKSPACE/$directory" -maxdepth 2 -type f | head -30
+            else
+              echo "Not present"
+            fi
+          done
+
+          echo
+          echo "=========================================="
+          echo "Preparing destination"
+          echo "=========================================="
 
           mkdir -p "$target"
 
+          echo "Destination permissions:"
+          ls -ld "$target"
+
+          # -----------------------------------------------------
+          # Directory synchronization
+          # -----------------------------------------------------
           sync_dir() {
             local src="$1"
             local dst="$2"
 
+            echo
+            echo "------------------------------------------"
+            echo "SYNC DIRECTORY"
+            echo "------------------------------------------"
+            echo "Source:      $src"
+            echo "Destination: $dst"
+
             if [[ ! -d "$src" ]]; then
-              echo "Skipping missing directory: $src"
+              echo "Source directory does not exist."
+              echo "Skipping."
               return 0
             fi
 
             mkdir -p "$dst"
 
-            echo "Syncing:"
-            echo "  $src/"
-            echo "  -> $dst/"
+            echo
+            echo "Source permissions:"
+            ls -ld "$src"
 
-            rsync -rlpt \
+            echo
+            echo "Destination permissions:"
+            ls -ld "$dst"
+
+            echo
+            echo "Running rsync:"
+            echo "rsync -rltv --itemize-changes \"$src/\" \"$dst/\""
+
+            echo
+            echo "Rsync output:"
+            echo "------------------------------------------"
+
+            rsync \
+              -rltv \
               --itemize-changes \
-              "$src/" "$dst/"
+              "$src/" \
+              "$dst/"
+
+            echo "------------------------------------------"
+            echo "Directory sync completed successfully."
           }
 
+          # -----------------------------------------------------
+          # Single-file synchronization
+          # -----------------------------------------------------
           sync_file() {
             local src="$1"
             local dst="$2"
 
+            echo
+            echo "------------------------------------------"
+            echo "SYNC FILE"
+            echo "------------------------------------------"
+            echo "Source:      $src"
+            echo "Destination: $dst"
+
             if [[ ! -f "$src" ]]; then
-              echo "Skipping missing file: $src"
+              echo "Source file does not exist."
+              echo "Skipping."
               return 0
             fi
 
             mkdir -p "$(dirname "$dst")"
 
-            echo "Syncing:"
-            echo "  $src"
-            echo "  -> $dst"
+            echo
+            echo "Source:"
+            ls -l "$src"
 
-            rsync -lpt \
+            echo
+            echo "Destination:"
+            if [[ -e "$dst" ]]; then
+              ls -l "$dst"
+            else
+              echo "Destination file does not exist."
+            fi
+
+            echo
+            echo "Running rsync:"
+            echo "rsync -ltv --itemize-changes \"$src\" \"$dst\""
+
+            echo
+            echo "Rsync output:"
+            echo "------------------------------------------"
+
+            rsync \
+              -ltv \
               --itemize-changes \
-              "$src" "$dst"
+              "$src" \
+              "$dst"
+
+            echo "------------------------------------------"
+            echo "File sync completed successfully."
           }
 
-          sync_file "$GITHUB_WORKSPACE/plugin.properties" \
-                    "$target/plugin.properties"
+          # -----------------------------------------------------
+          # Files to deploy
+          # -----------------------------------------------------
 
-          sync_dir "$GITHUB_WORKSPACE/assets" \
-                   "$target/assets"
+          sync_file \
+            "$GITHUB_WORKSPACE/plugin.properties" \
+            "$target/plugin.properties"
 
-          sync_dir "$GITHUB_WORKSPACE/config" \
-                   "$target/config"
+          sync_dir \
+            "$GITHUB_WORKSPACE/assets" \
+            "$target/assets"
 
-          sync_dir "$GITHUB_WORKSPACE/data" \
-                   "$target/data"
+          sync_dir \
+            "$GITHUB_WORKSPACE/config" \
+            "$target/config"
 
-          sync_dir "$GITHUB_WORKSPACE/images" \
-                   "$target/images"
+          sync_dir \
+            "$GITHUB_WORKSPACE/data" \
+            "$target/data"
 
-          sync_dir "$GITHUB_WORKSPACE/lib" \
-                   "$target/lib"
+          sync_dir \
+            "$GITHUB_WORKSPACE/images" \
+            "$target/images"
+
+          sync_dir \
+            "$GITHUB_WORKSPACE/lib" \
+            "$target/lib"
 
           echo
-          echo "Deployment files synchronized successfully."
+          echo "=========================================="
+          echo "SYNC COMPLETE"
+          echo "=========================================="
 
-      - name: Verify ResearchSpace
+
+      # ---------------------------------------------------------
+      # 5. Show deployed files
+      # ---------------------------------------------------------
+      - name: Verify synchronized files
         shell: bash
         run: |
           set -euo pipefail
 
-          URL="http://localhost:10214/"
+          echo "=========================================="
+          echo "Deployment directory after sync"
+          echo "=========================================="
 
-          echo "Checking $URL"
+          echo
+          echo "Runtime target:"
+          echo "$RUNTIME_TARGET"
+
+          echo
+          echo "Directory:"
+          ls -lah "$RUNTIME_TARGET"
+
+          echo
+          echo "Files:"
+          find "$RUNTIME_TARGET" -maxdepth 3 -type f -printf '%p\n' | sort | head -200
+
+
+      # ---------------------------------------------------------
+      # 6. Check ResearchSpace
+      # ---------------------------------------------------------
+      - name: Verify deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          url="http://localhost:10214/"
+
+          echo "=========================================="
+          echo "ResearchSpace health check"
+          echo "=========================================="
+
+          echo "URL:"
+          echo "$url"
+
+          echo
+          echo "Checking service..."
 
           status_code=$(curl \
             -s \
             -o /dev/null \
             -w "%{http_code}" \
             --max-time 10 \
-            "$URL" || true)
+            "$url" || true)
 
-          echo "HTTP status: ${status_code:-n/a}"
+          echo
+          echo "HTTP status code:"
+          echo "${status_code:-n/a}"
 
           if [[ "$status_code" =~ ^[0-9]{3}$ ]] && \
              [[ "$status_code" -lt 500 ]]; then
 
+            echo
+            echo "=========================================="
+            echo "DEPLOYMENT SUCCESSFUL"
+            echo "=========================================="
+
             echo "ResearchSpace is responding."
+            echo "Files were updated without restarting the container."
+
           else
-            echo "ResearchSpace is NOT responding correctly." >&2
+
+            echo
+            echo "=========================================="
+            echo "DEPLOYMENT FAILED"
+            echo "=========================================="
+
+            echo "ResearchSpace is not responding correctly."
+            echo "URL: $url"
+            echo "HTTP status: ${status_code:-n/a}"
+
             exit 1
           fi

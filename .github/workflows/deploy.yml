@@ -12,7 +12,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set paths
         shell: bash
@@ -27,6 +27,8 @@ jobs:
       - name: Sync changed files only
         shell: bash
         run: |
+          set -euo pipefail
+
           target="$RUNTIME_TARGET"
           echo "Syncing changed files to: $target"
 
@@ -50,6 +52,23 @@ jobs:
               rsync -a --update "$src/" "$dst/"
             else
               cp -ru "$src/." "$dst/"
+            fi
+          }
+
+          sync_file() {
+            src="$1"
+            dst="$2"
+
+            if [[ ! -f "$src" ]]; then
+              return 0
+            fi
+
+            mkdir -p "$(dirname "$dst")"
+
+            if command -v rsync >/dev/null 2>&1; then
+              rsync -a --update "$src" "$dst"
+            elif [[ ! -e "$dst" || "$src" -nt "$dst" ]]; then
+              cp -f "$src" "$dst"
             fi
           }
 

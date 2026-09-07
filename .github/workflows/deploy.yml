@@ -2,99 +2,150 @@ name: Deploy ResearchSpace
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: self-hosted
-    timeout-minutes: 5
-    
+    timeout-minutes: 10
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Set paths
+      - name: Configure deployment paths
         shell: bash
         run: |
-          compose_root="/home/matteo/researchspace-docker-desktop-main"
-          runtime_target="${compose_root}/researchspace/runtime-data"
+          set -euo pipefail
 
-          echo "COMPOSE_ROOT=${compose_root}" >> "$GITHUB_ENV"
-          echo "RUNTIME_TARGET=${runtime_target}" >> "$GITHUB_ENV"
-          echo "SERVICE_NAME=researchspace" >> "$GITHUB_ENV"
+          COMPOSE_ROOT="/home/matteo/researchspace-docker-desktop-main"
+          RUNTIME_TARGET="${COMPOSE_ROOT}/researchspace/runtime-data"
 
-      - name: Sync changed files only
+          echo "COMPOSE_ROOT=$COMPOSE_ROOT" >> "$GITHUB_ENV"
+          echo "RUNTIME_TARGET=$RUNTIME_TARGET" >> "$GITHUB_ENV"
+
+          echo "Compose root: $COMPOSE_ROOT"
+          echo "Runtime target: $RUNTIME_TARGET"
+
+      - name: Check deployment directory
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Runner user:"
+          whoami
+
+          echo
+          echo "Target directory:"
+          ls -ld "$RUNTIME_TARGET"
+
+          echo
+          echo "Testing write permission..."
+
+          test -w "$RUNTIME_TARGET" || {
+            echo "ERROR: GitHub Actions runner cannot write to $RUNTIME_TARGET"
+            exit 1
+          }
+
+          echo "Write permission OK"
+
+      - name: Sync repository to ResearchSpace runtime
         shell: bash
         run: |
           set -euo pipefail
 
           target="$RUNTIME_TARGET"
-          echo "Syncing changed files to: $target"
 
-          if [[ ! -d "$(dirname "$target")" ]]; then
-            echo "Apps directory not found: $(dirname "$target")" >&2
-            exit 1
-          fi
+          echo "Deploying to: $target"
 
           mkdir -p "$target"
 
           sync_dir() {
-            src="$1"
-            dst="$2"
+            local src="$1"
+            local dst="$2"
 
             if [[ ! -d "$src" ]]; then
+              echo "Skipping missing directory: $src"
               return 0
             fi
 
             mkdir -p "$dst"
 
-            # Match robocopy behavior: copy recursively, do not delete extras, do not overwrite newer target files.
-            if command -v rsync >/dev/null 2>&1; then
-              echo "Syncing directory $src -> $dst"
-              rsync -rlt --update --itemize-changes "$src/" "$dst/"
-            else
-              cp -ru "$src/." "$dst/"
-            fi
+            echo "Syncing:"
+            echo "  $src/"
+            echo "  -> $dst/"
+
+            rsync -rlpt \
+              --itemize-changes \
+              "$src/" "$dst/"
           }
 
           sync_file() {
-            src="$1"
-            dst="$2"
+            local src="$1"
+            local dst="$2"
 
             if [[ ! -f "$src" ]]; then
+              echo "Skipping missing file: $src"
               return 0
             fi
 
             mkdir -p "$(dirname "$dst")"
 
-            if command -v rsync >/dev/null 2>&1; then
-              echo "Syncing file $src -> $dst"
-              rsync -lt --update --itemize-changes "$src" "$dst"
-            elif [[ ! -e "$dst" || "$src" -nt "$dst" ]]; then
-              cp -f "$src" "$dst"
-            fi
+            echo "Syncing:"
+            echo "  $src"
+            echo "  -> $dst"
+
+            rsync -lpt \
+              --itemize-changes \
+              "$src" "$dst"
           }
 
-          sync_file "$PWD/plugin.properties" "$target/plugin.properties"
-          sync_dir "$PWD/assets" "$target/assets"
-          sync_dir "$PWD/config" "$target/config"
-          sync_dir "$PWD/data" "$target/data"
-          sync_dir "$PWD/images" "$target/images"
-          sync_dir "$PWD/lib" "$target/lib"
+          sync_file "$GITHUB_WORKSPACE/plugin.properties" \
+                    "$target/plugin.properties"
 
-          echo "Sync complete - only changed files updated"
+          sync_dir "$GITHUB_WORKSPACE/assets" \
+                   "$target/assets"
 
-      - name: Verify deployment
+          sync_dir "$GITHUB_WORKSPACE/config" \
+                   "$target/config"
+
+          sync_dir "$GITHUB_WORKSPACE/data" \
+                   "$target/data"
+
+          sync_dir "$GITHUB_WORKSPACE/images" \
+                   "$target/images"
+
+          sync_dir "$GITHUB_WORKSPACE/lib" \
+                   "$target/lib"
+
+          echo
+          echo "Deployment files synchronized successfully."
+
+      - name: Verify ResearchSpace
         shell: bash
         run: |
-          url="http://localhost:10214/"
-          status_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$url" || true)
+          set -euo pipefail
 
-          if [[ "$status_code" =~ ^[0-9]{3}$ ]] && [[ "$status_code" -lt 500 ]]; then
-            echo "Service is responding (HTTP $status_code)"
-            echo "Deployment successful - files updated without restart"
+          URL="http://localhost:10214/"
+
+          echo "Checking $URL"
+
+          status_code=$(curl \
+            -s \
+            -o /dev/null \
+            -w "%{http_code}" \
+            --max-time 10 \
+            "$URL" || true)
+
+          echo "HTTP status: ${status_code:-n/a}"
+
+          if [[ "$status_code" =~ ^[0-9]{3}$ ]] && \
+             [[ "$status_code" -lt 500 ]]; then
+
+            echo "ResearchSpace is responding."
           else
-            echo "Service is not responding at $url (HTTP ${status_code:-n/a})" >&2
+            echo "ResearchSpace is NOT responding correctly." >&2
             exit 1
           fi

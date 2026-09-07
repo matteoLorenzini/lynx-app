@@ -9,10 +9,10 @@ jobs:
   deploy:
     runs-on: self-hosted
     timeout-minutes: 5
-
+    
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Set paths
         shell: bash
@@ -27,13 +27,11 @@ jobs:
       - name: Sync changed files only
         shell: bash
         run: |
-          set -euo pipefail
-
           target="$RUNTIME_TARGET"
           echo "Syncing changed files to: $target"
 
           if [[ ! -d "$target" ]]; then
-            echo "Runtime app directory not found: $target" >&2
+            echo "Runtime directory not found: $target" >&2
             exit 1
           fi
 
@@ -47,27 +45,11 @@ jobs:
 
             mkdir -p "$dst"
 
+            # Match robocopy behavior: copy recursively, do not delete extras, do not overwrite newer target files.
             if command -v rsync >/dev/null 2>&1; then
               rsync -a --update "$src/" "$dst/"
             else
               cp -ru "$src/." "$dst/"
-            fi
-          }
-
-          sync_file() {
-            src="$1"
-            dst="$2"
-
-            if [[ ! -f "$src" ]]; then
-              return 0
-            fi
-
-            mkdir -p "$(dirname "$dst")"
-
-            if command -v rsync >/dev/null 2>&1; then
-              rsync -a --update "$src" "$dst"
-            elif [[ ! -e "$dst" || "$src" -nt "$dst" ]]; then
-              cp -f "$src" "$dst"
             fi
           }
 

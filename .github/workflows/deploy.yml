@@ -11,12 +11,15 @@ jobs:
     timeout-minutes: 5
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set paths
         shell: bash
         run: |
+          set -euxo pipefail
+
           compose_root="/home/matteo/researchspace-docker-desktop-main"
           runtime_target="${compose_root}/researchspace/runtime-data"
 
@@ -24,28 +27,28 @@ jobs:
           echo "RUNTIME_TARGET=${runtime_target}" >> "$GITHUB_ENV"
           echo "SERVICE_NAME=researchspace" >> "$GITHUB_ENV"
 
-          echo "======================================"
-          echo "Deployment configuration"
-          echo "======================================"
-          echo "COMPOSE_ROOT:   ${compose_root}"
-          echo "RUNTIME_TARGET: ${runtime_target}"
-          echo "SERVICE_NAME:   researchspace"
-          echo "======================================"
+          echo "=============================================="
+          echo "DEPLOYMENT CONFIGURATION"
+          echo "=============================================="
+          echo "COMPOSE_ROOT   = ${compose_root}"
+          echo "RUNTIME_TARGET = ${runtime_target}"
+          echo "SERVICE_NAME   = researchspace"
+          echo "=============================================="
 
       - name: Diagnose environment
         shell: bash
         run: |
-          set -euo pipefail
+          set -euxo pipefail
 
-          echo "======================================"
-          echo "Runner information"
-          echo "======================================"
+          echo "=============================================="
+          echo "ENVIRONMENT DIAGNOSTICS"
+          echo "=============================================="
 
           echo "User:"
           whoami
 
           echo
-          echo "UID/GID:"
+          echo "Identity:"
           id
 
           echo
@@ -54,152 +57,247 @@ jobs:
 
           echo
           echo "Workspace:"
-          echo "$PWD"
+          pwd
 
           echo
-          echo "======================================"
-          echo "Runtime directory"
-          echo "======================================"
+          echo "GitHub workspace:"
+          echo "$GITHUB_WORKSPACE"
+
+          echo
+          echo "=============================================="
+          echo "RUNTIME DIRECTORY"
+          echo "=============================================="
 
           echo "Target:"
           echo "$RUNTIME_TARGET"
 
-          if [[ -d "$RUNTIME_TARGET" ]]; then
-            echo
-            echo "Directory exists:"
-            ls -ld "$RUNTIME_TARGET"
-
-            echo
-            echo "Directory contents:"
-            ls -lah "$RUNTIME_TARGET" | head -50
-          else
-            echo "ERROR: Runtime directory does not exist:"
-            echo "$RUNTIME_TARGET"
-            exit 1
-          fi
+          ls -ld /home
+          ls -ld /home/matteo
+          ls -ld "$COMPOSE_ROOT"
+          ls -ld "$(dirname "$RUNTIME_TARGET")"
+          ls -ld "$RUNTIME_TARGET"
 
           echo
-          echo "======================================"
-          echo "Write permission"
-          echo "======================================"
+          echo "Runtime directory contents:"
+          ls -lah "$RUNTIME_TARGET"
+
+          echo
+          echo "=============================================="
+          echo "WRITE TEST"
+          echo "=============================================="
 
           test_file="$RUNTIME_TARGET/.github-actions-test"
 
-          if touch "$test_file"; then
-            echo "Runner can write to runtime directory."
-            rm -f "$test_file"
-          else
-            echo "ERROR: Runner cannot write to runtime directory."
-            exit 1
-          fi
+          touch "$test_file"
+
+          echo "Successfully created:"
+          ls -l "$test_file"
+
+          rm -f "$test_file"
+
+          echo "Write/delete test successful."
+
+      - name: Check rsync
+        shell: bash
+        run: |
+          set -euxo pipefail
+
+          echo "=============================================="
+          echo "RSYNC INFORMATION"
+          echo "=============================================="
+
+          command -v rsync
+
+          rsync --version
 
       - name: Sync changed files only
         shell: bash
         run: |
-          set -euo pipefail
+          set -euxo pipefail
 
           target="$RUNTIME_TARGET"
 
-          echo "======================================"
-          echo "Starting file synchronization"
-          echo "======================================"
+          echo
+          echo "=============================================="
+          echo "STARTING SYNCHRONIZATION"
+          echo "=============================================="
 
+          echo "Workspace:"
+          echo "$GITHUB_WORKSPACE"
+
+          echo
           echo "Target:"
           echo "$target"
 
-          if [[ ! -d "$target" ]]; then
-            echo "Runtime directory not found: $target" >&2
-            exit 1
-          fi
+          echo
+          echo "=============================================="
+          echo "SOURCE CONTENT"
+          echo "=============================================="
+
+          echo
+          echo "data:"
+          find "$PWD/data" -type f -print 2>/dev/null || true
+
+          echo
+          echo "ldp:"
+          find "$PWD/ldp" -type f -print 2>/dev/null || true
+
+          echo
+          echo "file:"
+          find "$PWD/file" -type f -print 2>/dev/null || true
+
+          echo
+          echo "images:"
+          find "$PWD/images" -type f -print 2>/dev/null || true
 
           sync_dir() {
-            src="$1"
-            dst="$2"
+            local src="$1"
+            local dst="$2"
 
             echo
-            echo "--------------------------------------"
-            echo "Synchronizing directory"
-            echo "--------------------------------------"
-            echo "Source:      $src"
-            echo "Destination: $dst"
+            echo
+            echo "##############################################"
+            echo "SYNCING DIRECTORY"
+            echo "##############################################"
+            echo "SOURCE:"
+            echo "$src"
+            echo
+            echo "DESTINATION:"
+            echo "$dst"
+            echo "##############################################"
 
             if [[ ! -d "$src" ]]; then
-              echo "Source does not exist - skipping:"
-              echo "$src"
+              echo "SOURCE DOES NOT EXIST - SKIPPING"
               return 0
             fi
 
             mkdir -p "$dst"
 
             echo
-            echo "Source:"
-            ls -ld "$src"
+            echo "Source permissions:"
+            stat "$src"
 
             echo
-            echo "Destination:"
-            ls -ld "$dst"
+            echo "Destination permissions:"
+            stat "$dst"
 
             echo
-            echo "Running:"
-            echo "rsync -av --update --itemize-changes \"$src/\" \"$dst/\""
+            echo "Files that will be considered:"
+            find "$src" -type f -print
 
             echo
-            echo "Rsync output:"
-            echo "--------------------------------------"
+            echo "----------------------------------------------"
+            echo "RUNNING RSYNC NOW"
+            echo "----------------------------------------------"
+
+            set +e
 
             rsync \
               -av \
               --update \
               --itemize-changes \
+              --stats \
               "$src/" \
               "$dst/"
 
-            echo "--------------------------------------"
-            echo "Directory synchronization completed."
+            rsync_exit=$?
+
+            set -e
+
+            echo
+            echo "----------------------------------------------"
+            echo "RSYNC EXIT CODE: $rsync_exit"
+            echo "----------------------------------------------"
+
+            if [[ "$rsync_exit" -ne 0 ]]; then
+              echo
+              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              echo "RSYNC FAILED"
+              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              echo "Source:      $src"
+              echo "Destination: $dst"
+              echo "Exit code:   $rsync_exit"
+              echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              exit "$rsync_exit"
+            fi
+
+            echo
+            echo "DIRECTORY SYNC SUCCESSFUL"
           }
 
-          sync_dir "$PWD/data" "$target/data"
-          sync_dir "$PWD/ldp" "$target/ldp"
-          sync_dir "$PWD/file" "$target/file"
-          sync_dir "$PWD/images" "$target/images"
+          echo
+          echo "=============================================="
+          echo "1/4 - DATA"
+          echo "=============================================="
+
+          sync_dir \
+            "$PWD/data" \
+            "$target/data"
 
           echo
-          echo "======================================"
-          echo "Sync complete"
-          echo "======================================"
-          echo "Only changed files were updated."
+          echo "=============================================="
+          echo "2/4 - LDP"
+          echo "=============================================="
 
-      - name: Verify synchronized files
+          sync_dir \
+            "$PWD/ldp" \
+            "$target/ldp"
+
+          echo
+          echo "=============================================="
+          echo "3/4 - FILE"
+          echo "=============================================="
+
+          sync_dir \
+            "$PWD/file" \
+            "$target/file"
+
+          echo
+          echo "=============================================="
+          echo "4/4 - IMAGES"
+          echo "=============================================="
+
+          sync_dir \
+            "$PWD/images" \
+            "$target/images"
+
+          echo
+          echo
+          echo "=============================================="
+          echo "ALL SYNCHRONIZATION COMPLETED"
+          echo "=============================================="
+
+      - name: Show deployed files
         shell: bash
         run: |
-          set -euo pipefail
+          set -euxo pipefail
 
-          echo "======================================"
-          echo "Verifying deployed files"
-          echo "======================================"
+          echo "=============================================="
+          echo "DEPLOYED FILES"
+          echo "=============================================="
 
-          echo "Runtime target:"
-          echo "$RUNTIME_TARGET"
-
-          echo
-          echo "Directory contents:"
           find "$RUNTIME_TARGET" \
-            -maxdepth 3 \
+            -maxdepth 4 \
             -type f \
-            -print | sort | head -200
+            -printf '%M %u:%g %s bytes %p\n' \
+            | sort
 
       - name: Verify deployment
         shell: bash
         run: |
-          set -euo pipefail
+          set -euxo pipefail
 
           url="http://localhost:10214/"
 
-          echo "======================================"
-          echo "ResearchSpace health check"
-          echo "======================================"
+          echo "=============================================="
+          echo "RESEARCHSPACE HEALTH CHECK"
+          echo "=============================================="
 
-          echo "URL: $url"
+          echo "URL:"
+          echo "$url"
+
+          echo
+          echo "Checking service..."
 
           status_code=$(curl \
             -s \
@@ -208,19 +306,29 @@ jobs:
             --max-time 5 \
             "$url" || true)
 
-          echo "HTTP status: ${status_code:-n/a}"
+          echo
+          echo "HTTP STATUS:"
+          echo "$status_code"
 
           if [[ "$status_code" =~ ^[0-9]{3}$ ]] && \
              [[ "$status_code" -lt 500 ]]; then
 
             echo
+            echo "=============================================="
+            echo "DEPLOYMENT SUCCESSFUL"
+            echo "=============================================="
+
             echo "Service is responding (HTTP $status_code)"
-            echo "Deployment successful - files updated without restart"
+            echo "Files updated without restart."
 
           else
 
             echo
-            echo "Service is not responding at $url"
+            echo "=============================================="
+            echo "DEPLOYMENT FAILED"
+            echo "=============================================="
+
+            echo "Service is not responding."
             echo "HTTP status: ${status_code:-n/a}"
 
             exit 1

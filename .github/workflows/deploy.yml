@@ -42,6 +42,31 @@ jobs:
             exit 1
           fi
 
+          if ! docker inspect "$DEPLOY_CONTAINER_NAME" >/dev/null 2>&1; then
+            echo "Container not found: $DEPLOY_CONTAINER_NAME"
+            exit 1
+          fi
+
+          deploy_realpath=$(realpath "$DEPLOY_APP_PATH")
+          mount_match=0
+
+          echo "Container mount sources:"
+          while IFS= read -r mount_source; do
+            [[ -n "$mount_source" ]] || continue
+            echo "- $mount_source"
+
+            mount_realpath=$(realpath "$mount_source" 2>/dev/null || printf '%s' "$mount_source")
+            if [[ "$deploy_realpath" == "$mount_realpath" || "$deploy_realpath" == "$mount_realpath/"* ]]; then
+              mount_match=1
+            fi
+          done < <(docker inspect --format '{{range .Mounts}}{{println .Source}}{{end}}' "$DEPLOY_CONTAINER_NAME")
+
+          if [[ "$mount_match" -ne 1 ]]; then
+            echo "DEPLOY_APP_PATH is not inside any bind-mounted host path for container $DEPLOY_CONTAINER_NAME"
+            echo "Configured deploy path: $DEPLOY_APP_PATH"
+            exit 1
+          fi
+
       - name: Sync changed files only
         shell: bash
         run: |

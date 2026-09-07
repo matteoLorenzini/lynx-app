@@ -33,10 +33,4 @@ restarts the ResearchSpace container so the app is reloaded.
 | `DEPLOY_APP_PATH` | Absolute Linux path to this app's local folder (e.g. `/opt/researchspace/apps/lynx-app`) |
 | `DEPLOY_CONTAINER_NAME` | Name of the local ResearchSpace Docker container to restart after sync |
 
-### Linux self-hosted runner requirements
-
-- `rsync`, `curl`, and `docker` must be installed on the runner machine.
-- The runner service user must have write access to `DEPLOY_APP_PATH`.
-- The runner service user must be allowed to run `docker restart` for `DEPLOY_CONTAINER_NAME`.
-
 

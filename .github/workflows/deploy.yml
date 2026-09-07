@@ -15,11 +15,13 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Validate deployment configuration
         shell: bash
         run: |
+          set -euo pipefail
+
           if [[ -z "$DEPLOY_APP_PATH" ]]; then
             echo "DEPLOY_APP_PATH secret is not set"
             exit 1
@@ -35,9 +37,16 @@ jobs:
             exit 1
           fi
 
+          if [[ ! -w "$DEPLOY_APP_PATH" ]]; then
+            echo "Deploy target directory is not writable: $DEPLOY_APP_PATH"
+            exit 1
+          fi
+
       - name: Sync changed files only
         shell: bash
         run: |
+          set -euo pipefail
+
           echo "Syncing app files to: $DEPLOY_APP_PATH"
 
           paths=(plugin.properties assets config data images lib)
@@ -45,10 +54,10 @@ jobs:
             if [[ -e "$path" ]]; then
               if [[ -d "$path" ]]; then
                 mkdir -p "$DEPLOY_APP_PATH/$path"
-                rsync -rlptD --update "$path/" "$DEPLOY_APP_PATH/$path/"
+                rsync -r --update --itemize-changes "$path/" "$DEPLOY_APP_PATH/$path/"
               else
                 mkdir -p "$DEPLOY_APP_PATH"
-                rsync -lptD --update "$path" "$DEPLOY_APP_PATH/$path"
+                rsync --update --itemize-changes "$path" "$DEPLOY_APP_PATH/$path"
               fi
             fi
           done

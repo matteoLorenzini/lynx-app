@@ -7,127 +7,89 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, linux]
+    runs-on: self-hosted
     timeout-minutes: 5
-    env:
-      DEPLOY_APP_PATH: ${{ secrets.DEPLOY_APP_PATH }}
-      DEPLOY_CONTAINER_NAME: ${{ secrets.DEPLOY_CONTAINER_NAME }}
-      DEPLOY_CONTAINER_APP_PATH: ${{ secrets.DEPLOY_CONTAINER_APP_PATH }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Validate deployment configuration
+      - name: Set paths
         shell: bash
         run: |
-          set -euo pipefail
+          compose_root="/home/matteo/researchspace-docker-desktop-main"
+          runtime_target="${compose_root}/researchspace/runtime-data"
 
-          if [[ -z "$DEPLOY_CONTAINER_NAME" ]]; then
-            echo "DEPLOY_CONTAINER_NAME secret is not set"
-            exit 1
-          fi
-
-          if [[ -z "${DEPLOY_APP_PATH:-}" && -z "${DEPLOY_CONTAINER_APP_PATH:-}" ]]; then
-            echo "Set either DEPLOY_APP_PATH for host-path sync or DEPLOY_CONTAINER_APP_PATH for direct container sync"
-            exit 1
-          fi
-
-          if ! docker inspect "$DEPLOY_CONTAINER_NAME" >/dev/null 2>&1; then
-            echo "Container not found: $DEPLOY_CONTAINER_NAME"
-            exit 1
-          fi
-
-          if [[ -n "${DEPLOY_CONTAINER_APP_PATH:-}" ]]; then
-            echo "Using direct container sync to: $DEPLOY_CONTAINER_APP_PATH"
-            exit 0
-          fi
-
-          if [[ ! -d "$DEPLOY_APP_PATH" ]]; then
-            echo "Deploy target directory not found: $DEPLOY_APP_PATH"
-            exit 1
-          fi
-
-          if [[ ! -w "$DEPLOY_APP_PATH" ]]; then
-            echo "Deploy target directory is not writable: $DEPLOY_APP_PATH"
-            exit 1
-          fi
-
-          deploy_realpath=$(realpath "$DEPLOY_APP_PATH")
-          mount_match=0
-
-          echo "Container mount sources:"
-          while IFS= read -r mount_source; do
-            [[ -n "$mount_source" ]] || continue
-            echo "- $mount_source"
-
-            mount_realpath=$(realpath "$mount_source" 2>/dev/null || printf '%s' "$mount_source")
-            if [[ "$deploy_realpath" == "$mount_realpath" || "$deploy_realpath" == "$mount_realpath/"* ]]; then
-              mount_match=1
-            fi
-          done < <(docker inspect --format '{{range .Mounts}}{{println .Source}}{{end}}' "$DEPLOY_CONTAINER_NAME")
-
-          if [[ "$mount_match" -ne 1 ]]; then
-            echo "DEPLOY_APP_PATH is not inside any bind-mounted host path for container $DEPLOY_CONTAINER_NAME"
-            echo "Configured deploy path: $DEPLOY_APP_PATH"
-            exit 1
-          fi
+          echo "COMPOSE_ROOT=${compose_root}" >> "$GITHUB_ENV"
+          echo "RUNTIME_TARGET=${runtime_target}" >> "$GITHUB_ENV"
+          echo "SERVICE_NAME=researchspace" >> "$GITHUB_ENV"
 
       - name: Sync changed files only
         shell: bash
         run: |
           set -euo pipefail
 
-          paths=(plugin.properties assets config data images lib)
+          target="$RUNTIME_TARGET"
+          echo "Syncing changed files to: $target"
 
-          if [[ -n "${DEPLOY_CONTAINER_APP_PATH:-}" ]]; then
-            echo "Syncing app files directly into container: $DEPLOY_CONTAINER_NAME:$DEPLOY_CONTAINER_APP_PATH"
-            docker exec "$DEPLOY_CONTAINER_NAME" mkdir -p "$DEPLOY_CONTAINER_APP_PATH"
-            tar -cf - "${paths[@]}" | docker exec -i "$DEPLOY_CONTAINER_NAME" tar -xf - -C "$DEPLOY_CONTAINER_APP_PATH"
-            echo "Sync complete - files copied into container"
-            exit 0
+          if [[ ! -d "$target" ]]; then
+            echo "Runtime app directory not found: $target" >&2
+            exit 1
           fi
 
-          echo "Syncing app files to: $DEPLOY_APP_PATH"
-          for path in "${paths[@]}"; do
-            if [[ -e "$path" ]]; then
-              if [[ -d "$path" ]]; then
-                mkdir -p "$DEPLOY_APP_PATH/$path"
-                rsync -r --update --itemize-changes "$path/" "$DEPLOY_APP_PATH/$path/"
-              else
-                mkdir -p "$DEPLOY_APP_PATH"
-                rsync --update --itemize-changes "$path" "$DEPLOY_APP_PATH/$path"
-              fi
+          sync_dir() {
+            src="$1"
+            dst="$2"
+
+            if [[ ! -d "$src" ]]; then
+              return 0
             fi
-          done
+
+            mkdir -p "$dst"
+
+            if command -v rsync >/dev/null 2>&1; then
+              rsync -a --update "$src/" "$dst/"
+            else
+              cp -ru "$src/." "$dst/"
+            fi
+          }
+
+          sync_file() {
+            src="$1"
+            dst="$2"
+
+            if [[ ! -f "$src" ]]; then
+              return 0
+            fi
+
+            mkdir -p "$(dirname "$dst")"
+
+            if command -v rsync >/dev/null 2>&1; then
+              rsync -a --update "$src" "$dst"
+            elif [[ ! -e "$dst" || "$src" -nt "$dst" ]]; then
+              cp -f "$src" "$dst"
+            fi
+          }
+
+          sync_file "$PWD/plugin.properties" "$target/plugin.properties"
+          sync_dir "$PWD/assets" "$target/assets"
+          sync_dir "$PWD/config" "$target/config"
+          sync_dir "$PWD/data" "$target/data"
+          sync_dir "$PWD/images" "$target/images"
+          sync_dir "$PWD/lib" "$target/lib"
 
           echo "Sync complete - only changed files updated"
-
-      - name: Restart container
-        shell: bash
-        run: |
-          echo "Restarting container: $DEPLOY_CONTAINER_NAME"
-          docker restart "$DEPLOY_CONTAINER_NAME"
 
       - name: Verify deployment
         shell: bash
         run: |
-          set -euo pipefail
-
           url="http://localhost:10214/"
-          for attempt in {1..12}; do
-            status_code=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 5 "$url" || true)
+          status_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$url" || true)
 
-            if [[ "$status_code" =~ ^[23][0-9][0-9]$ ]]; then
-              echo "Service is responding (HTTP $status_code)"
-              echo "Deployment successful - files synced and container restarted"
-              exit 0
-            fi
-
-            echo "Attempt $attempt/12: service not ready yet at $url (HTTP ${status_code:-curl-error})"
-            sleep 5
-          done
-
-          echo "Service did not become ready at $url after restart"
-          docker ps --filter "name=$DEPLOY_CONTAINER_NAME"
-          exit 1
+          if [[ "$status_code" =~ ^[0-9]{3}$ ]] && [[ "$status_code" -lt 500 ]]; then
+            echo "Service is responding (HTTP $status_code)"
+            echo "Deployment successful - files updated without restart"
+          else
+            echo "Service is not responding at $url (HTTP ${status_code:-n/a})" >&2
+            exit 1
+          fi

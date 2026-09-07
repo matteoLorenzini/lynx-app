@@ -23,22 +23,29 @@ lynx-app/
 ## Deployment
 
 On every push to `main` (or from **Run workflow**), [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
-runs on the configured self-hosted Linux runner, syncs this repo into the ResearchSpace container, and
-restarts the container so the app is reloaded.
+runs on the configured self-hosted Linux runner and syncs this repo into the local ResearchSpace
+runtime-data app directory.
 
-### Required repository secrets
+### Runner path configuration
 
-| Secret | Description |
-| --- | --- |
-| `DEPLOY_CONTAINER_NAME` | Name of the local ResearchSpace Docker container to restart after sync |
-| `DEPLOY_CONTAINER_APP_PATH` | Absolute app path inside the container (e.g. `/apps/lynx-app`) |
+The workflow currently expects this ResearchSpace checkout on the runner machine:
 
-### Optional fallback secret
+```text
+/home/mlorenzini/researchspace-docker-desktop-main
+```
 
-| Secret | Description |
-| --- | --- |
-| `DEPLOY_APP_PATH` | Absolute Linux host path to this app's local folder when the container uses a bind mount |
+It syncs this repo into:
 
-The workflow prefers direct container sync when `DEPLOY_CONTAINER_APP_PATH` is set. Use `DEPLOY_APP_PATH` only if you explicitly want to sync through a bind-mounted host folder.
+```text
+/home/mlorenzini/researchspace-docker-desktop-main/researchspace/runtime-data/apps/lynx-app
+```
+
+If your Ubuntu machine uses a different path, update the `compose_root` value in [.github/workflows/deploy.yml](.github/workflows/deploy.yml).
+
+### Runner requirements
+
+- `rsync` is recommended on the runner machine. The workflow falls back to `cp -ru` if `rsync` is unavailable.
+- The runner user must have write access to the runtime-data app directory.
+- The service must be reachable at `http://localhost:10214/` for the verification step to pass.
 
 

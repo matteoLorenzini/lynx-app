@@ -24,7 +24,7 @@ lynx-app/
 
 On every push to `main` (or from **Run workflow**), [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
 runs on the configured self-hosted Linux runner and syncs this repo into the local ResearchSpace
-runtime-data app directory.
+`/apps/lynx-app` directory.
 
 ### Runner path configuration
 
@@ -37,7 +37,7 @@ The workflow currently expects this ResearchSpace checkout on the runner machine
 It syncs this repo into:
 
 ```text
-/home/mlorenzini/researchspace-docker-desktop-main/researchspace/runtime-data/apps/lynx-app
+/home/matteo/researchspace-docker-desktop-main/researchspace/apps/lynx-app
 ```
 
 If your Ubuntu machine uses a different path, update the `compose_root` value in [.github/workflows/deploy.yml](.github/workflows/deploy.yml).
@@ -45,7 +45,7 @@ If your Ubuntu machine uses a different path, update the `compose_root` value in
 ### Runner requirements
 
 - `rsync` is recommended on the runner machine. The workflow falls back to `cp -ru` if `rsync` is unavailable.
-- The runner user must have write access to the runtime-data app directory.
+- The runner user must have write access to the `researchspace/apps` directory.
 - The service must be reachable at `http://localhost:10214/` for the verification step to pass.
 
 

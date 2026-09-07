@@ -32,10 +32,12 @@ jobs:
           target="$RUNTIME_TARGET"
           echo "Syncing changed files to: $target"
 
-          if [[ ! -d "$target" ]]; then
-            echo "Runtime directory not found: $target" >&2
+          if [[ ! -d "$(dirname "$target")" ]]; then
+            echo "Apps directory not found: $(dirname "$target")" >&2
             exit 1
           fi
+
+          mkdir -p "$target"
 
           sync_dir() {
             src="$1"
@@ -49,7 +51,8 @@ jobs:
 
             # Match robocopy behavior: copy recursively, do not delete extras, do not overwrite newer target files.
             if command -v rsync >/dev/null 2>&1; then
-              rsync -a --update "$src/" "$dst/"
+              echo "Syncing directory $src -> $dst"
+              rsync -rlt --update --itemize-changes "$src/" "$dst/"
             else
               cp -ru "$src/." "$dst/"
             fi
@@ -66,7 +69,8 @@ jobs:
             mkdir -p "$(dirname "$dst")"
 
             if command -v rsync >/dev/null 2>&1; then
-              rsync -a --update "$src" "$dst"
+              echo "Syncing file $src -> $dst"
+              rsync -lt --update --itemize-changes "$src" "$dst"
             elif [[ ! -e "$dst" || "$src" -nt "$dst" ]]; then
               cp -f "$src" "$dst"
             fi

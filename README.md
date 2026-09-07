@@ -39,22 +39,4 @@ restarts the ResearchSpace container so the app is reloaded.
 - The runner service user must have write access to `DEPLOY_APP_PATH`.
 - The runner service user must be allowed to run `docker restart` for `DEPLOY_CONTAINER_NAME`.
 
-### Quick test: small push to `main`
 
-Use this once your runner and secrets are configured to trigger deployment with a minimal change.
-
-```bash
-git checkout main
-git pull --ff-only
-printf "\nTest deploy: %s\n" "$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> README.md
-git add README.md
-git commit -m "chore: trigger deploy workflow test"
-git push origin main
-```
-
-Then open **Actions** in GitHub and check the latest **Deploy ResearchSpace** run.
-
-If you do not want to commit to `main` directly, use **Run workflow** manually from the Actions page.
-
-Note: config file changes (repositories, services, page-layout) require the platform restart performed by the
-workflow. Changes under `data/templates` and `assets` are picked up immediately without a restart.

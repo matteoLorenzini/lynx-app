@@ -165,9 +165,9 @@
     SELECT ?subject 
     WHERE {
       ?subject a crm:E18_Physical_Thing ; 
-               crm:P1_is_identified_by ?name_identifier . 
-      ?name_identifier a crm:E41_Appellation ;
-                       skos:prefLabel ?label .
+           crm:P1_is_identified_by ?name_identifier . 
+      ?name_identifier a crm:E42_Identifier ;
+               rdfs:label ?label .
       FILTER REGEX(STR(?label), ?__token__, "i") 
     } 
   ' default-query='
@@ -211,16 +211,27 @@
 
                     SELECT ?subject ?value ?label_type ?note ?preview ?previewStr ?previewImageStr WHERE {
                       {
-                        SELECT ?subject ?value (SAMPLE(?preview_) AS ?preview) (SAMPLE(?rand_) AS ?rand_) WHERE {
-                          ?subject a crm:E18_Physical_Thing ;
-                                   crm:P1_is_identified_by ?appellation .
-                          ?appellation a crm:E41_Appellation ;
-                                      skos:prefLabel ?value .
-                          OPTIONAL { ?subject crm:P3_has_note ?note_ . }
+                           SELECT ?subject ?value
+                             (SAMPLE(?label_type_) AS ?label_type)
+                             (SAMPLE(?note_) AS ?note)
+                             (SAMPLE(?preview_) AS ?preview)
+                             (SAMPLE(?rand_) AS ?rand_) WHERE {
+                            ?subject a crm:E18_Physical_Thing ;
+                               crm:P1_is_identified_by ?identifier .
+                            ?identifier a crm:E42_Identifier ;
+                                  crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
+                                  rdfs:label ?value .
+                            OPTIONAL {
+                              ?subject crm:P67i_is_referred_to_by ?description .
+                              ?description a crm:E33_Linguistic_Object ;
+                               crm:P2_has_type <http://www.lynx.com/resource/description-notes> ;
+                               rdfs:label ?note_ .
+                            }
                           OPTIONAL {
                             ?subject crm:P2_has_type ?type .
                             ?type a crm:E55_Type ;
-                                  skos:prefLabel ?label_type .
+                              crm:P2_has_type <http://www.lynx.com/resource/classification> ;
+                                  rdfs:label ?label_type_ .
                           }
                           # collect previews from documents but SAMPLE ensures only one preview per subject
                           OPTIONAL {
@@ -336,7 +347,7 @@
               ORDER BY ?value
               " column-configuration='[
               {
-                "displayName": "Site", 
+                "displayName": "Unique ID", 
                 "cellTemplate": "<semantic-link iri=\"{{subject.value}}\">{{value.value}}</semantic-link>" 
               },
               {

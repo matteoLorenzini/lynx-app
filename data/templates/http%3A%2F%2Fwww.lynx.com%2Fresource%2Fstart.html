@@ -185,7 +185,7 @@ SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previe
                 query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                        SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
                            ?subject a crm:E53_Place ;
-                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> .
+                           crm:P2_has_type <http://www.lynx.com/resource/place-of-discovery> .
                        }"
                 template="{{#each bindings}}Found {{num.value}} places{{/each}}"
             ></semantic-query>
@@ -198,14 +198,13 @@ SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previe
         <bs-col md="10" class="bso-component card-container horizontal-scroll">
             <semantic-query
                 query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                        
                        SELECT DISTINCT ?subject ?label WHERE {
                            ?subject a crm:E53_Place ;
-                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                                   crm:P1_is_identified_by ?appellation .
-                           ?appellation a crm:E41_Appellation ;
-                                       skos:prefLabel ?label .
+                         crm:P2_has_type <http://www.lynx.com/resource/place-of-discovery> .
+                     OPTIONAL { ?subject rdfs:label ?placeLabel . }
+                     BIND(COALESCE(?placeLabel, REPLACE(STR(?subject), &quot;^.*/&quot;, &quot;&quot;)) AS ?label)
                            BIND(DAY(NOW()) as ?day)
                            BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
                        } ORDER BY ?random LIMIT 10"

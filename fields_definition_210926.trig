@@ -1,0 +1,1683 @@
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/bibliography/context> {
+  <http://www.lynx-platform.com/field/bibliography> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    rdfs:label "Bibliography"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-09-21T21:01:52.420Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23551;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23552;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/information_object>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E73_Information_Object .
+  
+  _:t23552 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+ $subject a crm:E18_Physical_Thing;
+             crm:P129i_is_subject_of ?information_object.
+     ?information_object a crm:E73_Information_Object;
+                         rdfs:label ?value
+}""" .
+  
+  _:t23551 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx489 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/bibliography> .
+}
+
+{
+  _:node1k32orpejx489 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/boxlocation/context> {
+  <http://www.lynx-platform.com/field/boxlocation> a <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23536;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    rdfs:label "Box Location"@en;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23537;
+    prov:generatedAtTime "2026-09-21T20:56:20.958Z"^^xsd:dateTime .
+  
+  _:t23536 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23537 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crm:E18_Physical_Thing;
+             crm:P55_has_current_location ?location.
+     ?location a crm:E53_Place;
+               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/box/location>;
+               rdfs:label ?value
+}""" .
+  
+  _:node1k32orpejx490 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/boxlocation> .
+}
+
+{
+  _:node1k32orpejx490 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/chronology/context> {
+  <http://www.lynx-platform.com/field/chronology> a <http://www.researchspace.org/resource/system/fields/Field>,
+      prov:Entity, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/timespan>;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E52_Time-Span;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23432;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23433;
+    prov:generatedAtTime "2026-09-21T17:26:53.241Z"^^xsd:dateTime;
+    rdfs:label "Chronology"@en .
+  
+  _:t23433 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23432 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+      $subject a crm:E18_Physical_Thing;
+               crm:P108i_was_produced_by ?production.
+    ?production a crm:E12_Production;
+                  crm:P4_has_time-span ?time_span.
+    ?time_span  a crm:E52_Time-Span;
+                rdfs:label ?value
+}""" .
+  
+  _:node1k32orpejx491 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/chronology> .
+}
+
+{
+  _:node1k32orpejx491 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/Classification/context> {
+  <http://www.lynx-platform.com/field/Classification> a prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>;
+    prov:generatedAtTime "2026-09-21T16:22:33.235Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/type>;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    rdfs:label "Classification"@en;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23399;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23398;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E55_Type .
+  
+  _:t23398 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23399 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+                crm:P2_has_type ?type.
+                ?type a crm:E55_Type;
+                crm:P2_has_type <http://www.lynx.com/resource/classification>;
+                rdfs:label ?value.
+}""" .
+  
+  _:node1k32orpejx492 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/Classification> .
+}
+
+{
+  _:node1k32orpejx492 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/composedof/context> {
+  <http://www.lynx-platform.com/field/composedof> a prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23463;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23462;
+    prov:generatedAtTime "2026-09-21T18:03:50.165Z"^^xsd:dateTime;
+    rdfs:label "Composed Of"@en;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>,
+      <http://www.researchspace.org/resource/system/category/physical_object>;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E18_Physical_Thing .
+  
+  _:t23462 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23463 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+             crm:P46_is_composed_of ?value.
+}""" .
+  
+  _:node1k32orpejx493 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/composedof> .
+}
+
+{
+  _:node1k32orpejx493 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/dateofdiscovery/context> {
+  _:t23522 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23523 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crm:E18_Physical_Thing;
+             crm:P12i_was_present_at ?activity.
+     ?activity a crm:E7_Activity;
+               crm:P4_has_time-span ?time_span.
+     ?time_span a crm:E52_Time-Span;
+                crm:P2_has_type <http://www.lynx.com/resource/date_of_discovery>;
+                rdfs:label ?value.
+}""" .
+  
+  <http://www.lynx-platform.com/field/dateofdiscovery> a prov:Entity, <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    prov:generatedAtTime "2026-09-21T20:49:42.458Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23522;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23523;
+    rdfs:label "Date of Discovery"@en;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/activity>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E52_Time-Span .
+  
+  _:node1k32orpejx494 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/dateofdiscovery> .
+}
+
+{
+  _:node1k32orpejx494 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/depth/context> {
+  _:t23483 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+             crm:P43_has_dimension ?dimension.
+
+    ?dimension a crm:E54_Dimension;
+               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/depth>;
+               crm:P91_has_unit ?unit;
+               rdfs:label ?dimensionValue.
+
+    BIND(
+        CONCAT(
+            STR(?dimensionValue),
+            \" \",
+            STRAFTER(STR(?unit), \"/dimension-unit/\")
+        )
+        AS ?value
+    )
+}""" .
+  
+  <http://www.lynx-platform.com/field/depth> a prov:Entity, <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/dimension>;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23483;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E54_Dimension;
+    rdfs:label "Depth"@en;
+    prov:generatedAtTime "2026-09-21T20:21:51.778Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23482;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing .
+  
+  _:t23482 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx495 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/depth> .
+}
+
+{
+  _:node1k32orpejx495 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/Description/context> {
+  <http://www.lynx-platform.com/field/Description> a <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E33_Linguistic_Object;
+    prov:generatedAtTime "2026-09-21T16:34:45.823Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23405;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23406;
+    rdfs:label "Description"@en;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/linguistic_object> .
+  
+  _:t23405 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23406 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crm:E18_Physical_Thing;
+                crm:P67i_is_referred_to_by ?e33.
+    ?e33     a crm:E33_Linguistic_Object;
+               crm:P2_has_type <http://www.lynx.com/resource/description-notes>;
+               rdfs:label  ?value.
+}""" .
+  
+  _:node1k32orpejx496 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/Description> .
+}
+
+{
+  _:node1k32orpejx496 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/diameter/context> {
+  <http://www.lynx-platform.com/field/diameter> a <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>, prov:Entity;
+    prov:generatedAtTime "2026-09-21T20:23:10.822Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23487;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23488;
+    rdfs:label "Diameter"@en;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E54_Dimension;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/dimension> .
+  
+  _:t23488 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+             crm:P43_has_dimension ?dimension.
+
+    ?dimension a crm:E54_Dimension;
+               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/diameter>;
+               crm:P91_has_unit ?unit;
+               rdfs:label ?dimensionValue.
+
+    BIND(
+        CONCAT(
+            STR(?dimensionValue),
+            \" \",
+            STRAFTER(STR(?unit), \"/dimension-unit/\")
+        )
+        AS ?value
+    )
+}""" .
+  
+  _:t23487 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx497 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/diameter> .
+}
+
+{
+  _:node1k32orpejx497 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/height/context> {
+  <http://www.lynx-platform.com/field/height> a <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E54_Dimension;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/dimension>;
+    prov:generatedAtTime "2026-09-21T20:10:06.117Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23467;
+    rdfs:label "Height"@en;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23468 .
+  
+  _:t23467 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+             crm:P43_has_dimension ?dimension.
+
+    ?dimension a crm:E54_Dimension;
+               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/height>;
+               crm:P91_has_unit ?unit;
+               rdfs:label ?dimensionValue.
+
+    BIND(
+        CONCAT(
+            STR(?dimensionValue),
+            \" \",
+            STRAFTER(STR(?unit), \"/dimension-unit/\")
+        )
+        AS ?value
+    )
+}""" .
+  
+  _:t23468 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx498 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/height> .
+}
+
+{
+  _:node1k32orpejx498 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/siteofdiscovery/context> {
+  <http://www.lynx-platform.com/field/siteofdiscovery> a <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/site_search>,
+      <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place;
+    prov:generatedAtTime "2026-09-21T20:41:12.262Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23511;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:wasAttributedTo User:admin;
+    rdfs:label "Site of Discovery"@en;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23512 .
+  
+  _:t23511 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+    $subject a crm:E18_Physical_Thing;
+             crm:P53_has_former_or_current_location ?value.
+    ?value a crm:E53_Place;
+             crm:P2_has_type <http://www.lynx.com/resource/site-of-discovery>
+}""" .
+  
+  _:t23512 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx499 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/siteofdiscovery> .
+}
+
+{
+  _:node1k32orpejx499 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/shelflocation/context> {
+  <http://www.lynx-platform.com/field/shelflocation> a prov:Entity, <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23534;
+    rdfs:label "Shelf Location"@en;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place;
+    prov:generatedAtTime "2026-09-21T20:56:16.263Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23535 .
+  
+  _:t23534 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+   $subject a crm:E18_Physical_Thing;
+             crm:P55_has_current_location ?location.
+     ?location a crm:E53_Place;
+               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/shelf/location>;
+               rdfs:label ?value
+}""" .
+  
+  _:t23535 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx500 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/shelflocation> .
+}
+
+{
+  _:node1k32orpejx500 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/sameas/context> {
+  _:t23455 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+             crmdig:L54_is_same-as ?value.
+}""" .
+  
+  <http://www.lynx-platform.com/field/sameas> a <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>, prov:Entity;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_object>,
+      <http://www.researchspace.org/resource/system/category/physical_feature>, <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    rdfs:label "Same As"@en;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23454;
+    prov:generatedAtTime "2026-09-21T17:59:10.536Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23455 .
+  
+  _:t23454 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx501 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/sameas> .
+}
+
+{
+  _:node1k32orpejx501 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/provenance/context> {
+  <http://www.lynx-platform.com/field/provenance> a <http://www.researchspace.org/resource/system/fields/Field>,
+      prov:Entity, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23517;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23518;
+    rdfs:label "Provenance"@en;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    prov:generatedAtTime "2026-09-21T20:44:15.789Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place .
+  
+  _:t23517 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+     $subject a crm:E18_Physical_Thing;
+             crm:P53_has_former_or_current_location ?location.
+    ?location a crm:E53_Place;
+             crm:P2_has_type <http://www.lynx.com/resource/provenance>;
+			rdfs:label ?value
+}""" .
+  
+  _:t23518 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx502 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/provenance> .
+}
+
+{
+  _:node1k32orpejx502 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/project_id/context> {
+  <http://www.lynx-platform.com/field/project_id> a <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>, prov:Entity;
+    prov:generatedAtTime "2026-09-21T16:16:53.232Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    rdfs:label "Project ID"@en;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E42_Identifier;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23386;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23387;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/identifier> .
+  
+  _:t23387 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23386 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+$subject a crm:E18_Physical_Thing;
+             crm:P1_is_identified_by?identifier.
+  ?identifier a crm:E42_Identifier;
+                crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/internal-id>;
+                rdfs:label ?value
+}""" .
+  
+  _:node1k32orpejx503 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/project_id> .
+}
+
+{
+  _:node1k32orpejx503 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/placeofdiscovery/context> {
+  <http://www.lynx-platform.com/field/placeofdiscovery> a prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>;
+    rdfs:label "Place of Discovery"@en;
+    prov:generatedAtTime "2026-09-21T20:56:31.036Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23540;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23541 .
+  
+  _:t23541 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23540 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+     $subject a crm:E18_Physical_Thing;
+             crm:P53_has_former_or_current_location ?value.
+    ?value a crm:E53_Place;
+             crm:P2_has_type <http://www.lynx.com/resource/place-of-discovery>
+}""" .
+  
+  _:node1k32orpejx504 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/placeofdiscovery> .
+}
+
+{
+  _:node1k32orpejx504 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/material/context> {
+  <http://www.lynx-platform.com/field/material> a prov:Entity, <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23439;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/material>;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23440;
+    prov:generatedAtTime "2026-09-21T17:41:07.950Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E57_Material;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    rdfs:label "Material"@en;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing .
+  
+  _:t23439 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+   $subject a crm:E18_Physical_Thing;
+               crm:P45_consists_of ?material.
+    ?material a crm:E57_Material;
+              rdfs:label ?value
+}""" .
+  
+  _:t23440 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx505 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/material> .
+}
+
+{
+  _:node1k32orpejx505 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/manifacturing_marks/context> {
+  <http://www.lynx-platform.com/field/manifacturing_marks> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23437;
+    rdfs:label "Manifacturing Marks"@en;
+    prov:generatedAtTime "2026-09-21T17:39:29.142Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23438;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E55_Type;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_feature> .
+  
+  _:t23437 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+               crm:P56_bears_feature ?feature.
+    ?feature a crm:E25_Man-Made_Feature;
+             crm:P2_has_type <http://www.lynx.com/resource/manifacturing-marks>;
+             rdfs:label ?value
+}""" .
+  
+  _:t23438 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx506 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/manifacturing_marks> .
+}
+
+{
+  _:node1k32orpejx506 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/length/context> {
+  <http://www.lynx-platform.com/field/length> a <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>;
+    prov:generatedAtTime "2026-09-21T20:12:13.231Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E54_Dimension;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/dimension>;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23472;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23473;
+    rdfs:label "Length"@en .
+  
+  _:t23472 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23473 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+             crm:P43_has_dimension ?dimension.
+
+    ?dimension a crm:E54_Dimension;
+               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/lenght>;
+               crm:P91_has_unit ?unit;
+               rdfs:label ?dimensionValue.
+
+    BIND(
+        CONCAT(
+            STR(?dimensionValue),
+            \" \",
+            STRAFTER(STR(?unit), \"/dimension-unit/\")
+        )
+        AS ?value
+    )
+}""" .
+  
+  _:node1k32orpejx507 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/length> .
+}
+
+{
+  _:node1k32orpejx507 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/inventory_id/context> {
+  _:t23389 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+$subject a crm:E18_Physical_Thing;
+             crm:P1_is_identified_by?identifier.
+  ?identifier a crm:E42_Identifier;
+                crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/inventory-id>;
+                rdfs:label ?value
+}""" .
+  
+  <http://www.lynx-platform.com/field/inventory_id> a <http://www.researchspace.org/resource/system/fields/Field>,
+      prov:Entity, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23389;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    rdfs:label "Inventory ID"@en;
+    prov:wasAttributedTo User:admin;
+    prov:generatedAtTime "2026-09-21T16:16:57.246Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E42_Identifier;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/identifier>;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23388 .
+  
+  _:t23388 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx508 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/inventory_id> .
+}
+
+{
+  _:node1k32orpejx508 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/stateofpreservation/context> {
+  <http://www.lynx-platform.com/field/stateofpreservation> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/condition_state>;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23538;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23539;
+    rdfs:label "State of Preservation"@en;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E3_Condition_State;
+    prov:generatedAtTime "2026-09-21T20:56:26.420Z"^^xsd:dateTime .
+  
+  _:t23539 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+   $subject a crm:E18_Physical_Thing;
+               crm:P44_has_condition ?condition.
+    ?condition a crm:E3_Condition_State;
+               rdfs:label ?value.
+}""" .
+  
+  _:t23538 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx509 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/stateofpreservation> .
+}
+
+{
+  _:node1k32orpejx509 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/status/context> {
+  <http://www.lynx-platform.com/field/status> a prov:Entity, <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    rdfs:label "Status"@en;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23420;
+    prov:generatedAtTime "2026-09-21T17:11:52.147Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23421;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E55_Type;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string .
+  
+  _:t23421 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+ $subject a crm:E18_Physical_Thing;
+               crm:P2_has_type ?type.
+    ?type   a  crm:E55_Type ;
+            crm:P2_has_type <http://www.lynx.com/resource/status> ;
+            rdfs:label ?value .
+}""" .
+  
+  _:t23420 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx510 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/status> .
+}
+
+{
+  _:node1k32orpejx510 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/stylistic-notes/context> {
+  <http://www.lynx-platform.com/field/stylistic-notes> a <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity, <http://www.researchspace.org/resource/system/fields/Field>;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/linguistic_object>;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23425;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23426;
+    rdfs:label "Stylistic Notes"@en;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E33_Linguistic_Object;
+    prov:generatedAtTime "2026-09-21T17:21:47.207Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing .
+  
+  _:t23425 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23426 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crm:E18_Physical_Thing;
+                crm:P67i_is_referred_to_by ?e33.
+    ?e33     a crm:E33_Linguistic_Object;
+               crm:P2_has_type <http://www.lynx.com/resource/stylistic-notes>;
+               rdfs:label  ?value.
+}""" .
+  
+  _:node1k32orpejx511 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/stylistic-notes> .
+}
+
+{
+  _:node1k32orpejx511 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/TechnicalDiagnosticFeatures/context> {
+  <http://www.lynx-platform.com/field/TechnicalDiagnosticFeatures> a <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E25_Man-Made_Feature;
+    prov:generatedAtTime "2026-09-21T20:28:07.654Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23492;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23493;
+    rdfs:label "Technical Diagnostic Features"@en .
+  
+  _:t23492 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:t23493 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+      $subject a crm:E18_Physical_Thing;
+               crm:P56_bears_feature ?feature.
+    ?feature a crm:E25_Man-Made_Feature;
+             crm:P2_has_type <http://www.lynx.com/resource/technical-diagnostic-feature>;
+             rdfs:label ?value
+}""" .
+  
+  _:node1k32orpejx512 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/TechnicalDiagnosticFeatures> .
+}
+
+{
+  _:node1k32orpejx512 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/Unique_ID/context> {
+  _:t23390 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  <http://www.lynx-platform.com/field/Unique_ID> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/identifier>;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E42_Identifier;
+    prov:generatedAtTime "2026-09-21T16:17:00.978Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23390;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23391;
+    rdfs:label "Unique ID"@en .
+  
+  _:t23391 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+$subject a crm:E18_Physical_Thing;
+             crm:P1_is_identified_by?identifier.
+  ?identifier a crm:E42_Identifier;
+                crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id>;
+                rdfs:label ?value
+}""" .
+  
+  _:node1k32orpejx513 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/Unique_ID> .
+}
+
+{
+  _:node1k32orpejx513 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+<http://www.lynx-platform.com/field/width/context> {
+  <http://www.lynx-platform.com/field/width> a prov:Entity, <http://www.w3.org/ns/ldp#Resource>,
+      <http://www.researchspace.org/resource/system/fields/Field>;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t23477;
+    rdfs:label "Width"@en;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/dimension>;
+    prov:generatedAtTime "2026-09-21T20:14:09.755Z"^^xsd:dateTime;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t23478;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E54_Dimension;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/domain> crm:E18_Physical_Thing .
+  
+  _:t23477 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+    $subject a crm:E18_Physical_Thing;
+             crm:P43_has_dimension ?dimension.
+
+    ?dimension a crm:E54_Dimension;
+               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/dimension/width>;
+               crm:P91_has_unit ?unit;
+               rdfs:label ?dimensionValue.
+
+    BIND(
+        CONCAT(
+            STR(?dimensionValue),
+            \" \",
+            STRAFTER(STR(?unit), \"/dimension-unit/\")
+        )
+        AS ?value
+    )
+}""" .
+  
+  _:t23478 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+  
+  _:node1k32orpejx514 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/width> .
+}
+
+{
+  _:node1k32orpejx514 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}

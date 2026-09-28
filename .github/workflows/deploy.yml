@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set paths
         shell: pwsh
@@ -134,6 +134,6 @@ jobs:
           if ($statusCode -ge 100 -and $statusCode -lt 500) {
             Write-Output "Service is responding (HTTP $statusCode)"
             Write-Output 'Deployment successful - files updated without restart'
-          else
+          } else {
             throw "Service is not responding at $url (HTTP $statusCode)"
           }

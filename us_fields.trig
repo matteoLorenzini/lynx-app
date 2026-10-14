@@ -1,0 +1,1537 @@
+@prefix fedsail: <http://www.openrdf.org/config/sail/federation#> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/> .
+@prefix Help: <http://help.researchspace.org/resource/> .
+@prefix bds: <http://www.bigdata.com/rdf/search#> .
+@prefix crmdig: <http://www.ics.forth.gr/isl/CRMcrmdig/> .
+@prefix assets: <http://www.researchspace.org/resource/assets/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmgeo: <http://www.cidoc-crm.org/extensions/crmgeo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix User: <http://www.researchspace.org/resource/user/> .
+@prefix crmsci: <http://www.cidoc-crm.org/extensions/crmsci/> .
+@prefix forms: <http://www.researchspace.org/resource/system/forms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rshelp: <http://researchspace.org/help/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix Platform: <http://www.researchspace.org/resource/system/> .
+@prefix crminfluence: <http://www.cidoc-crm.org/extensions/influence/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rso: <http://www.researchspace.org/ontology/> .
+@prefix Admin: <http://www.researchspace.org/resource/admin/> .
+@prefix ontodia: <http://ontodia.org/schema/v1#> .
+@prefix frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix rsp: <http://www.researchspace.org/resource/> .
+
+
+<http://www.lynx-platform.com/field/us_global_id/context> {
+  <http://www.lynx-platform.com/field/us_global_id> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "US Global ID"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30001;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30002;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/identifier>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E42_Identifier .
+
+  _:t30002 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P1_is_identified_by ?identifier.
+    ?identifier a crm:E42_Identifier;
+                crm:P2_has_type <http://www.lynx.com/resource/global-id>;
+                rdfs:label ?value
+}""" .
+
+  _:t30001 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus001 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_global_id> .
+}
+
+{
+  _:nodeus001 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_definition/context> {
+  <http://www.lynx-platform.com/field/us_definition> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "US Definition"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30003;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30004;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/linguistic_object>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E33_Linguistic_Object .
+
+  _:t30004 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P67i_is_referred_to_by ?e33.
+    ?e33 a crm:E33_Linguistic_Object;
+         rdfs:label ?value
+}""" .
+
+  _:t30003 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus002 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_definition> .
+}
+
+{
+  _:nodeus002 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_notes/context> {
+  <http://www.lynx-platform.com/field/us_notes> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "US Notes"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30005;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30006;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/linguistic_object>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E33_Linguistic_Object .
+
+  _:t30006 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P67i_is_referred_to_by ?value.
+    FILTER(isLiteral(?value))
+}""" .
+
+  _:t30005 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus003 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_notes> .
+}
+
+{
+  _:nodeus003 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_typology/context> {
+  <http://www.lynx-platform.com/field/us_typology> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "US Typology"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30007;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30008;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/type>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E55_Type .
+
+  _:t30008 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P2_has_type ?type.
+    ?type a crm:E55_Type;
+          rdfs:label ?value.
+    FILTER(CONTAINS(STR(?type), "/tipologia/"))
+}""" .
+
+  _:t30007 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus004 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_typology> .
+}
+
+{
+  _:nodeus004 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_formation_mode/context> {
+  <http://www.lynx-platform.com/field/us_formation_mode> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Formation Mode"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30009;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30010;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/type>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E83_Type_Creation .
+
+  _:t30010 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P136i_supported_type_creation ?creation.
+    ?creation a crm:E83_Type_Creation;
+              rdfs:label ?value
+}""" .
+
+  _:t30009 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus005 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_formation_mode> .
+}
+
+{
+  _:nodeus005 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_conservation_state/context> {
+  <http://www.lynx-platform.com/field/us_conservation_state> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Conservation State"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30011;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30012;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/condition_state>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E3_Condition_State .
+
+  _:t30012 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P44_has_condition ?condition.
+    ?condition a crm:E3_Condition_State;
+               rdfs:label ?value.
+    FILTER(CONTAINS(STR(?condition), "/stato-conservazione/"))
+}""" .
+
+  _:t30011 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus006 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_conservation_state> .
+}
+
+{
+  _:nodeus006 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_stratigraphic_reliability/context> {
+  <http://www.lynx-platform.com/field/us_stratigraphic_reliability> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Stratigraphic Reliability"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30013;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30014;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/condition_state>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E3_Condition_State .
+
+  _:t30014 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P44_has_condition ?condition.
+    ?condition a crm:E3_Condition_State;
+               rdfs:label ?value.
+    FILTER(CONTAINS(STR(?condition), "/affidabilita-stratigrafica/"))
+}""" .
+
+  _:t30013 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus007 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_stratigraphic_reliability> .
+}
+
+{
+  _:nodeus007 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_consistency/context> {
+  <http://www.lynx-platform.com/field/us_consistency> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Consistency"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30015;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30016;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/type>;
+    <http://www.researchspace.org/resource/system/fields/range> crmsci:S9_Property_Type .
+
+  _:t30016 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P130_shows_features_of ?property.
+    ?property a <http://www.ics.forth.gr/isl/CRMsci/S9_Property_Type>;
+              crm:P2_has_type <http://www.lynx.com/resource/consistenza>;
+              rdfs:label ?value
+}""" .
+
+  _:t30015 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus008 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_consistency> .
+}
+
+{
+  _:nodeus008 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_color/context> {
+  <http://www.lynx-platform.com/field/us_color> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Color"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30017;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30018;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/type>;
+    <http://www.researchspace.org/resource/system/fields/range> crmsci:S9_Property_Type .
+
+  _:t30018 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P130_shows_features_of ?property.
+    ?property a <http://www.ics.forth.gr/isl/CRMsci/S9_Property_Type>;
+              crm:P2_has_type <http://www.lynx.com/resource/colore>;
+              rdfs:label ?value
+}""" .
+
+  _:t30017 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus009 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_color> .
+}
+
+{
+  _:nodeus009 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_distinction_criteria/context> {
+  <http://www.lynx-platform.com/field/us_distinction_criteria> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Distinction Criteria"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30019;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30020;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/type>;
+    <http://www.researchspace.org/resource/system/fields/range> crmsci:S9_Property_Type .
+
+  _:t30020 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P130_shows_features_of ?property.
+    ?property a <http://www.ics.forth.gr/isl/CRMsci/S9_Property_Type>;
+              rdfs:label ?value.
+    FILTER(CONTAINS(STR(?property), "/criteri-distinzione/"))
+}""" .
+
+  _:t30019 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus010 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_distinction_criteria> .
+}
+
+{
+  _:nodeus010 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_inorganic_components/context> {
+  <http://www.lynx-platform.com/field/us_inorganic_components> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Inorganic Components"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30021;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30022;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E18_Physical_Thing .
+
+  _:t30022 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP21_contains ?component.
+    ?component a crm:E18_Physical_Thing;
+               crm:P2_has_type <http://www.lynx.com/resource/componenti-inorganici>;
+               rdfs:label ?value
+}""" .
+
+  _:t30021 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus011 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_inorganic_components> .
+}
+
+{
+  _:nodeus011 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_organic_components/context> {
+  <http://www.lynx-platform.com/field/us_organic_components> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Organic Components"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30023;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30024;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E20_Biological_Object .
+
+  _:t30024 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP21_contains ?component.
+    ?component a crm:E20_Biological_Object;
+               crm:P2_has_type <http://www.lynx.com/resource/componenti-organici>;
+               rdfs:label ?value
+}""" .
+
+  _:t30023 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus012 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_organic_components> .
+}
+
+{
+  _:nodeus012 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_dating_elements/context> {
+  <http://www.lynx-platform.com/field/us_dating_elements> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Dating Elements"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30025;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30026;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E18_Physical_Thing .
+
+  _:t30026 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP21_contains ?component.
+    ?component a crm:E18_Physical_Thing;
+               rdfs:label ?value.
+    FILTER(CONTAINS(STR(?component), "/elementi-datanti/"))
+}""" .
+
+  _:t30025 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus013 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_dating_elements> .
+}
+
+{
+  _:nodeus013 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_competent_body/context> {
+  <http://www.lynx-platform.com/field/us_competent_body> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Competent Body"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30027;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30028;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/actor>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E74_Group .
+
+  _:t30028 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P105_right_held_by ?group.
+    ?group a crm:E74_Group;
+           rdfs:label ?value.
+    FILTER(CONTAINS(STR(?group), "/ente-competente/"))
+}""" .
+
+  _:t30027 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus014 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_competent_body> .
+}
+
+{
+  _:nodeus014 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_responsible_body/context> {
+  <http://www.lynx-platform.com/field/us_responsible_body> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Responsible Body"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30029;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30030;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/actor>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E74_Group .
+
+  _:t30030 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P105_right_held_by ?group.
+    ?group a crm:E74_Group.
+    FILTER(CONTAINS(STR(?group), "/ente-responsabile/"))
+    OPTIONAL { ?group rdfs:label ?groupLabel }
+    BIND(COALESCE(?groupLabel, STRAFTER(STR(?group), "/ente-responsabile/")) AS ?value)
+}""" .
+
+  _:t30029 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus015 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_responsible_body> .
+}
+
+{
+  _:nodeus015 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_quote/context> {
+  <http://www.lynx-platform.com/field/us_quote> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Elevations (Quote)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30031;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30032;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/dimension>;
+    <http://www.researchspace.org/resource/system/fields/range> crmsci:S21_Measurement .
+
+  _:t30032 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    <http://www.ics.forth.gr/isl/CRMsci/O24i_was_measured_by> ?measurement.
+    ?measurement a <http://www.ics.forth.gr/isl/CRMsci/S21_Measurement>;
+                 crm:P2_has_type <http://www.lynx.com/resource/quote>;
+                 rdfs:label ?value
+}""" .
+
+  _:t30031 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus016 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_quote> .
+}
+
+{
+  _:nodeus016 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_measures/context> {
+  <http://www.lynx-platform.com/field/us_measures> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Measures"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30033;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30034;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/dimension>;
+    <http://www.researchspace.org/resource/system/fields/range> crmgeo:SP6_Declarative_Place .
+
+  _:t30034 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    <http://www.ics.forth.gr/isl/CRMgeo/Q11i_is_approximated_by> ?place.
+    ?place a <http://www.ics.forth.gr/isl/CRMgeo/SP6_Declarative_Place>;
+           crm:P2_has_type <http://www.lynx.com/resource/misure-us>;
+           rdfs:label ?value
+}""" .
+
+  _:t30033 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus017 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_measures> .
+}
+
+{
+  _:nodeus017 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_activity/context> {
+  <http://www.lynx-platform.com/field/us_activity> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Periodization - Activity"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30035;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30036;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/activity>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E7_Activity .
+
+  _:t30036 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP7i_was_produced_by ?genesis.
+    ?genesis a crmarchaeo:A4_Stratigraphic_Genesis;
+             crm:P9i_forms_part_of ?activity.
+    ?activity a crm:E7_Activity;
+              rdfs:label ?value
+}""" .
+
+  _:t30035 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus018 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_activity> .
+}
+
+{
+  _:nodeus018 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_phase/context> {
+  <http://www.lynx-platform.com/field/us_phase> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Periodization - Phase"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30037;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30038;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/activity>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E5_Event .
+
+  _:t30038 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP7i_was_produced_by ?genesis.
+    ?genesis a crmarchaeo:A4_Stratigraphic_Genesis;
+             crm:P9i_forms_part_of ?activity.
+    ?activity a crm:E7_Activity;
+              crm:P9i_forms_part_of ?phase.
+    ?phase a crm:E5_Event;
+           rdfs:label ?value
+}""" .
+
+  _:t30037 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus019 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_phase> .
+}
+
+{
+  _:nodeus019 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_period/context> {
+  <http://www.lynx-platform.com/field/us_period> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Periodization - Period"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30039;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30040;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/activity>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E4_Period .
+
+  _:t30040 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP7i_was_produced_by ?genesis.
+    ?genesis a crmarchaeo:A4_Stratigraphic_Genesis;
+             crm:P9i_forms_part_of ?activity.
+    ?activity a crm:E7_Activity;
+              crm:P9i_forms_part_of ?phase.
+    ?phase a crm:E5_Event;
+           crm:P9i_forms_part_of ?period.
+    ?period a crm:E4_Period;
+            rdfs:label ?value
+}""" .
+
+  _:t30039 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus020 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_period> .
+}
+
+{
+  _:nodeus020 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_dating/context> {
+  <http://www.lynx-platform.com/field/us_dating> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Dating"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30041;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30042;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/timespan>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E52_Time-Span .
+
+  _:t30042 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP7i_was_produced_by ?genesis.
+    ?genesis a crmarchaeo:A4_Stratigraphic_Genesis;
+             crm:P4_has_time-span ?time_span.
+    ?time_span a crm:E52_Time-Span;
+               rdfs:label ?value
+}""" .
+
+  _:t30041 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus021 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_dating> .
+}
+
+{
+  _:nodeus021 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_quadrato/context> {
+  <http://www.lynx-platform.com/field/us_quadrato> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Square (Quadrato)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30043;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30044;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place .
+
+  _:t30044 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation.
+    ?excavation a crmarchaeo:A1_Excavation_Processing_Unit;
+                crm:P7_took_place_at ?site.
+    ?site a crm:E27_Site;
+          crm:P89_falls_within ?place.
+    ?place a crm:E53_Place;
+           crm:P2_has_type <http://www.lynx.com/resource/quadrato>;
+           rdfs:label ?value
+}""" .
+
+  _:t30043 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus022 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_quadrato> .
+}
+
+{
+  _:nodeus022 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_settore/context> {
+  <http://www.lynx-platform.com/field/us_settore> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Sector (Settore)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30045;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30046;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place .
+
+  _:t30046 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation.
+    ?excavation a crmarchaeo:A1_Excavation_Processing_Unit;
+                crm:P7_took_place_at ?site.
+    ?site a crm:E27_Site;
+          crm:P89_falls_within ?place.
+    ?place a crm:E53_Place;
+           crm:P2_has_type <http://www.lynx.com/resource/settore>;
+           rdfs:label ?value
+}""" .
+
+  _:t30045 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus023 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_settore> .
+}
+
+{
+  _:nodeus023 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_posizione/context> {
+  <http://www.lynx-platform.com/field/us_posizione> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Position (Posizione)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30047;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30048;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place .
+
+  _:t30048 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation.
+    ?excavation a crmarchaeo:A1_Excavation_Processing_Unit;
+                crm:P7_took_place_at ?site.
+    ?site a crm:E27_Site;
+          crm:P89_falls_within ?place.
+    ?place a crm:E53_Place;
+           crm:P2_has_type <http://www.lynx.com/resource/posizione>;
+           rdfs:label ?value
+}""" .
+
+  _:t30047 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus024 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_posizione> .
+}
+
+{
+  _:nodeus024 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_ambiente_unita_funzionale/context> {
+  <http://www.lynx-platform.com/field/us_ambiente_unita_funzionale> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Room / Functional Unit"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30049;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30050;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place .
+
+  _:t30050 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation.
+    ?excavation a crmarchaeo:A1_Excavation_Processing_Unit;
+                crm:P7_took_place_at ?site.
+    ?site a crm:E27_Site;
+          crm:P89_falls_within ?place.
+    ?place a crm:E53_Place;
+           crm:P2_has_type <http://www.lynx.com/resource/ambiente-unita-funzionale>;
+           rdfs:label ?value
+}""" .
+
+  _:t30049 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus025 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_ambiente_unita_funzionale> .
+}
+
+{
+  _:nodeus025 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_saggio/context> {
+  <http://www.lynx-platform.com/field/us_saggio> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Trench (Saggio)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30051;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30052;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place .
+
+  _:t30052 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation.
+    ?excavation a crmarchaeo:A1_Excavation_Processing_Unit;
+                crm:P7_took_place_at ?site.
+    ?site a crm:E27_Site;
+          crm:P89_falls_within ?place.
+    ?place a crm:E53_Place;
+           crm:P2_has_type <http://www.lynx.com/resource/saggio>;
+           rdfs:label ?value
+}""" .
+
+  _:t30051 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus026 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_saggio> .
+}
+
+{
+  _:nodeus026 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_area_struttura/context> {
+  <http://www.lynx-platform.com/field/us_area_struttura> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Area / Structure"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:string;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30053;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30054;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E53_Place .
+
+  _:t30054 a sp:Query;
+    sp:text """SELECT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation.
+    ?excavation a crmarchaeo:A1_Excavation_Processing_Unit;
+                crm:P7_took_place_at ?site.
+    ?site a crm:E27_Site;
+          crm:P89_falls_within ?place.
+    ?place a crm:E53_Place;
+           crm:P2_has_type <http://www.lynx.com/resource/area-struttura>;
+           rdfs:label ?value
+}""" .
+
+  _:t30053 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus027 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_area_struttura> .
+}
+
+{
+  _:nodeus027 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_excavation_site/context> {
+  <http://www.lynx-platform.com/field/us_excavation_site> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Excavation Site"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30055;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30056;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/place>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E27_Site .
+
+  _:t30056 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation.
+    ?excavation a crmarchaeo:A1_Excavation_Processing_Unit;
+                crm:P7_took_place_at ?value.
+    ?value a crm:E27_Site
+}""" .
+
+  _:t30055 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus028 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_excavation_site> .
+}
+
+{
+  _:nodeus028 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_representation/context> {
+  <http://www.lynx-platform.com/field/us_representation> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Visual Representation"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30057;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30058;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/visual_item>;
+    <http://www.researchspace.org/resource/system/fields/range> crm:E36_Visual_Item .
+
+  _:t30058 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P138i_has_representation ?value.
+    ?value a crm:E36_Visual_Item
+}""" .
+
+  _:t30057 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus029 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_representation> .
+}
+
+{
+  _:nodeus029 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_digital_object/context> {
+  <http://www.lynx-platform.com/field/us_digital_object> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Digital Object"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30059;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30060;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/linguistic_object>;
+    <http://www.researchspace.org/resource/system/fields/range> crmdig:D1_Digital_Object .
+
+  _:t30060 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P67i_is_referred_to_by ?value.
+    ?value a <http://www.ics.forth.gr/isl/CRMdig/D1_Digital_Object>
+}""" .
+
+  _:t30059 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus030 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_digital_object> .
+}
+
+{
+  _:nodeus030 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_occurs_before/context> {
+  <http://www.lynx-platform.com/field/us_rel_occurs_before> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Occurs Before (US)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30061;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30062;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30062 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P120_occurs_before ?value.
+    OPTIONAL {
+      ?value crm:P2_has_type ?relationType.
+      BIND(STRAFTER(STR(?relationType), "http://www.lynx.com/resource/") AS ?label)
+    }
+}""" .
+
+  _:t30061 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus031 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_occurs_before> .
+}
+
+{
+  _:nodeus031 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_occurs_after/context> {
+  <http://www.lynx-platform.com/field/us_rel_occurs_after> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Occurs After (US)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30063;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30064;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30064 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P120i_occurs_after ?value.
+    OPTIONAL {
+      ?value crm:P2_has_type ?relationType.
+      BIND(STRAFTER(STR(?relationType), "http://www.lynx.com/resource/") AS ?label)
+    }
+}""" .
+
+  _:t30063 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus032 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_occurs_after> .
+}
+
+{
+  _:nodeus032 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_physical_relation_to/context> {
+  <http://www.lynx-platform.com/field/us_rel_physical_relation_to> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Physical Relation To (US)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30065;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30066;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30066 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP11_has_physical_relation_to ?value.
+    OPTIONAL {
+      ?value crm:P2_has_type ?relationType.
+      BIND(STRAFTER(STR(?relationType), "http://www.lynx.com/resource/") AS ?label)
+    }
+}""" .
+
+  _:t30065 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus033 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_physical_relation_to> .
+}
+
+{
+  _:nodeus033 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_physical_relation_from/context> {
+  <http://www.lynx-platform.com/field/us_rel_physical_relation_from> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Physical Relation From (US)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30067;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30068;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30068 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crmarchaeo:AP11i_is_physical_relation_from ?value.
+    OPTIONAL {
+      ?value crm:P2_has_type ?relationType.
+      BIND(STRAFTER(STR(?relationType), "http://www.lynx.com/resource/") AS ?label)
+    }
+}""" .
+
+  _:t30067 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus034 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_physical_relation_from> .
+}
+
+{
+  _:nodeus034 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_covers/context> {
+  <http://www.lynx-platform.com/field/us_rel_covers> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Covers"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30069;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30070;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30070 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/copre>.
+}""" .
+
+  _:t30069 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus035 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_covers> .
+}
+
+{
+  _:nodeus035 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_covered_by/context> {
+  <http://www.lynx-platform.com/field/us_rel_covered_by> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Covered By"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30071;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30072;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30072 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/coperto-da>.
+}""" .
+
+  _:t30071 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus036 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_covered_by> .
+}
+
+{
+  _:nodeus036 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_cuts/context> {
+  <http://www.lynx-platform.com/field/us_rel_cuts> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Cuts"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30073;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30074;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30074 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/taglia>.
+}""" .
+
+  _:t30073 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus037 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_cuts> .
+}
+
+{
+  _:nodeus037 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_cut_by/context> {
+  <http://www.lynx-platform.com/field/us_rel_cut_by> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Cut By"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30075;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30076;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30076 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/tagliato-da>.
+}""" .
+
+  _:t30075 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus038 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_cut_by> .
+}
+
+{
+  _:nodeus038 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_fills/context> {
+  <http://www.lynx-platform.com/field/us_rel_fills> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Fills"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30077;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30078;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30078 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/riempie>.
+}""" .
+
+  _:t30077 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus039 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_fills> .
+}
+
+{
+  _:nodeus039 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_filled_by/context> {
+  <http://www.lynx-platform.com/field/us_rel_filled_by> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Filled By"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30079;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30080;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30080 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/riempito-da>.
+}""" .
+
+  _:t30079 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus040 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_filled_by> .
+}
+
+{
+  _:nodeus040 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_abuts/context> {
+  <http://www.lynx-platform.com/field/us_rel_abuts> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Abuts (Leans Against)"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30081;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30082;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30082 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/si-appoggia-a>.
+}""" .
+
+  _:t30081 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus041 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_abuts> .
+}
+
+{
+  _:nodeus041 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_abutted_by/context> {
+  <http://www.lynx-platform.com/field/us_rel_abutted_by> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Abutted By"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30083;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30084;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30084 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/gli-si-appoggia>.
+}""" .
+
+  _:t30083 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus042 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_abutted_by> .
+}
+
+{
+  _:nodeus042 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_bonds_to/context> {
+  <http://www.lynx-platform.com/field/us_rel_bonds_to> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Bonds To"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30085;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30086;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30086 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/si-lega-a>.
+}""" .
+
+  _:t30085 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus043 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_bonds_to> .
+}
+
+{
+  _:nodeus043 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}
+
+
+<http://www.lynx-platform.com/field/us_rel_equal_to/context> {
+  <http://www.lynx-platform.com/field/us_rel_equal_to> a <http://www.researchspace.org/resource/system/fields/Field>,
+      <http://www.w3.org/ns/ldp#Resource>, prov:Entity;
+    <http://www.researchspace.org/resource/system/fields/domain> crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    rdfs:label "Equal To"@en;
+    <http://www.researchspace.org/resource/system/fields/xsdDatatype> xsd:anyURI;
+    prov:generatedAtTime "2026-10-13T09:00:00.000Z"^^xsd:dateTime;
+    prov:wasAttributedTo User:admin;
+    <http://www.researchspace.org/resource/system/fields/insertPattern> _:t30087;
+    <http://www.researchspace.org/resource/system/fields/selectPattern> _:t30088;
+    <http://www.researchspace.org/resource/system/fields/category> <http://www.researchspace.org/resource/system/category/physical_thing>;
+    <http://www.researchspace.org/resource/system/fields/range> crmarchaeo:A2_Stratigraphic_Volume_Unit .
+
+  _:t30088 a sp:Query;
+    sp:text """SELECT ?value ?label WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    (crm:P120_occurs_before|crm:P120i_occurs_after|crmarchaeo:AP11_has_physical_relation_to|crmarchaeo:AP11i_is_physical_relation_from) ?value.
+    ?value crm:P2_has_type <http://www.lynx.com/resource/uguale-a>.
+}""" .
+
+  _:t30087 a sp:Query;
+    sp:text "INSERT { $subject ?predicate $value} WHERE {}" .
+
+  _:nodeus044 <http://www.w3.org/ns/ldp#contains> <http://www.lynx-platform.com/field/us_rel_equal_to> .
+}
+
+{
+  _:nodeus044 a <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#Resource>,
+      prov:Entity .
+}

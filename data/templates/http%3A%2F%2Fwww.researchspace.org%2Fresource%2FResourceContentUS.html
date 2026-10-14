@@ -1,0 +1,416 @@
+[[#if (urlParam "details")]]
+<div class="details-content">
+  <bs-tabs class="details-tabs">
+    <bs-tab title='Stratigraphic Unit Description' event-key='us-description-raw' mount-on-enter=true class="rawdata-tab">
+      <mp-field-visualization
+        subject='[[this]]'
+        fields='[[fieldDefinitionsFromQuery (setQueryBindings "SELECT DISTINCT ?field WHERE {?resource ?field ?o . ?field a <http://www.researchspace.org/resource/system/fields/Field> } ORDER BY DESC(?field)" resource=this.iri) ]]'
+        template='{{> template}}'>
+        <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+      </mp-field-visualization>
+    </bs-tab>
+  </bs-tabs>
+</div>
+[[else]]
+<with-types fixed-key='resource-[[this]]' iri='[[this]]' template='{{> resource}}' [[> rsp:TypeMappings]]>
+  <template id='resource'>
+    <div class="rs-resource-container">
+      [[#block "resourceHeader"]]
+      <!-- Resource Header -->
+      <div class="rs-resource-header {{getValueByKey entityBgColor allTypes 'rs-entity-bg-thing'}}">
+        <div class="rs-resource-header-topContainer">
+          [[#block "resourceHeaderTop"]]
+          [[/block]]
+          <div class="rs-resource-header-topButtons">
+            <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='knowledge-map' urlqueryparam-resource='[[this]]'>
+              <button type="button" title="Author Resource in Knowledge Map">
+                <rs-icon icon-type="round" icon-name="account_tree"></rs-icon>
+              </button>
+            </semantic-link-container>
+            <mp-event-trigger id='details-view-trigger' type='Component.TemplateUpdate' data='{"iri": "{{iri}}"}' targets='["details-view", "open-details-sidebar"]'>
+              <button type="button" title="Resource Details">
+                <rs-icon icon-type="rounded" icon-name="info" symbol="true"></rs-icon>
+              </button>
+            </mp-event-trigger>
+            <mp-has-permission permission="api:ldp:*">
+              <semantic-link-container uri='http://www.researchspace.org/resource/ResourceContentEditE18' urlqueryparam-resource='[[this]]'>
+                <button type="button" title="Author Resource in Form">
+                  <rs-icon icon-type="rounded" icon-name="edit_note" symbol="true"></rs-icon>
+                </button>
+              </semantic-link-container>
+            </mp-has-permission>
+          </div>
+        </div>
+        <!-- Header content: preview image (documents or visual items) + resource primary information -->
+        <div class="rs-resource-header-content-container">
+          <div class="rs-resource-header--image-container">
+            <semantic-query query='
+PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+PREFIX arco: <https://w3id.org/arco/ontology/arco/>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+PREFIX rs: <http://www.researchspace.org/ontology/>
+
+SELECT DISTINCT ?subject ?document ?preview ?previewIiif
+WHERE {
+  BIND(<[[this]]> AS ?subject)
+
+  {
+    ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+             crm:P70i_is_documented_in ?document .
+    ?document a crm:E31_Document .
+    OPTIONAL {
+      ?document pico:preview ?preview .
+    }
+  }
+
+  UNION
+
+  {
+    ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+             crm:P138i_has_representation ?preview .
+  }
+
+  UNION
+
+  {
+    ?subject rdf:type arco:ArchitecturalOrLandscapeHeritage ;
+             pico:preview ?preview .
+  }
+
+  BIND(
+    IF(
+      STRSTARTS(STR(?preview), "http://"),
+      IRI(CONCAT("https://", STRAFTER(STR(?preview), "http://"))),
+      ?preview
+    ) AS ?previewSafe
+  )
+  OPTIONAL { ?preview rs:PX_has_file_name ?previewFileName . }
+  BIND(STR(?preview) AS ?previewStr)
+  BIND(STR(?previewSafe) AS ?previewSafeStr)
+  BIND(IF(REGEX(?previewStr, "/resource/EX_File/", "i"), REPLACE(?previewStr, "^.*/EX_File/", ""), "") AS ?previewFileFromIri)
+  BIND(COALESCE(STR(?previewFileName), ?previewFileFromIri, "") AS ?previewFileAny)
+  BIND(
+    IF(
+      STRLEN(?previewFileAny) > 0,
+      CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?previewFileAny), "/full/!700,700/0/default.jpg"),
+      IF(REGEX(?previewSafeStr, "^https://", "i"), ?previewSafeStr, "")
+    ) AS ?previewIiif
+  )
+}
+ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
+              <template id="headerPreview">
+                {{#with bindings.[0]}}
+                  {{#if preview.value}}
+                    <div class="detail-thumb" style="margin-bottom:8px;">
+                      {{#if previewIiif.value}}
+                        <a href="{{previewIiif.value}}" target="_blank" rel="noopener">
+                          <img src="{{previewIiif.value}}" alt="Preview" style="max-width:240px; max-height:160px; object-fit:cover; border-radius:4px; display:block;" />
+                        </a>
+                      {{else}}
+                        <a href="{{preview.value}}" target="_blank" rel="noopener">
+                          <mp-resource-thumbnail iri='{{preview.value}}' no-image-uri='/images/help/thenounproject/noun_1113333.svg' style="max-width:240px; max-height:160px; display:block;" />
+                        </a>
+                      {{/if}}
+                    </div>
+                  {{/if}}
+                {{/with}}
+              </template>
+            </semantic-query>
+
+            <div class="rs-resource-img__btngroup">
+              {{#if (hasKey allTypes "http://www.researchspace.org/ontology/EX_Digital_Image_Region")}}
+              {{else}}
+                <mp-overlay-dialog title="Resource Media" type="modal" class="modal-xlSize">
+                  <mp-overlay-dialog-trigger>
+                    <button type="button" class="btn btn-icon" title="Explore Media">
+                      <rs-icon icon-type="rounded" icon-name="fullscreen" symbol="true"></rs-icon>
+                    </button>
+                  </mp-overlay-dialog-trigger>
+                  <mp-overlay-dialog-content>
+                    <mp-page-loader urlqueryparam-frame=true iri='http://www.researchspace.org/resource/ItemCardMedia' context='[[this]]'></mp-page-loader>
+                  </mp-overlay-dialog-content>
+                </mp-overlay-dialog>
+              {{/if}}
+              <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='iiif' urlqueryparam-resource='[[this]]'>
+                <button type="button" class="btn btn-icon" title="Explore Images in high resolution Viewer">
+                  <rs-icon icon-type="rounded" icon-name="image" symbol="true"></rs-icon>
+                </button>
+              </semantic-link-container>
+              [[#if (hasPermission "forms:ldp:*")]]
+                {{#if (hasKey allTypes "http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit")}}
+                  {{#if (hasKey allTypes "http://www.researchspace.org/ontology/EX_Digital_Image_Region")}}
+                  {{else}}
+                    <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='image-annotation' urlqueryparam-resource='[[this]]'>
+                      <button type="button" class="btn btn-icon" title="Annotate Images">
+                        <rs-icon icon-type="round" icon-name="photo_size_select_large"></rs-icon>
+                      </button>
+                    </semantic-link-container>
+                  {{/if}}
+                {{/if}}
+              [[/if]]
+            </div>
+          </div>
+          <div style="padding: 1.8% 1.5% 1.5% 5%;">
+            [[> resourceHeaderData image=true]]
+            <!-- Key facts under the title: typology, period, conservation state -->
+            <div style="margin-top: 8px;">
+              <semantic-query
+                query='
+                  PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                  PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+                  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+                  SELECT
+                    (GROUP_CONCAT(DISTINCT ?typology; separator=", ") AS ?typologies)
+                    (GROUP_CONCAT(DISTINCT ?state; separator=", ") AS ?states)
+                    (GROUP_CONCAT(DISTINCT ?saggio; separator=", ") AS ?saggi)
+                  WHERE {
+                    BIND(<[[this]]> AS ?subject)
+                    ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit .
+                    OPTIONAL {
+                      ?subject crm:P2_has_type ?t .
+                      ?t rdfs:label ?typology .
+                      FILTER(CONTAINS(STR(?t), "/tipologia/"))
+                    }
+                    OPTIONAL {
+                      ?subject crm:P44_has_condition ?c .
+                      ?c rdfs:label ?state .
+                      FILTER(CONTAINS(STR(?c), "/stato-conservazione/"))
+                    }
+                    OPTIONAL {
+                      ?subject crmarchaeo:AP5i_was_partially_or_totally_removed_by ?exc .
+                      ?exc crm:P7_took_place_at ?site .
+                      ?site crm:P89_falls_within ?p .
+                      ?p crm:P2_has_type <http://www.lynx.com/resource/saggio> ;
+                         rdfs:label ?saggio .
+                    }
+                  }'
+                template='{{> usSummary}}'>
+                <template id='usSummary'>
+                  {{#with bindings.[0]}}
+                    <div style="font-size:0.85rem;">
+                      {{#if typologies.value}}<div><strong>Typology:</strong> {{typologies.value}}</div>{{/if}}
+                      {{#if states.value}}<div><strong>Conservation:</strong> {{states.value}}</div>{{/if}}
+                      {{#if saggi.value}}<div><strong>Trench:</strong> {{saggi.value}}</div>{{/if}}
+                    </div>
+                  {{/with}}
+                </template>
+              </semantic-query>
+            </div>
+          </div>
+        </div>
+      </div>
+      [[/block]]
+      <!-- Tabs: Identification, Description, Components & Measures, Excavation & Location, Chronology & Periodization, Stratigraphic Relations, Documentation & Responsibility -->
+      <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="identification">
+        <div>
+          <bs-nav bs-style="tabs">
+            <bs-nav-item event-key="identification">Identification</bs-nav-item>
+            <bs-nav-item event-key="us-description">Description</bs-nav-item>
+            <bs-nav-item event-key="composition">Components & Measures</bs-nav-item>
+            <bs-nav-item event-key="location">Excavation & Location</bs-nav-item>
+            <bs-nav-item event-key="periodization">Chronology & Periodization</bs-nav-item>
+            <bs-nav-item event-key="relations">Stratigraphic Relations</bs-nav-item>
+            <bs-nav-item event-key="documentation">Documentation & Responsibility</bs-nav-item>
+          </bs-nav>
+          <bs-tab-content animation="true">
+            <bs-tab-pane event-key="identification">
+              <div class="rs-resource-tab-container">
+                <div>
+                  <hr class="rs-resource-section--headerLine">
+                  [[#block "instituteHeader"]]
+                  <span class="h1 rs-resource-section--header">Stratigraphic Unit</span>
+                  [[/block]]
+                  <span class="text-underline rs-resource-section--header">Latest confirmed data set from [[currentDateTime format="dd-MM-yyyy"]].</span>
+                </div>
+                <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions us_global_id="http://www.lynx-platform.com/field/us_global_id" us_definition="http://www.lynx-platform.com/field/us_definition" us_notes="http://www.lynx-platform.com/field/us_notes"]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="us-description">
+              <div class="rs-resource-tab-container">
+                <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions us_typology="http://www.lynx-platform.com/field/us_typology" us_formation_mode="http://www.lynx-platform.com/field/us_formation_mode" us_consistency="http://www.lynx-platform.com/field/us_consistency" us_color="http://www.lynx-platform.com/field/us_color" us_distinction_criteria="http://www.lynx-platform.com/field/us_distinction_criteria" us_conservation_state="http://www.lynx-platform.com/field/us_conservation_state" us_stratigraphic_reliability="http://www.lynx-platform.com/field/us_stratigraphic_reliability"]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="composition">
+              <div class="rs-resource-tab-container">
+                <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions us_inorganic_components="http://www.lynx-platform.com/field/us_inorganic_components" us_organic_components="http://www.lynx-platform.com/field/us_organic_components" us_dating_elements="http://www.lynx-platform.com/field/us_dating_elements" us_quote="http://www.lynx-platform.com/field/us_quote" us_measures="http://www.lynx-platform.com/field/us_measures"]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="location">
+              <div class="rs-resource-tab-container">
+                <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions us_excavation_site="http://www.lynx-platform.com/field/us_excavation_site" us_saggio="http://www.lynx-platform.com/field/us_saggio" us_area_struttura="http://www.lynx-platform.com/field/us_area_struttura" us_settore="http://www.lynx-platform.com/field/us_settore" us_quadrato="http://www.lynx-platform.com/field/us_quadrato" us_posizione="http://www.lynx-platform.com/field/us_posizione" us_ambiente_unita_funzionale="http://www.lynx-platform.com/field/us_ambiente_unita_funzionale"]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="periodization">
+              <div class="rs-resource-tab-container">
+                <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions us_period="http://www.lynx-platform.com/field/us_period" us_phase="http://www.lynx-platform.com/field/us_phase" us_activity="http://www.lynx-platform.com/field/us_activity" us_dating="http://www.lynx-platform.com/field/us_dating"]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="relations">
+              <div class="rs-resource-tab-container">
+                <bs-tab-container id="relations-subtabs" class="rs-resource-subtabs" default-active-key="rel-cover">
+                  <div>
+                    <bs-nav bs-style="pills">
+                    <bs-nav-item event-key="rel-cover">Covers / Covered By</bs-nav-item>
+                    <bs-nav-item event-key="rel-cut">Cuts / Cut By</bs-nav-item>
+                    <bs-nav-item event-key="rel-fill">Fills / Filled By</bs-nav-item>
+                    <bs-nav-item event-key="rel-abut">Abuts / Abutted By</bs-nav-item>
+                    <bs-nav-item event-key="rel-bond">Bonds To / Equal To</bs-nav-item>
+                    <bs-nav-item event-key="rel-temporal">Temporal Sequence</bs-nav-item>
+                    <bs-nav-item event-key="rel-physical">All Physical Relations</bs-nav-item>
+                    </bs-nav>
+                    <bs-tab-content animation="true">
+                    <bs-tab-pane event-key="rel-cover">
+                      <div class="rs-resource-data-table">
+                        <mp-field-visualization
+                          subject='[[this]]'
+                          fields='[[fieldDefinitions us_rel_covers="http://www.lynx-platform.com/field/us_rel_covers" us_rel_covered_by="http://www.lynx-platform.com/field/us_rel_covered_by"]]'
+                          template='{{> template}}'>
+                          <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                        </mp-field-visualization>
+                      </div>
+                    </bs-tab-pane>
+                    <bs-tab-pane event-key="rel-cut">
+                      <div class="rs-resource-data-table">
+                        <mp-field-visualization
+                          subject='[[this]]'
+                          fields='[[fieldDefinitions us_rel_cuts="http://www.lynx-platform.com/field/us_rel_cuts" us_rel_cut_by="http://www.lynx-platform.com/field/us_rel_cut_by"]]'
+                          template='{{> template}}'>
+                          <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                        </mp-field-visualization>
+                      </div>
+                    </bs-tab-pane>
+                    <bs-tab-pane event-key="rel-fill">
+                      <div class="rs-resource-data-table">
+                        <mp-field-visualization
+                          subject='[[this]]'
+                          fields='[[fieldDefinitions us_rel_fills="http://www.lynx-platform.com/field/us_rel_fills" us_rel_filled_by="http://www.lynx-platform.com/field/us_rel_filled_by"]]'
+                          template='{{> template}}'>
+                          <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                        </mp-field-visualization>
+                      </div>
+                    </bs-tab-pane>
+                    <bs-tab-pane event-key="rel-abut">
+                      <div class="rs-resource-data-table">
+                        <mp-field-visualization
+                          subject='[[this]]'
+                          fields='[[fieldDefinitions us_rel_abuts="http://www.lynx-platform.com/field/us_rel_abuts" us_rel_abutted_by="http://www.lynx-platform.com/field/us_rel_abutted_by"]]'
+                          template='{{> template}}'>
+                          <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                        </mp-field-visualization>
+                      </div>
+                    </bs-tab-pane>
+                    <bs-tab-pane event-key="rel-bond">
+                      <div class="rs-resource-data-table">
+                        <mp-field-visualization
+                          subject='[[this]]'
+                          fields='[[fieldDefinitions us_rel_bonds_to="http://www.lynx-platform.com/field/us_rel_bonds_to" us_rel_equal_to="http://www.lynx-platform.com/field/us_rel_equal_to"]]'
+                          template='{{> template}}'>
+                          <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                        </mp-field-visualization>
+                      </div>
+                    </bs-tab-pane>
+                    <bs-tab-pane event-key="rel-temporal">
+                      <div class="rs-resource-data-table">
+                        <mp-field-visualization
+                          subject='[[this]]'
+                          fields='[[fieldDefinitions us_rel_occurs_before="http://www.lynx-platform.com/field/us_rel_occurs_before" us_rel_occurs_after="http://www.lynx-platform.com/field/us_rel_occurs_after"]]'
+                          template='{{> template}}'>
+                          <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                        </mp-field-visualization>
+                      </div>
+                    </bs-tab-pane>
+                    <bs-tab-pane event-key="rel-physical">
+                      <div class="rs-resource-data-table">
+                        <mp-field-visualization
+                          subject='[[this]]'
+                          fields='[[fieldDefinitions us_rel_physical_relation_to="http://www.lynx-platform.com/field/us_rel_physical_relation_to" us_rel_physical_relation_from="http://www.lynx-platform.com/field/us_rel_physical_relation_from"]]'
+                          template='{{> template}}'>
+                          <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                        </mp-field-visualization>
+                      </div>
+                    </bs-tab-pane>
+                    </bs-tab-content>
+                  </div>
+                </bs-tab-container>
+              </div>
+            </bs-tab-pane>
+            <bs-tab-pane event-key="documentation">
+              <div class="rs-resource-tab-container">
+                <div class="rs-resource-data-table">
+                  <mp-field-visualization
+                    subject='[[this]]'
+                    fields='[[fieldDefinitions us_representation="http://www.lynx-platform.com/field/us_representation" us_digital_object="http://www.lynx-platform.com/field/us_digital_object" us_competent_body="http://www.lynx-platform.com/field/us_competent_body" us_responsible_body="http://www.lynx-platform.com/field/us_responsible_body"]]'
+                    template='{{> template}}'>
+                    <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
+                  </mp-field-visualization>
+                </div>
+              </div>
+            </bs-tab-pane>
+          </bs-tab-content>
+        </div>
+      </bs-tab-container>
+    </div>
+  </template>
+</with-types>
+[[/if]]
+
+[[#*inline "resourceHeaderData"]]
+  [[#block "headerData"]]
+  <!-- RESOURCE LABEL -->
+  <div class="rs-resource-header--singletitle">
+    <div class="rs-resource-header--title" style="text-transform: capitalize;">
+      <mp-label iri='[[this]]'></mp-label>
+    </div>
+    <div style="display: flex;">
+      <mp-copy-to-clipboard text='[[this]]'>
+        <div class="rs-copy-IRI">Copy IRI</div>
+      </mp-copy-to-clipboard>
+      <mp-sparql-download
+        query='CONSTRUCT { ?s ?p ?o } WHERE { BIND(<[[this]]> AS ?root) { ?root ?p ?o . BIND(?root AS ?s) } UNION { ?s ?p ?root . BIND(?root AS ?o) } UNION { ?n ?p1 ?root . ?n ?p ?o . BIND(?n AS ?s) } UNION { ?root ?p1 ?n . ?n ?p ?o . BIND(?n AS ?s) } }'
+        header='application/ld+json'
+        filename='resource-graph.jsonld'>
+        <button class="btn btn-default">Download JSON-LD</button>
+      </mp-sparql-download>
+      <div class="statements">Statements</div>
+    </div>
+  </div>
+  [[/block]]
+[[/inline]]

@@ -1,4 +1,41 @@
-<!-- HERO UNIFIED SEARCH SECTION -->
+<!--
+  Landing page digital library - template ResearchSpace
+  Query ricavate dal modello degli RDF caricati:
+    - Reperti      : crm:E18_Physical_Thing + P2_has_type lynx:archaeological-object
+                     etichetta = E42 con tipo .../identifier/general-id (affiancata da internal-id e tipologia)
+    - US           : crmarchaeo:A2_Stratigraphic_Volume_Unit + P2_has_type lynx:stratigraphic-unit
+                     etichetta = E42 con tipo lynx:global-id
+    - Luoghi / Siti: crm:E53_Place + P2_has_type .../cultural-heritage-place/place | site
+    - Tipologie    : crm:E55_Type con P2_has_type lynx:classification
+
+  Nelle query SPARQL non usare apostrofi: gli attributi query sono delimitati da apici singoli.
+-->
+
+<style>
+  .cl-tiles { display:flex; flex-wrap:wrap; gap:12px; margin:24px 0; }
+  .cl-tile { flex:1 1 200px; border:1px solid #ddd; border-radius:6px; background:#fff; }
+  .cl-tile semantic-link a, .cl-tile a { display:block; padding:16px; color:#000; text-decoration:none; }
+  .cl-tile .cl-num { display:block; font-size:2rem; line-height:1.1; font-weight:600; }
+  .cl-tile .cl-dom { display:block; margin-top:4px; color:#555; }
+
+  .cl-grid { display:flex; flex-wrap:wrap; gap:12px; }
+  .cl-card { width:200px; border:1px solid #ddd; border-radius:6px; overflow:hidden; background:#fff; text-align:center; }
+  .cl-thumb { height:140px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; }
+  .cl-thumb img { max-width:100%; max-height:140px; object-fit:contain; display:block; }
+  .cl-thumb img.cl-noimg { width:72px; height:72px; }
+  .cl-thumb mp-resource-thumbnail { max-width:100%; max-height:140px; display:block; }
+  .cl-label { padding:10px 8px; min-height:56px; font-size:.95rem; line-height:1.2em; color:#000; }
+  .cl-label a, .cl-label semantic-link { color:#000; text-decoration:none; }
+  .cl-sub { margin-top:4px; font-size:.8rem; color:#666; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .cl-empty { color:#666; }
+
+  .cl-textcard { display:inline-block; margin:10px; width:200px; height:120px; border:1px solid #ddd; padding:15px; border-radius:4px; vertical-align:top; overflow:hidden; background:#fff; }
+  .cl-textcard .cl-body { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .cl-textcard h5 { margin:0; text-align:center; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
+  .cl-textcard small { margin-top:5px; color:#666; }
+</style>
+
+<!-- 1. Ricerca unica su tutti i domini -->
 <div class="bso-component home-search">
     <bs-col md="10" md-offset="1">
         <div class="bso-component simple-search">
@@ -6,123 +43,438 @@
               query='
                 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                 PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                
+                PREFIX lynx: <http://www.lynx.com/resource/>
+
                 SELECT DISTINCT ?resource ?label ?typelabel WHERE {
                   {
-                    # Objects (E18_Physical_Thing)
+                    # Reperti archeologici: id generale + tipologia + id interno (cercabili tutti)
                     ?resource a crm:E18_Physical_Thing ;
-                              crm:P1_is_identified_by ?identifier .
-                    ?identifier a crm:E42_Identifier ;
-                                crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
-                                rdfs:label ?label .
-                    BIND("Object" AS ?typelabel)
+                              crm:P2_has_type lynx:archaeological-object ;
+                              crm:P1_is_identified_by ?gid .
+                    ?gid crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
+                         rdfs:label ?gidLabel .
+                    OPTIONAL {
+                      ?resource crm:P1_is_identified_by ?iid .
+                      ?iid crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/internal-id> ;
+                           rdfs:label ?iidLabel .
+                    }
+                    OPTIONAL {
+                      ?resource crm:P2_has_type ?cls .
+                      ?cls crm:P2_has_type lynx:classification ;
+                           rdfs:label ?clsLabel .
+                    }
+                    BIND(CONCAT(STR(?gidLabel),
+                                COALESCE(CONCAT(" - ", STR(?clsLabel)), ""),
+                                COALESCE(CONCAT(" (", STR(?iidLabel), ")"), "")) AS ?label)
+                    BIND("Reperto archeologico" AS ?typelabel)
                   } UNION {
-                    # Archaeological Documents / Excavation Cards (E31_Document)
-                    ?resource a crm:E31_Document .
-                    ?resource crm:P1_is_identified_by/rdfs:label ?label .
-                    BIND("Document/Card" AS ?typelabel)
+                    # Unita stratigrafiche: etichetta = "US " + global-id
+                    ?resource crm:P2_has_type lynx:stratigraphic-unit ;
+                              crm:P1_is_identified_by ?uid .
+                    ?uid crm:P2_has_type lynx:global-id ;
+                         rdfs:label ?uidLabel .
+                    BIND(CONCAT("US ", STR(?uidLabel)) AS ?label)
+                    BIND("Unita stratigrafica" AS ?typelabel)
                   } UNION {
-                    # People / Actors (E21_Person or E39_Actor)
-                    ?resource a crm:E21_Person .
-                    OPTIONAL { ?resource crm:P1_is_identified_by/rdfs:label ?personLabel . }
-                    OPTIONAL { ?resource rdfs:label ?rdfsLabel . }
-                    BIND(COALESCE(?personLabel, ?rdfsLabel) AS ?label)
-                    BIND("Person" AS ?typelabel)
-                  } UNION {
-                    # Places & Sites (E53_Place)
+                    # Luoghi
                     ?resource a crm:E53_Place ;
                               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                              crm:P1_is_identified_by/rdfs:label ?label .
-                    BIND("Place" AS ?typelabel)
+                              crm:P1_is_identified_by ?appellation .
+                    ?appellation a crm:E41_Appellation ;
+                                 rdfs:label ?label .
+                    BIND("Luogo" AS ?typelabel)
                   } UNION {
+                    # Siti
                     ?resource a crm:E53_Place ;
                               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
-                              crm:P1_is_identified_by/rdfs:label ?label .
-                    BIND("Site" AS ?typelabel)
+                              crm:P1_is_identified_by ?siteAppellation .
+                    ?siteAppellation a crm:E41_Appellation ;
+                                     rdfs:label ?label .
+                    BIND("Sito" AS ?typelabel)
                   } UNION {
-                    # Object Types (E55_Type)
+                    # Tipologie di reperto
                     ?resource a crm:E55_Type ;
-                              crm:P2_has_type <http://www.lynx.com/resource/classification> ;
+                              crm:P2_has_type lynx:classification ;
                               rdfs:label ?label .
-                    BIND("Object Type" AS ?typelabel)
+                    BIND("Tipologia" AS ?typelabel)
                   }
-                  
+
+                  # TODO altri domini (opere d arte, archivio, persone, foto): aggiungere un UNION
+                  # per ciascuno, con la propria etichetta e il proprio ?typelabel
+
                   FILTER REGEX(?label, ?__token__, "i")
-                } 
+                }
                 LIMIT 10'
-              template='<span style="color: blue;" title="{{resource.value}}">{{label.value}} <em style="color: #666;">({{typelabel.value}})</em></span>'
-              input-placeholder='Search across objects, documents, cards, people, sites, types...'
+              template='<span style="color: blue;" title="{{resource.value}}">{{label.value}} <em style="color: #999;">({{typelabel.value}})</em></span>'
+              input-placeholder='Cerca reperti, unita stratigrafiche, luoghi, siti, tipologie...'
             >
             </semantic-simple-search>
         </div>
     </bs-col>
 </div>
 
-<!-- PANEL 1: ARCHAEOLOGICAL DOCUMENTS & CARDS -->
+<!-- 2. Un riquadro per dominio, con contatore: una sola query per tutti -->
+<semantic-query
+    query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+           PREFIX lynx: <http://www.lynx.com/resource/>
+
+           SELECT ?ord ?domainLabel ?link (COUNT(DISTINCT ?r) AS ?num) WHERE {
+             {
+               ?r a crm:E18_Physical_Thing ;
+                  crm:P2_has_type lynx:archaeological-object .
+               BIND(1 AS ?ord)
+               BIND("Reperti archeologici" AS ?domainLabel)
+               BIND(<http://www.lynx.com/resource/structuredSearch> AS ?link)
+             } UNION {
+               ?r crm:P2_has_type lynx:stratigraphic-unit .
+               BIND(2 AS ?ord)
+               BIND("Unita stratigrafiche" AS ?domainLabel)
+               # TODO: sostituire con la pagina di ricerca strutturata delle US
+               BIND(<http://www.lynx.com/resource/structured-search-us> AS ?link)
+             } UNION {
+               ?r a crm:E53_Place ;
+                  crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> .
+               BIND(3 AS ?ord)
+               BIND("Luoghi" AS ?domainLabel)
+               BIND(<http://www.siriusplatform-risk-assessment/resource/structured-search-place> AS ?link)
+             } UNION {
+               ?r a crm:E53_Place ;
+                  crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> .
+               BIND(4 AS ?ord)
+               BIND("Siti" AS ?domainLabel)
+               BIND(<http://www.siriusplatform-risk-assessment/resource/structured-search-site> AS ?link)
+             }
+             # TODO altri domini: un UNION per opere d arte, archivio, persone, foto
+           }
+           GROUP BY ?ord ?domainLabel ?link
+           ORDER BY ?ord'
+    template='<div class="cl-tiles">{{#each bindings}}<div class="cl-tile"><semantic-link iri="{{link.value}}"><span class="cl-num">{{num.value}}</span><span class="cl-dom">{{domainLabel.value}}</span></semantic-link></div>{{/each}}</div>'
+></semantic-query>
+
+<!-- 3a. Reperti archeologici -->
 <div class="bso-component separator panel">
     <bs-row>
         <bs-col md="2">
-            <h3>Documents & Cards</h3>
-            <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       SELECT (COUNT(DISTINCT ?doc) as ?num) WHERE {
-                         ?doc a crm:E31_Document .
-                       }"
-                template="{{#each bindings}}Found {{num.value}} documents & cards{{/each}}"
-            ></semantic-query>
+            <h3>Reperti archeologici</h3>
             <div class="bottom">
-                <semantic-link iri="http://www.lynx.com/resource/structuredSearchDocument">
-                    See all documents
+                <semantic-link iri="http://www.lynx.com/resource/structuredSearch">
+                    Vedi tutti
                 </semantic-link>
             </div>
         </bs-col>
         <bs-col md="10" class="bso-component card-container horizontal-scroll">
             <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                       
-                       SELECT DISTINCT ?doc ?label WHERE {
-                           ?doc a crm:E31_Document ;
-                                crm:P1_is_identified_by ?appellation .
-                           ?appellation rdfs:label ?label .
-                       } LIMIT 10"
-                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; align-items: center; justify-content: center;'><h5 style='margin: 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;'><semantic-link iri='{{doc.value}}'>{{label.value}}</semantic-link></h5></div></div>{{/each}}"
+                query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                   PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                   PREFIX lynx: <http://www.lynx.com/resource/>
+                   PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+                   PREFIX rs: <http://www.researchspace.org/ontology/>
+                   PREFIX a-cd: <https://w3id.org/arco/ontology/context-description/>
+
+SELECT ?subject ?label ?subtitle ?preview ?previewSafeStr ?previewIiif ?previewImageStr ?rand WHERE {
+  {
+    SELECT ?subject ?label (SAMPLE(?subtitle_) AS ?subtitle) (SAMPLE(?preview_) AS ?preview) (SAMPLE(?rand_) AS ?rand) WHERE {
+      ?subject a crm:E18_Physical_Thing ;
+               crm:P2_has_type lynx:archaeological-object ;
+               crm:P1_is_identified_by ?identifier .
+      ?identifier crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
+                  rdfs:label ?label .
+      # sottotitolo: tipologia del reperto (es. Frammento di panneggio)
+      OPTIONAL {
+        ?subject crm:P2_has_type ?cls .
+        ?cls crm:P2_has_type lynx:classification ;
+             rdfs:label ?subtitle_ .
+      }
+      OPTIONAL {
+        {
+          ?subject crm:P70i_is_documented_in ?document .
+          ?document a crm:E31_Document .
+          OPTIONAL { ?document pico:preview ?preview_ . }
+        }
+        UNION
+        {
+          ?subject crm:P138i_has_representation ?preview_ .
+          FILTER NOT EXISTS { ?preview_ rdf:type a-cd:GraphicOrCartographicDocumentation . }
+          FILTER NOT EXISTS { ?preview_ crm:P2_has_type a-cd:GraphicOrCartographicDocumentation . }
+        }
+      }
+      BIND(DAY(NOW()) AS ?day)
+      BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?rand_)
+    }
+    GROUP BY ?subject ?label
+  }
+
+  BIND(IF(BOUND(?preview), STR(?preview), "") AS ?previewStr)
+  BIND(IF(STRSTARTS(?previewStr, "http://"), CONCAT("https://", STRAFTER(?previewStr, "http://")), ?previewStr) AS ?previewSafeStr)
+  OPTIONAL { ?preview rs:PX_has_file_name ?previewFileName . }
+  BIND(IF(REGEX(?previewStr, "/resource/EX_File/", "i"), REPLACE(?previewStr, "^.*/EX_File/", ""), "") AS ?previewFileFromIri)
+  BIND(COALESCE(STR(?previewFileName), ?previewFileFromIri, "") AS ?previewFileAny)
+  BIND(
+    IF(STRLEN(?previewFileAny) > 0,
+       CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?previewFileAny), "/full/!700,700/0/default.jpg"),
+       IF(REGEX(?previewSafeStr, "^https://", "i"), ?previewSafeStr, "")
+    ) AS ?previewIiif
+  )
+  BIND(IF(STRLEN(?previewIiif) > 0, ?previewIiif, "") AS ?previewImageStr)
+} ORDER BY ?rand LIMIT 10'
+                template='{{> cardGridReperti}}'>
+              <template id="cardGridReperti">
+              {{#if bindings}}
+                <div class="cl-grid">
+                  {{#each bindings}}
+                    <div class="cl-card">
+                      <div class="cl-thumb">
+                        {{#if previewImageStr.value}}
+                          <a href="{{subject.value}}">
+                            <img src="{{previewIiif.value}}" alt="{{label.value}}" loading="lazy"
+                                 onerror="this.onerror=null;this.src='/images/help/thenounproject/noun_1113333.svg';" />
+                          </a>
+                        {{else}}
+                          {{#if preview.value}}
+                            <a href="{{subject.value}}">
+                              <mp-resource-thumbnail iri="{{preview.value}}" no-image-uri="/images/help/thenounproject/noun_1113333.svg" />
+                            </a>
+                          {{else}}
+                            <a href="{{subject.value}}">
+                              <img class="cl-noimg" src="/images/help/thenounproject/noun_1113333.svg" alt="Nessuna immagine" />
+                            </a>
+                          {{/if}}
+                        {{/if}}
+                      </div>
+                      <div class="cl-label">
+                        <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                        {{#if subtitle.value}}<div class="cl-sub">{{subtitle.value}}</div>{{/if}}
+                      </div>
+                    </div>
+                  {{/each}}
+                </div>
+              {{else}}
+                <div class="cl-empty">Nessun reperto</div>
+              {{/if}}
+              </template>
+            </semantic-query>
+        </bs-col>
+    </bs-row>
+</div>
+
+<!-- 3b. Unita stratigrafiche (documentazione di scavo) -->
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Unita stratigrafiche</h3>
+            <div class="bottom">
+                <!-- TODO: IRI della ricerca strutturata sulle US -->
+                <semantic-link iri="http://www.lynx.com/resource/structured-search-us">
+                    Vedi tutte
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                   PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                   PREFIX lynx: <http://www.lynx.com/resource/>
+                   PREFIX rs: <http://www.researchspace.org/ontology/>
+                   PREFIX a-cd: <https://w3id.org/arco/ontology/context-description/>
+
+SELECT ?subject ?label ?subtitle ?preview ?previewSafeStr ?previewIiif ?previewImageStr ?rand WHERE {
+  {
+    SELECT ?subject ?label (SAMPLE(?subtitle_) AS ?subtitle) (SAMPLE(?preview_) AS ?preview) (SAMPLE(?rand_) AS ?rand) WHERE {
+      # le US stub (solo IRI citati nelle relazioni) non hanno il tipo lynx:stratigraphic-unit e restano escluse
+      ?subject crm:P2_has_type lynx:stratigraphic-unit ;
+               crm:P1_is_identified_by ?identifier .
+      ?identifier crm:P2_has_type lynx:global-id ;
+                  rdfs:label ?idLabel .
+      BIND(CONCAT("US ", STR(?idLabel)) AS ?label)
+      # sottotitolo: definizione della US (E33_Linguistic_Object)
+      OPTIONAL {
+        ?subject crm:P67i_is_referred_to_by ?definition .
+        ?definition a crm:E33_Linguistic_Object ;
+                    rdfs:label ?subtitle_ .
+      }
+      OPTIONAL {
+        ?subject crm:P138i_has_representation ?preview_ .
+        FILTER NOT EXISTS { ?preview_ rdf:type a-cd:GraphicOrCartographicDocumentation . }
+        FILTER NOT EXISTS { ?preview_ crm:P2_has_type a-cd:GraphicOrCartographicDocumentation . }
+      }
+      BIND(DAY(NOW()) AS ?day)
+      BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?rand_)
+    }
+    GROUP BY ?subject ?label
+  }
+
+  BIND(IF(BOUND(?preview), STR(?preview), "") AS ?previewStr)
+  BIND(IF(STRSTARTS(?previewStr, "http://"), CONCAT("https://", STRAFTER(?previewStr, "http://")), ?previewStr) AS ?previewSafeStr)
+  OPTIONAL { ?preview rs:PX_has_file_name ?previewFileName . }
+  BIND(IF(REGEX(?previewStr, "/resource/EX_File/", "i"), REPLACE(?previewStr, "^.*/EX_File/", ""), "") AS ?previewFileFromIri)
+  BIND(COALESCE(STR(?previewFileName), ?previewFileFromIri, "") AS ?previewFileAny)
+  BIND(
+    IF(STRLEN(?previewFileAny) > 0,
+       CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?previewFileAny), "/full/!700,700/0/default.jpg"),
+       IF(REGEX(?previewSafeStr, "^https://", "i"), ?previewSafeStr, "")
+    ) AS ?previewIiif
+  )
+  BIND(IF(STRLEN(?previewIiif) > 0, ?previewIiif, "") AS ?previewImageStr)
+} ORDER BY ?rand LIMIT 10'
+                template='{{> cardGridUS}}'>
+              <template id="cardGridUS">
+              {{#if bindings}}
+                <div class="cl-grid">
+                  {{#each bindings}}
+                    <div class="cl-card">
+                      <div class="cl-thumb">
+                        {{#if previewImageStr.value}}
+                          <a href="{{subject.value}}">
+                            <img src="{{previewIiif.value}}" alt="{{label.value}}" loading="lazy"
+                                 onerror="this.onerror=null;this.src='/images/help/thenounproject/noun_1113333.svg';" />
+                          </a>
+                        {{else}}
+                          {{#if preview.value}}
+                            <a href="{{subject.value}}">
+                              <mp-resource-thumbnail iri="{{preview.value}}" no-image-uri="/images/help/thenounproject/noun_1113333.svg" />
+                            </a>
+                          {{else}}
+                            <a href="{{subject.value}}">
+                              <img class="cl-noimg" src="/images/help/thenounproject/noun_1113333.svg" alt="Nessuna immagine" />
+                            </a>
+                          {{/if}}
+                        {{/if}}
+                      </div>
+                      <div class="cl-label">
+                        <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                        {{#if subtitle.value}}<div class="cl-sub">{{subtitle.value}}</div>{{/if}}
+                      </div>
+                    </div>
+                  {{/each}}
+                </div>
+              {{else}}
+                <div class="cl-empty">Nessuna unita stratigrafica</div>
+              {{/if}}
+              </template>
+            </semantic-query>
+        </bs-col>
+    </bs-row>
+</div>
+
+<!--
+  3c. TODO altri domini: duplicare uno dei due blocchi sopra cambiando solo la parte che identifica
+  il dominio (tipo + identificatore + sottotitolo):
+    - Opere d arte, Fotografie (immagini, card con anteprima)
+    - Documentazione archivistica, Persone (card testuali: segnatura/estremi cronologici, ruolo)
+-->
+
+<!-- 4. Luoghi -->
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Luoghi</h3>
+            <div class="bottom">
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-place">
+                    Vedi tutti
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+                   SELECT DISTINCT ?place ?label WHERE {
+                     ?place a crm:E53_Place ;
+                            crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
+                            crm:P1_is_identified_by ?appellation .
+                     ?appellation a crm:E41_Appellation ;
+                                  rdfs:label ?label .
+                     BIND(DAY(NOW()) as ?day)
+                     BIND(SHA512(CONCAT(STR(?day), STR(?place))) AS ?random)
+                   } ORDER BY ?random LIMIT 10'
+                template='{{#each bindings}}<div class="cl-textcard"><div class="cl-body"><h5><semantic-link iri="{{place.value}}">{{label.value}}</semantic-link></h5></div></div>{{/each}}'
             ></semantic-query>
         </bs-col>
     </bs-row>
 </div>
 
-<!-- PANEL 2: PEOPLE & ACTORS -->
+<!-- 5. Siti (con il numero di luoghi che vi ricadono, via P89_falls_within) -->
 <div class="bso-component separator panel">
     <bs-row>
         <bs-col md="2">
-            <h3>People</h3>
-            <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       SELECT (COUNT(DISTINCT ?person) as ?num) WHERE {
-                         ?person a crm:E21_Person .
-                       }"
-                template="{{#each bindings}}Found {{num.value}} people{{/each}}"
-            ></semantic-query>
+            <h3>Siti</h3>
             <div class="bottom">
-                <semantic-link iri="http://www.lynx.com/resource/structuredSearchPerson">
-                    See all people
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-site">
+                    Vedi tutti
                 </semantic-link>
             </div>
         </bs-col>
         <bs-col md="10" class="bso-component card-container horizontal-scroll">
             <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+                   SELECT ?subject ?label (COUNT(DISTINCT ?place) AS ?placeCount) WHERE {
+                     ?subject a crm:E53_Place ;
+                              crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
+                              crm:P1_is_identified_by ?appellation .
+                     ?appellation a crm:E41_Appellation ;
+                                  rdfs:label ?label .
+                     OPTIONAL { ?place crm:P89_falls_within ?subject . }
+                     BIND(DAY(NOW()) as ?day)
+                     BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
+                   }
+                   GROUP BY ?subject ?label ?random
+                   ORDER BY ?random LIMIT 10'
+                template='{{#each bindings}}<div class="cl-textcard"><div class="cl-body"><h5><semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link></h5><small>{{placeCount.value}} luoghi</small></div></div>{{/each}}'
+            ></semantic-query>
+        </bs-col>
+    </bs-row>
+</div>
+
+<!-- 6. Tipologie di reperto -->
+<div class="bso-component separator panel">
+    <bs-row>
+        <bs-col md="2">
+            <h3>Tipologie di reperto</h3>
+            <semantic-query
+                query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                       
-                       SELECT DISTINCT ?person ?label WHERE {
-                           ?person a crm:E21_Person .
-                           OPTIONAL { ?person crm:P1_is_identified_by/rdfs:label ?pLabel . }
-                           OPTIONAL { ?person rdfs:label ?rLabel . }
-                           BIND(COALESCE(?pLabel, ?rLabel, 'Unnamed Person') AS ?label)
-                       } LIMIT 10"
-                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; align-items: center; justify-content: center;'><h5 style='margin: 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;'><semantic-link iri='{{person.value}}'>{{label.value}}</semantic-link></h5></div></div>{{/each}}"
+                       PREFIX lynx: <http://www.lynx.com/resource/>
+                       SELECT (COUNT(DISTINCT ?label) AS ?num) WHERE {
+                           ?subject a crm:E55_Type ;
+                                    crm:P2_has_type lynx:classification ;
+                                    rdfs:label ?label .
+                           ?object a crm:E18_Physical_Thing ;
+                                   crm:P2_has_type lynx:archaeological-object ;
+                                   crm:P2_has_type ?subject .
+                       }'
+                template="{{#each bindings}}{{num.value}} tipologie{{/each}}"
+            ></semantic-query>
+            <div class="bottom">
+                <semantic-link iri="http://www.lynx.com/resource/structuredSearch">
+                    Vedi tutti i reperti
+                </semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="10" class="bso-component card-container horizontal-scroll">
+            <semantic-query
+                query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                       PREFIX lynx: <http://www.lynx.com/resource/>
+
+                       SELECT ?label (SAMPLE(?subject) AS ?repSubject) (COUNT(DISTINCT ?object) AS ?objectCount) WHERE {
+                           ?subject a crm:E55_Type ;
+                                    crm:P2_has_type lynx:classification ;
+                                    rdfs:label ?label .
+                           ?object a crm:E18_Physical_Thing ;
+                                   crm:P2_has_type lynx:archaeological-object ;
+                                   crm:P2_has_type ?subject .
+                           BIND(DAY(NOW()) as ?day)
+                           BIND(SHA512(CONCAT(STR(?day), STR(?label))) AS ?random)
+                       }
+                       GROUP BY ?label ?random
+                       ORDER BY ?random
+                       LIMIT 10'
+                template='{{#each bindings}}<div class="cl-textcard"><div class="cl-body"><h5><semantic-link iri="{{repSubject.value}}">{{label.value}}</semantic-link></h5><small>{{objectCount.value}} reperti</small></div></div>{{/each}}'
             ></semantic-query>
         </bs-col>
     </bs-row>

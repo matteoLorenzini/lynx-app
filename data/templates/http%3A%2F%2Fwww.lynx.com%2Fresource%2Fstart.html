@@ -1,15 +1,17 @@
-<div class="bso-component home-search">
-    <bs-col md="10" md-offset="1">
+<!-- HERO SEARCH SECTION -->
+<div class="bso-component home-hero-search jumbotron text-center" style="padding: 3rem 1rem; background: #f8f9fa;">
+    <bs-col md="8" md-offset="2">
+        <h1 class="display-4" style="font-size: 2.2rem; margin-bottom: 1rem;">Explore Cultural Heritage Archive</h1>
+        <p class="lead" style="color: #6c757d;">Discover archival documents, archaeological finds, art objects, and historic sites.</p>
+        
         <div class="bso-component simple-search">
             <semantic-simple-search
               query='
                 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                 PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 
                 SELECT DISTINCT ?resource ?label ?typelabel WHERE {
                   {
-                    # Objects (E18_Physical_Thing) - labelled by their general-id E42_Identifier
                     ?resource a crm:E18_Physical_Thing ;
                               crm:P1_is_identified_by ?identifier .
                     ?identifier a crm:E42_Identifier ;
@@ -17,283 +19,131 @@
                                 rdfs:label ?label .
                     BIND("Object" AS ?typelabel)
                   } UNION {
-                    # Places (E53_Place) - typed as cultural-heritage-place/place, labelled via rdfs:label
+                    ?resource a crm:E31_Document ;
+                              rdfs:label ?label .
+                    BIND("Archive" AS ?typelabel)
+                  } UNION {
                     ?resource a crm:E53_Place ;
                               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                              crm:P1_is_identified_by ?appellation .
-                    ?appellation a crm:E41_Appellation ;
-                                 rdfs:label ?label .
+                              crm:P1_is_identified_by/rdfs:label ?label .
                     BIND("Place" AS ?typelabel)
                   } UNION {
-                    # Sites (E53_Place) - typed as cultural-heritage-place/site, labelled via rdfs:label
                     ?resource a crm:E53_Place ;
                               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
-                              crm:P1_is_identified_by ?siteAppellation .
-                    ?siteAppellation a crm:E41_Appellation ;
-                                     rdfs:label ?label .
+                              crm:P1_is_identified_by/rdfs:label ?label .
                     BIND("Site" AS ?typelabel)
                   } UNION {
-                    # Object Types (E55_Type classification)
                     ?resource a crm:E55_Type ;
                               crm:P2_has_type <http://www.lynx.com/resource/classification> ;
                               rdfs:label ?label .
-                    BIND("Object Type" AS ?typelabel)
+                    BIND("Typology" AS ?typelabel)
                   }
-                  
                   FILTER REGEX(?label, ?__token__, "i")
-                } 
-                LIMIT 10'
-              template='<span style="color: blue;" title="{{resource.value}}">{{label.value}} <em style="color: #999;">({{typelabel.value}})</em></span>'
-              input-placeholder='Search for objects, sites, places, types...'
+                } LIMIT 10'
+              template='<span style="font-weight: 500;" title="{{resource.value}}">{{label.value}} <span class="badge badge-secondary" style="font-size: 0.75rem; background:#e9ecef; color:#495057; margin-left: 5px;">{{typelabel.value}}</span></span>'
+              input-placeholder='Search across objects, archival documents, sites, and classifications...'
             >
             </semantic-simple-search>
         </div>
     </bs-col>
 </div>
 
-<div class="bso-component separator panel">
-    <bs-row>
-        <bs-col md="2">
-            <h3>Objects</h3>
+<!-- DOMAIN QUICK-ACCESS TILES -->
+<div class="container my-4">
+    <bs-row class="text-center">
+        <bs-col md="3" sm="6" class="mb-3">
+            <div class="card p-3 shadow-sm border-light">
+                <i class="fa fa-archive fa-2x mb-2" style="color: #0d6efd;"></i>
+                <h5>Archival Records</h5>
+                <semantic-link iri="http://www.lynx.com/resource/structuredSearchArchive" class="btn btn-sm btn-outline-primary mt-2">Browse Archive</semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="3" sm="6" class="mb-3">
+            <div class="card p-3 shadow-sm border-light">
+                <i class="fa fa-monument fa-2x mb-2" style="color: #0d6efd;"></i>
+                <h5>Archaeology & Sites</h5>
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-site" class="btn btn-sm btn-outline-primary mt-2">Explore Sites</semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="3" sm="6" class="mb-3">
+            <div class="card p-3 shadow-sm border-light">
+                <i class="fa fa-palette fa-2x mb-2" style="color: #0d6efd;"></i>
+                <h5>Art & Objects</h5>
+                <semantic-link iri="http://www.lynx.com/resource/structuredSearch" class="btn btn-sm btn-outline-primary mt-2">View Objects</semantic-link>
+            </div>
+        </bs-col>
+        <bs-col md="3" sm="6" class="mb-3">
+            <div class="card p-3 shadow-sm border-light">
+                <i class="fa fa-map-marked-alt fa-2x mb-2" style="color: #0d6efd;"></i>
+                <h5>Places & Context</h5>
+                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-place" class="btn btn-sm btn-outline-primary mt-2">Explore Places</semantic-link>
+            </div>
+        </bs-col>
+    </bs-row>
+</div>
+
+<!-- CONTENT ROW 1: PHYSICAL OBJECTS & ARTWORKS -->
+<div class="bso-component separator panel mb-4">
+    <bs-row class="align-items-center">
+        <bs-col md="2" class="p-3">
+            <h4 style="margin-bottom: 0.5rem;">Objects</h4>
             <semantic-query
                 query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       SELECT (COUNT(?subject) as ?num) WHERE {
-                           ?subject a crm:E18_Physical_Thing .
-                       }"
-                template="{{#each bindings}}Found {{num.value}} objects{{/each}}"
+                       SELECT (COUNT(?subject) as ?num) WHERE { ?subject a crm:E18_Physical_Thing . }"
+                template="{{#each bindings}}<p class='text-muted small'>{{num.value}} items indexed</p>{{/each}}"
             ></semantic-query>
-            <div class="bottom">
-                <semantic-link iri="http://www.lynx.com/resource/structuredSearch">
-                    See all
+            <div>
+                <semantic-link iri="http://www.lynx.com/resource/structuredSearch" class="btn btn-sm btn-link p-0">
+                    See all objects &rarr;
                 </semantic-link>
             </div>
         </bs-col>
         <bs-col md="10" class="bso-component card-container horizontal-scroll">
             <semantic-query
                 query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                   PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                   PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
-                   PREFIX rs: <http://www.researchspace.org/ontology/>
-                   PREFIX a-cd: <https://w3id.org/arco/ontology/context-description/>
+                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                       PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+                       PREFIX rs: <http://www.researchspace.org/ontology/>
 
-SELECT ?subject ?label ?preview ?previewStr ?previewSafeStr ?previewIiif ?previewImageStr ?rand WHERE {
-  {
-    SELECT ?subject ?label (SAMPLE(?preview_) AS ?preview) (SAMPLE(?rand_) AS ?rand) WHERE {
-      ?subject a crm:E18_Physical_Thing ;
-               crm:P1_is_identified_by ?identifier .
-      ?identifier a crm:E42_Identifier ;
-                  crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
-                  rdfs:label ?label .
-      OPTIONAL {
-        {
-          ?subject crm:P70i_is_documented_in ?document .
-          ?document a crm:E31_Document .
-          OPTIONAL { ?document pico:preview ?preview_ . }
-        }
-        UNION
-        {
-          ?subject crm:P138i_has_representation ?preview_ .
-          FILTER NOT EXISTS { ?preview_ rdf:type a-cd:GraphicOrCartographicDocumentation . }
-          FILTER NOT EXISTS { ?preview_ crm:P2_has_type a-cd:GraphicOrCartographicDocumentation . }
-        }
-      }
-      BIND(DAY(NOW()) AS ?day)
-      BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?rand_)
-    }
-    GROUP BY ?subject ?label
-  }
-
-  BIND(IF(BOUND(?preview), STR(?preview), "") AS ?previewStr)
-  BIND(
-    IF(
-      STRSTARTS(?previewStr, "http://"),
-      CONCAT("https://", STRAFTER(?previewStr, "http://")),
-      ?previewStr
-    ) AS ?previewSafeStr
-  )
-  OPTIONAL { ?preview rs:PX_has_file_name ?previewFileName . }
-  BIND(IF(REGEX(?previewStr, "/resource/EX_File/", "i"), REPLACE(?previewStr, "^.*/EX_File/", ""), "") AS ?previewFileFromIri)
-  BIND(COALESCE(STR(?previewFileName), ?previewFileFromIri, "") AS ?previewFileAny)
-  BIND(
-    IF(
-      STRLEN(?previewFileAny) > 0,
-      CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?previewFileAny), "/full/!700,700/0/default.jpg"),
-      IF(REGEX(?previewSafeStr, "^https://", "i"), ?previewSafeStr, "")
-    ) AS ?previewIiif
-  )
-  BIND(IF(STRLEN(?previewIiif) > 0, ?previewIiif, "") AS ?previewImageStr)
-} ORDER BY ?rand LIMIT 10' template='{{> siteCardGrid}}'>
-              <template id="siteCardGrid">
-              <style>
-                .site-grid { display:flex; flex-wrap:wrap; gap:12px; }
-                .site-card { width:200px; border:1px solid #ddd; border-radius:6px; overflow:hidden; background:#fff; text-align:center; }
-                .site-card .thumb { height:140px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; }
-                .site-card img { max-width:100%; max-height:140px; object-fit:contain; display:block; border-radius:4px; }
-                .site-card mp-resource-thumbnail { max-width:100%; max-height:140px; display:block; }
-                .site-card .label { padding:10px 8px; font-size:.95rem; line-height:1.2em; height:48px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; color:#000; }
-                .site-card .label a, .site-card .label semantic-link { color:#000; text-decoration:none; }
-                .site-card a { color:inherit; text-decoration:none; }
-              </style>
-
-              {{#if bindings}}
-                <div class="site-grid">
-                  {{#each bindings}}
-                    <div class="site-card">
-                      <div class="thumb">
-                        {{#with this}}
-                          {{#if previewImageStr.value}}
-                            <a href="{{previewSafeStr.value}}" target="_blank" rel="noopener">
-                              <img src="{{previewIiif.value}}" alt="{{label.value}}" loading="lazy"
-                                   onerror="this.onerror=null;this.src='/images/help/thenounproject/noun_1113333.svg';this.style.objectFit='contain';" />
-                            </a>
-                          {{else}}
-                            {{#if preview.value}}
-                              <!-- preview exists but is not a direct image URL: use platform thumbnail rendering -->
-                              <a href="{{subject.value}}">
+                       SELECT ?subject ?label ?preview ?previewIiif WHERE {
+                         ?subject a crm:E18_Physical_Thing ;
+                                  crm:P1_is_identified_by ?identifier .
+                         ?identifier a crm:E42_Identifier ;
+                                     crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
+                                     rdfs:label ?label .
+                         OPTIONAL {
+                           ?subject crm:P138i_has_representation ?preview .
+                         }
+                       } LIMIT 10' 
+                template='{{> siteCardGrid}}'>
+                <template id="siteCardGrid">
+                    <style>
+                        .site-grid { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 12px; padding-bottom: 10px; }
+                        .site-card { min-width: 180px; max-width: 180px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #fff; text-align: center; transition: transform 0.2s; }
+                        .site-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+                        .site-card .thumb { height: 130px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; }
+                        .site-card .label { padding: 8px; font-size: 0.875rem; font-weight: 500; height: 48px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+                    </style>
+                    <div class="site-grid">
+                      {{#each bindings}}
+                        <div class="site-card">
+                          <div class="thumb">
+                            <semantic-link iri="{{subject.value}}">
+                              {{#if preview.value}}
                                 <mp-resource-thumbnail iri="{{preview.value}}" no-image-uri="/images/help/thenounproject/noun_1113333.svg" />
-                              </a>
-                            {{else}}
-                              <!-- no preview at all: show static icon to avoid fetch/errors -->
-                              <a href="{{subject.value}}">
-                                <img src="/images/help/thenounproject/noun_1113333.svg" alt="No image" style="width:72px;height:72px;object-fit:contain;" />
-                              </a>
-                            {{/if}}
-                          {{/if}}
-                        {{/with}}
-                      </div>
-                      <div class="label">
-                        <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
-                      </div>
+                              {{else}}
+                                <img src="/images/help/thenounproject/noun_1113333.svg" alt="No thumbnail" style="width: 48px; opacity: 0.4;" />
+                              {{/if}}
+                            </semantic-link>
+                          </div>
+                          <div class="label">
+                            <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                          </div>
+                        </div>
+                      {{/each}}
                     </div>
-                  {{/each}}
-                </div>
-              {{else}}
-                <div style="color:#666">No objects</div>
-              {{/if}}
-            </template>
+                </template>
             </semantic-query>
-        </bs-col>
-    </bs-row>
-</div>
-
-<div class="bso-component separator panel">
-    <bs-row>
-        <bs-col md="2">
-            <h3>Places</h3>
-            <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                     SELECT (COUNT(DISTINCT ?place) as ?num) WHERE {
-                       ?place a crm:E53_Place ;
-                              crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> .
-                       }"
-                template="{{#each bindings}}Found {{num.value}} places{{/each}}"
-            ></semantic-query>
-            <div class="bottom">
-                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-place">
-                    See all
-                </semantic-link>
-            </div>
-        </bs-col>
-        <bs-col md="10" class="bso-component card-container horizontal-scroll">
-            <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                       
-                         SELECT DISTINCT ?place ?label WHERE {
-                           ?place a crm:E53_Place ;
-                                  crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                                  crm:P1_is_identified_by ?appellation .
-                           ?appellation a crm:E41_Appellation ;
-                                        rdfs:label ?label .
-                           BIND(DAY(NOW()) as ?day)
-                           BIND(SHA512(CONCAT(STR(?day), STR(?place))) AS ?random)
-                       } ORDER BY ?random LIMIT 10"
-                    template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; align-items: center; justify-content: center;'><h5 style='margin: 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;'><semantic-link iri='{{place.value}}'>{{label.value}}</semantic-link></h5></div></div>{{/each}}"
-            ></semantic-query>
-        </bs-col>
-    </bs-row>
-</div>
-
-<div class="bso-component separator panel">
-    <bs-row>
-        <bs-col md="2">
-            <h3>Sites</h3>
-            <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       SELECT (COUNT(DISTINCT ?subject) as ?num) WHERE {
-                           ?subject a crm:E53_Place ;
-                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> .
-                       }"
-                template="{{#each bindings}}Found {{num.value}} sites{{/each}}"
-            ></semantic-query>
-            <div class="bottom">
-                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search-site">
-                    See all
-                </semantic-link>
-            </div>
-        </bs-col>
-        <bs-col md="10" class="bso-component card-container horizontal-scroll">
-            <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                       
-                       SELECT DISTINCT ?subject ?label WHERE {
-                           ?subject a crm:E53_Place ;
-                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
-                                   crm:P1_is_identified_by ?appellation .
-                           ?appellation a crm:E41_Appellation ;
-                                       rdfs:label ?label .
-                           BIND(DAY(NOW()) as ?day)
-                           BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?random)
-                       } ORDER BY ?random LIMIT 10"
-                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; align-items: center; justify-content: center;'><h5 style='margin: 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;'><semantic-link iri='{{subject.value}}'>{{label.value}}</semantic-link></h5></div></div>{{/each}}"
-            ></semantic-query>
-        </bs-col>
-    </bs-row>
-</div>
-
-<div class="bso-component separator panel">
-    <bs-row>
-        <bs-col md="2">
-            <h3>Object Typology</h3>
-            <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                       SELECT (COUNT(DISTINCT ?label) as ?num) WHERE {
-                           ?subject a crm:E55_Type ;
-                                   crm:P2_has_type <http://www.lynx.com/resource/classification> ;
-                                   rdfs:label ?label .
-                           ?object crm:P2_has_type ?subject .
-                           ?object a crm:E18_Physical_Thing .
-                       }"
-                template="{{#each bindings}}Found {{num.value}} types{{/each}}"
-            ></semantic-query>
-            <div class="bottom">
-                <semantic-link iri="http://www.siriusplatform-risk-assessment/resource/structured-search">
-                    See all objects
-                </semantic-link>
-            </div>
-        </bs-col>
-        <bs-col md="10" class="bso-component card-container horizontal-scroll">
-            <semantic-query
-                query="PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                       
-                       SELECT ?label (SAMPLE(?subject) AS ?repSubject) (COUNT(DISTINCT ?object) as ?objectCount) WHERE {
-                           ?subject a crm:E55_Type ;
-                                   crm:P2_has_type <http://www.lynx.com/resource/classification> ;
-                                   rdfs:label ?label .
-                           ?object a crm:E18_Physical_Thing ;
-                                   crm:P2_has_type ?subject .
-                           BIND(DAY(NOW()) as ?day)
-                           BIND(SHA512(CONCAT(STR(?day), STR(?label))) AS ?random)
-                       } 
-                       GROUP BY ?label ?random
-                       ORDER BY ?random 
-                       LIMIT 10"
-                template="{{#each bindings}}<div class='card' style='display: inline-block; margin: 10px; width: 200px; height: 120px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; vertical-align: top; overflow: hidden;'><div class='card-body' style='height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;'><h5 style='margin: 0 0 5px 0; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;'><semantic-link iri='{{repSubject.value}}'>{{label.value}}</semantic-link></h5><small style='color: #666;'>{{objectCount.value}} objects</small></div></div>{{/each}}"
-            ></semantic-query>
         </bs-col>
     </bs-row>
 </div>

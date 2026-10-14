@@ -1,0 +1,47 @@
+[[#if (urlParam "frame")]]
+<style>
+  .rs-application .page.page-local-overwrite {
+    padding-top: 0;
+  }
+</style>
+<div class="page page-local-overwrite">
+    [[> rsp:ResourceContentUS]]
+</div>
+
+[[else]]
+[[!-- Breadcrumb --]]
+<ol class="page-breadcrumb">
+    <li>
+        <mp-link title="Home" url="/">Home</mp-link>
+    </li>
+
+   [[#block "activeBreadcrumb"]]
+  <semantic-query query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?label
+WHERE {
+    <[[this]]> a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+               crm:P1_is_identified_by ?identifier .
+    ?identifier a crm:E42_Identifier ;
+                crm:P2_has_type <http://www.lynx.com/resource/global-id> ;
+                rdfs:label ?label .
+}'
+    template='{{> breadcrumbTmpl}}'>
+    <template id='breadcrumbTmpl'>
+      <li class="active">
+        {{#each bindings}}
+          US {{label.value}}
+        {{/each}}
+      </li>
+    </template>
+   </semantic-query>
+   [[/block]]
+</ol>
+
+[[!-- Resource Page --]]
+<div class="page">
+  [[> rsp:ResourceContentUS]]
+</div>
+[[/if]]

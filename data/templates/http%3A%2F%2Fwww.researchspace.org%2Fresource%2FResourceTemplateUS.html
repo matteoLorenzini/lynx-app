@@ -22,11 +22,10 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT ?label
 WHERE {
-    <[[this]]> a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
-               crm:P1_is_identified_by ?identifier .
-    ?identifier a crm:E42_Identifier ;
-                crm:P2_has_type <http://www.lynx.com/resource/global-id> ;
-                rdfs:label ?label .
+    <[[this]]> ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+                                   a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P1_is_identified_by <http://www.lynx.com/resource/us-number>;
+    rdfs:label ?label .
 }'
     template='{{> breadcrumbTmpl}}'>
     <template id='breadcrumbTmpl'>

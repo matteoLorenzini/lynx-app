@@ -12,14 +12,14 @@
         "iri": "<http://www.lynx.com/resource/field/contains_site>",
         "label": "Contains Site",
         "hasDomain": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>",
-        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E27_Site>"
       }
     ]
   }'
   relations='{
     "<http://www.lynx.com/resource/field/contains_site>": [{
       "kind": "resource",
-      "queryPattern": "{$subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ; ^crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> .}"
+      "queryPattern": "{$subject a crm:E53_Place ; ^crm:P89_falls_within ?__value__ . ?__value__ a crm:E27_Site .}"
     }]
   }'
   >
@@ -30,10 +30,7 @@
     SELECT DISTINCT ?subject
     WHERE {
       ?subject a crm:E53_Place ;
-               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-               crm:P1_is_identified_by ?appellation .
-      ?appellation a crm:E41_Appellation ;
-                   rdfs:label ?label .
+               rdfs:label ?label .
       FILTER REGEX(STR(?label), ?__token__, "i")
     }
   ' default-query='
@@ -41,8 +38,7 @@
 
     SELECT DISTINCT ?subject
     WHERE {
-      ?subject a crm:E53_Place ;
-               crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> .
+      ?subject a crm:E53_Place .
     }
   ' debounce=500></semantic-search-query-keyword>
 
@@ -80,13 +76,10 @@
                           (COUNT(DISTINCT ?us) AS ?usCount)
                         WHERE {
                           ?subject a crm:E53_Place ;
-                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                                   crm:P1_is_identified_by ?appellation .
-                          ?appellation a crm:E41_Appellation ;
-                                       rdfs:label ?value_ .
+                                   rdfs:label ?value_ .
                           OPTIONAL {
                             ?placeResource crm:P89_falls_within ?subject .
-                            ?placeResource crm:P1_is_identified_by/rdfs:label ?place_ .
+                            ?placeResource rdfs:label ?place_ .
                           }
                           OPTIONAL {
                             ?siteResource crm:P89_falls_within ?subject .
@@ -144,13 +137,10 @@
                 SELECT DISTINCT ?subject ?value ?place
                 WHERE {
                   ?subject a crm:E53_Place ;
-                           crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                           crm:P1_is_identified_by ?appellation .
-                  ?appellation a crm:E41_Appellation ;
-                               rdfs:label ?value .
+                           rdfs:label ?value .
                   OPTIONAL {
                     ?placeResource crm:P89_falls_within ?subject .
-                    ?placeResource crm:P1_is_identified_by/rdfs:label ?place .
+                    ?placeResource rdfs:label ?place .
                   }
                 }
                 ORDER BY ?value
@@ -176,11 +166,8 @@
 
                 SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
                   ?subject a crm:E53_Place ;
-                           crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                           crm:P1_is_identified_by ?appellation ;
+                           rdfs:label ?label ;
                            crm:P168_place_is_defined_by ?literal .
-                  ?appellation a crm:E41_Appellation ;
-                               rdfs:label ?label .
                   ?literal rdfs:label ?coords .
                 }
                 ' tuple-template='{{> template }}'>
@@ -200,10 +187,7 @@
               PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
               SELECT DISTINCT ?subject ?value WHERE {
                 ?subject a crm:E53_Place ;
-                         crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                         crm:P1_is_identified_by ?appellation .
-                ?appellation a crm:E41_Appellation ;
-                             rdfs:label ?value .
+                         rdfs:label ?value .
               }" header="text/csv" filename="places.csv">
               <button class="btn btn-default">Download CSV</button>
             </mp-sparql-download>
@@ -214,10 +198,7 @@
               PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
               SELECT DISTINCT ?subject ?value WHERE {
                 ?subject a crm:E53_Place ;
-                         crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                         crm:P1_is_identified_by ?appellation .
-                ?appellation a crm:E41_Appellation ;
-                             rdfs:label ?value .
+                         rdfs:label ?value .
               }" header="application/sparql-results+json" filename="places.json">
               <button class="btn btn-default">Download JSON</button>
             </mp-sparql-download>

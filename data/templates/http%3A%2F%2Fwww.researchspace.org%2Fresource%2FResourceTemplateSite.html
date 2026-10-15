@@ -21,17 +21,17 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-SELECT ?value_appellation ?value_type WHERE {
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
   <[[this]]> a crm:E53_Place ;
-          crmgeo:P1_is_identified_by ?appellation .
-  ?appellation a crmgeo:E44_Place_Appellation ;
-          skos:prefLabel ?value_appellation .
+          crm:P1_is_identified_by ?appellation .
+  ?appellation a crm:E41_Appellation ;
+          rdfs:label ?value_appellation .
 }'
     template='{{> breadcrumbTmpl}}'>
     <template id='breadcrumbTmpl'>
       <li class="active">
         {{#each bindings}}
-          {{value_type.value}}: {{value_appellation.value}}{{#if @last}}{{else}}; {{/if}}
+          Site: {{value_appellation.value}}{{#if @last}}{{else}}; {{/if}}
         {{/each}}
       </li>
     </template>

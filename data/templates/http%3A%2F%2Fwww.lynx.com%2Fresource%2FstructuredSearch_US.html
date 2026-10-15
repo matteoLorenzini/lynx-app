@@ -207,10 +207,9 @@
                           (GROUP_CONCAT(DISTINCT ?place_; separator=", ") AS ?places)
                         WHERE {
                           ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
-                                   crm:P1_is_identified_by ?identifier .
-                          ?identifier a crm:E42_Identifier ;
-                                      crm:P2_has_type <http://www.lynx.com/resource/global-id> ;
-                                      rdfs:label ?value_ .
+                                   a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P1_is_identified_by <http://www.lynx.com/resource/us-number>;
+    rdfs:label ?value_ .
 
                           OPTIONAL {
                             {
@@ -333,10 +332,9 @@
                       (SAMPLE(?note_) AS ?note)
                     WHERE {
                       ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
-                               crm:P1_is_identified_by ?identifier .
-                      ?identifier a crm:E42_Identifier ;
-                                  crm:P2_has_type <http://www.lynx.com/resource/global-id> ;
-                                  rdfs:label ?value_ .
+                                   a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P1_is_identified_by <http://www.lynx.com/resource/us-number>;
+    rdfs:label ?value_ .
                       OPTIONAL {
                         ?subject crm:P2_has_type ?type .
                         ?type a crm:E55_Type ;
@@ -396,10 +394,9 @@
                 SELECT DISTINCT ?subject ?value ?placeType ?place
                 WHERE {
                   ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
-                           crm:P1_is_identified_by ?identifier .
-                  ?identifier a crm:E42_Identifier ;
-                              crm:P2_has_type <http://www.lynx.com/resource/global-id> ;
-                              rdfs:label ?value .
+                                   a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P1_is_identified_by <http://www.lynx.com/resource/us-number>;
+    rdfs:label ?value .
                   ?subject crmarchaeo:AP5i_was_partially_or_totally_removed_by/
                            crm:P7_took_place_at/crm:P89_falls_within ?placeResource .
                   ?placeResource a crm:E53_Place ;
@@ -434,10 +431,9 @@
               PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
               SELECT DISTINCT ?subject ?value WHERE {
                 ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
-                         crm:P1_is_identified_by ?identifier .
-                ?identifier a crm:E42_Identifier ;
-                            crm:P2_has_type <http://www.lynx.com/resource/global-id> ;
-                            rdfs:label ?value .
+                                   a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P1_is_identified_by <http://www.lynx.com/resource/us-number>;
+    rdfs:label ?value .
               }" header="text/csv" filename="stratigraphic-units.csv">
               <button class="btn btn-default">Download CSV</button>
             </mp-sparql-download>
@@ -449,10 +445,9 @@
               PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
               SELECT DISTINCT ?subject ?value WHERE {
                 ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
-                         crm:P1_is_identified_by ?identifier .
-                ?identifier a crm:E42_Identifier ;
-                            crm:P2_has_type <http://www.lynx.com/resource/global-id> ;
-                            rdfs:label ?value .
+                                   a crmarchaeo:A2_Stratigraphic_Volume_Unit;
+    crm:P1_is_identified_by <http://www.lynx.com/resource/us-number>;
+    rdfs:label ?value .
               }" header="application/sparql-results+json" filename="stratigraphic-units.json">
               <button class="btn btn-default">Download JSON</button>
             </mp-sparql-download>

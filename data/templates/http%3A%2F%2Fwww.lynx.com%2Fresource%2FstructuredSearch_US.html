@@ -124,7 +124,7 @@
     }],
     "<http://www.lynx.com/resource/field/excavation_place>": [{
       "kind": "resource",
-      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP5i_was_partially_or_totally_removed_by/crm:P7_took_place_at/crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place .}"
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation . ?excavation crm:P7_took_place_at ?site . ?site a crm:E27_Site ; crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> .}"
     }]
   }'
   >
@@ -387,24 +387,18 @@
           <bs-tab event-key="4" title="Excavation Context">
             <semantic-search-result id='context-result-wrapper'>
               <semantic-table id='context-result' query='
-                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                 PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
 
-                SELECT DISTINCT ?subject ?value ?placeType ?place
-                WHERE {
-                  ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
-                                   a crmarchaeo:A2_Stratigraphic_Volume_Unit;
-    crm:P1_is_identified_by <http://www.lynx.com/resource/us-number>;
-    rdfs:label ?value .
-                  ?subject crmarchaeo:AP5i_was_partially_or_totally_removed_by/
-                           crm:P7_took_place_at/crm:P89_falls_within ?placeResource .
-                  ?placeResource a crm:E53_Place ;
-                                 crm:P2_has_type ?placeTypeResource ;
-                                 rdfs:label ?place .
-                  ?placeTypeResource rdfs:label ?placeType .
-                }
-                ORDER BY ?value ?placeType
+SELECT DISTINCT ?value WHERE {
+  $subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+           crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
+  ?excavation crm:P7_took_place_at ?site .
+  ?site a crm:E27_Site ;
+        crm:P89_falls_within ?value .
+  ?value a crm:E53_Place ;
+         crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place>
+}
               ' column-configuration='[
               {
                 "displayName": "US ID",
@@ -421,6 +415,34 @@
               </semantic-table>
             </semantic-search-result>
           </bs-tab>
+
+          <bs-tab event-key="5" title="Map">
+            <semantic-search-result id='map-result-wrapper'>
+              <div style='height: 30vw;'>
+                <semantic-map id='map-result' query='
+                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+
+                SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
+                  ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+                           crm:P1_is_identified_by <http://www.lynx.com/resource/us-number> ;
+                           rdfs:label ?usLabel ;
+                           crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
+                  ?excavation crm:P7_took_place_at ?site .
+                  ?site a crm:E27_Site ;
+                        crm:P168_place_is_defined_by ?literal .
+                  ?literal rdfs:label ?coords .
+                  BIND(CONCAT("US ", STR(?usLabel)) AS ?label)
+                }
+                ' tuple-template='{{> template }}'>
+                <template id='template'>
+                  <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                </template>
+              </semantic-map>
+            </div>
+          </semantic-search-result>
+        </bs-tab>
         </bs-tabs>
 
         <bs-panel>

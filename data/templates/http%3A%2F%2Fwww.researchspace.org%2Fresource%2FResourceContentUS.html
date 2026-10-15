@@ -294,7 +294,6 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
                     <bs-nav-item event-key="rel-abut">Abuts / Abutted By</bs-nav-item>
                     <bs-nav-item event-key="rel-bond">Bonds To / Equal To</bs-nav-item>
                     <bs-nav-item event-key="rel-temporal">Temporal Sequence</bs-nav-item>
-                    <bs-nav-item event-key="rel-physical">All Physical Relations</bs-nav-item>
                     </bs-nav>
                     <bs-tab-content animation="true">
                     <bs-tab-pane event-key="rel-cover">
@@ -352,16 +351,6 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
                         <mp-field-visualization
                           subject='[[this]]'
                           fields='[[fieldDefinitions us_rel_occurs_before="http://www.lynx-platform.com/field/us_rel_occurs_before" us_rel_occurs_after="http://www.lynx-platform.com/field/us_rel_occurs_after"]]'
-                          template='{{> template}}'>
-                          <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
-                        </mp-field-visualization>
-                      </div>
-                    </bs-tab-pane>
-                    <bs-tab-pane event-key="rel-physical">
-                      <div class="rs-resource-data-table">
-                        <mp-field-visualization
-                          subject='[[this]]'
-                          fields='[[fieldDefinitions us_rel_physical_relation_to="http://www.lynx-platform.com/field/us_rel_physical_relation_to" us_rel_physical_relation_from="http://www.lynx-platform.com/field/us_rel_physical_relation_from"]]'
                           template='{{> template}}'>
                           <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
                         </mp-field-visualization>

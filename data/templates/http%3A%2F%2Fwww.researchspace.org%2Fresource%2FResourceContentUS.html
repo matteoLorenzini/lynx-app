@@ -154,50 +154,29 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
           </div>
           <div style="padding: 1.8% 1.5% 1.5% 5%;">
             [[> resourceHeaderData image=true]]
-            <!-- Key facts under the title: typology, period, conservation state -->
-            <div style="margin-top: 8px;">
-              <semantic-query
+            <!-- Small map of the excavation site this US refers to -->
+            <div style="margin-top: 8px; height: 200px; width: 100%;">
+              <semantic-map
+                id='us-site-map-[[this]]'
                 query='
                   PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                   PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-                  SELECT
-                    (GROUP_CONCAT(DISTINCT ?typology; separator=", ") AS ?typologies)
-                    (GROUP_CONCAT(DISTINCT ?state; separator=", ") AS ?states)
-                    (GROUP_CONCAT(DISTINCT ?saggio; separator=", ") AS ?saggi)
-                  WHERE {
-                    BIND(<[[this]]> AS ?subject)
-                    ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit .
-                    OPTIONAL {
-                      ?subject crm:P2_has_type ?t .
-                      ?t rdfs:label ?typology .
-                      FILTER(CONTAINS(STR(?t), "/tipologia/"))
-                    }
-                    OPTIONAL {
-                      ?subject crm:P44_has_condition ?c .
-                      ?c rdfs:label ?state .
-                      FILTER(CONTAINS(STR(?c), "/stato-conservazione/"))
-                    }
-                    OPTIONAL {
-                      ?subject crmarchaeo:AP5i_was_partially_or_totally_removed_by ?exc .
-                      ?exc crm:P7_took_place_at ?site .
-                      ?site crm:P89_falls_within ?p .
-                      ?p crm:P2_has_type <http://www.lynx.com/resource/saggio> ;
-                         rdfs:label ?saggio .
-                    }
+                  SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?site WHERE {
+                    <[[this]]> crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
+                    ?excavation crm:P7_took_place_at ?site .
+                    ?site a crm:E27_Site ;
+                          crm:P168_place_is_defined_by ?literal .
+                    ?literal rdfs:label ?coords .
+                    OPTIONAL { ?site rdfs:label ?siteLabel }
+                    BIND(COALESCE(?siteLabel, STR(?site)) AS ?label)
                   }'
-                template='{{> usSummary}}'>
-                <template id='usSummary'>
-                  {{#with bindings.[0]}}
-                    <div style="font-size:0.85rem;">
-                      {{#if typologies.value}}<div><strong>Typology:</strong> {{typologies.value}}</div>{{/if}}
-                      {{#if states.value}}<div><strong>Conservation:</strong> {{states.value}}</div>{{/if}}
-                      {{#if saggi.value}}<div><strong>Trench:</strong> {{saggi.value}}</div>{{/if}}
-                    </div>
-                  {{/with}}
+                tuple-template='{{> siteMarker}}'>
+                <template id='siteMarker'>
+                  <semantic-link iri="{{site.value}}">{{label.value}}</semantic-link>
                 </template>
-              </semantic-query>
+              </semantic-map>
             </div>
           </div>
         </div>

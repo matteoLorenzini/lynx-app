@@ -193,8 +193,10 @@
                     PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                     PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
                     PREFIX crmsci: <http://www.ics.forth.gr/isl/CRMsci/>
+                    PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+                    PREFIX rs: <http://www.researchspace.org/ontology/>
 
-                    SELECT ?subject ?value ?label_type ?note ?condition ?consistency ?color ?components ?places WHERE {
+                    SELECT ?subject ?value ?label_type ?note ?condition ?consistency ?color ?components ?places ?previewIiif WHERE {
                       {
                         SELECT ?subject
                           (SAMPLE(?value_) AS ?value)
@@ -205,6 +207,7 @@
                           (SAMPLE(?color_) AS ?color)
                           (GROUP_CONCAT(DISTINCT ?component_; separator=", ") AS ?components)
                           (GROUP_CONCAT(DISTINCT ?place_; separator=", ") AS ?places)
+                          (MIN(?previewFile_) AS ?previewFile)
                         WHERE {
                           ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
                                    a crmarchaeo:A2_Stratigraphic_Volume_Unit;
@@ -256,9 +259,25 @@
                             ?placeResource a crm:E53_Place ;
                                            rdfs:label ?place_ .
                           }
+                          OPTIONAL {
+                            ?subject crm:P70i_is_documented_in ?imgDocument .
+                            ?imgDocument pico:preview ?imgPreview .
+                            OPTIONAL { ?imgPreview rs:PX_has_file_name ?imgFileName . }
+                            BIND(
+                              COALESCE(
+                                STR(?imgFileName),
+                                IF(REGEX(STR(?imgPreview), "/resource/EX_File/", "i"), REPLACE(STR(?imgPreview), "^.*/EX_File/", ""), "")
+                              ) AS ?previewFile_
+                            )
+                          }
                         }
                         GROUP BY ?subject
                       }
+                      BIND(
+                        IF(BOUND(?previewFile) && STRLEN(STR(?previewFile)) > 0,
+                           CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(STR(?previewFile)), "/full/!400,240/0/default.jpg"),
+                           "") AS ?previewIiif
+                      )
                     }
                     ORDER BY ?value
                   '
@@ -271,8 +290,13 @@
                       <div class="panel panel-default" style="height: 380px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 15px;">
                           <div style="height: 90px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                            <img src="../assets/images/icons/rs-icons/place.svg" alt="Stratigraphic unit"
-                                 style="width: 72px; height: 72px; object-fit: contain;" />
+                            {{#if previewIiif.value}}
+                              <img src="{{previewIiif.value}}" alt="Preview"
+                                   style="max-width: 100%; max-height: 90px; object-fit: cover; border-radius: 4px;" />
+                            {{else}}
+                              <img src="../assets/images/icons/rs-icons/place.svg" alt="Stratigraphic unit"
+                                   style="width: 72px; height: 72px; object-fit: contain;" />
+                            {{/if}}
                           </div>
 
                           <h4 style="margin: 0 0 10px 0; color: #337ab7;">

@@ -208,13 +208,15 @@
                     PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                     PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+                    PREFIX rs: <http://www.researchspace.org/ontology/>
 
-                    SELECT ?subject ?value ?label_type ?note ?preview ?previewStr ?previewImageStr WHERE {
+                    SELECT ?subject ?value ?label_type ?note ?preview ?previewStr ?previewImageStr ?previewIiif WHERE {
                       {
                            SELECT ?subject ?value
                              (SAMPLE(?label_type_) AS ?label_type)
                              (SAMPLE(?note_) AS ?note)
                              (SAMPLE(?preview_) AS ?preview)
+                             (MIN(?previewFile_) AS ?previewFile)
                              (SAMPLE(?rand_) AS ?rand_) WHERE {
                             ?subject a crm:E18_Physical_Thing ;
                                crm:P1_is_identified_by ?identifier .
@@ -238,6 +240,13 @@
                             ?subject crm:P70i_is_documented_in ?document .
                             ?document a crm:E31_Document .
                             OPTIONAL { ?document pico:preview ?preview_ . }
+                            OPTIONAL { ?preview_ rs:PX_has_file_name ?previewFileName_ . }
+                            BIND(
+                              COALESCE(
+                                STR(?previewFileName_),
+                                IF(REGEX(STR(?preview_), "/resource/EX_File/", "i"), REPLACE(STR(?preview_), "^.*/EX_File/", ""), "")
+                              ) AS ?previewFile_
+                            )
                           }
                           BIND(DAY(NOW()) AS ?day)
                           BIND(SHA512(CONCAT(STR(?day), STR(?subject))) AS ?rand_)
@@ -247,6 +256,11 @@
 
                       OPTIONAL { BIND(STRAFTER(STR(?preview), "") AS ?previewStr) }
                       BIND( IF( BOUND(?preview) && REGEX(STR(?preview), "\\.(jpg|jpeg|png|gif|webp)$", "i"), STR(?preview), "" ) AS ?previewImageStr )
+                      BIND(
+                        IF(BOUND(?previewFile) && STRLEN(STR(?previewFile)) > 0,
+                           CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(STR(?previewFile)), "/full/!400,280/0/default.jpg"),
+                           "") AS ?previewIiif
+                      )
                     }
                     ORDER BY ?value
                   '
@@ -260,6 +274,13 @@
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 15px;">
                           
                           <div style="height:140px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
+                            {{#if previewIiif.value}}
+                              <semantic-link iri="{{subject.value}}">
+                                <img src="{{previewIiif.value}}" alt="{{value.value}}"
+                                     style="max-width:100%; max-height:140px; object-fit:cover; border-radius:4px;"
+                                     onerror="this.onerror=null;this.src='../assets/images/icons/rs-icons/place.svg';" />
+                              </semantic-link>
+                            {{else}}
                             {{#if previewImageStr.value}}
                               <a href="{{preview.value}}" target="_blank" rel="noopener">
                                 <img src="{{preview.value}}" alt="{{value.value}}"
@@ -277,6 +298,7 @@
                                 <img src="../assets/images/icons/rs-icons/place.svg" alt="No image"
                                      style="width:72px;height:72px;object-fit:contain;border-radius:4px;" />
                               {{/if}}
+                            {{/if}}
                             {{/if}}
                           </div>
 

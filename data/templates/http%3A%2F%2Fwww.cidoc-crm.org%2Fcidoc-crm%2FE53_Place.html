@@ -77,11 +77,7 @@
         </div>
       </div>
       
-      <!-- E53_Place covers both Place and Site instances; branch on P2_has_type since rdf:type alone can't tell them apart -->
-      <semantic-if
-        query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> <http://www.lynx.com/resource/cultural-heritage-place/site> }'
-        then='{{> siteTabs}}' else='{{> placeTabs}}'>
-        <template id='placeTabs'>
+      <div>
           <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="place-description">
             <div>
               <bs-nav bs-style="tabs">
@@ -107,13 +103,15 @@
               </bs-tab-content>
             </div>
           </bs-tab-container>
-        </template>
-        <template id='siteTabs'>
-          [[> rsp:ResourceContentSite]]
-        </template>
-      </semantic-if>
+      </div>
     </div>
   </template>
 </with-types>
 [[/inline]]
-[[> resource]]
+[[!-- E53_Place covers both Place and Site; branch on P2_has_type since rdf:type alone can't tell them apart --]]
+<semantic-if
+  query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> <http://www.lynx.com/resource/cultural-heritage-place/site> }'
+  then='{{> siteMap}}' else='{{> placePage}}'>
+  <template id='siteMap'>[[> rsp:ResourceContentSite]]</template>
+  <template id='placePage'>[[> resource]]</template>
+</semantic-if>

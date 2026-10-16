@@ -177,12 +177,7 @@
 
     <semantic-search-result-holder>
       <div data-flex-self="md-full">
-        <semantic-search-result id='result-count'>
-          <mp-sparql-result-counts id='query-count' query="SELECT DISTINCT * {}" template='{{#if hasLimit}} <bs-alert bs-style="warning">
-            Showing {{numberOfResults}} of {{totalNumberOfResults}} matches. <strong>Please, refine your search.</strong> </bs-alert>
-            {{else}}<span> found {{numberOfResults}} stratigraphic units </span>{{/if}}'>
-          </mp-sparql-result-counts>
-        </semantic-search-result>
+        <!-- map only -->
 
         <semantic-search-result id='map-result-wrapper'>
           <div style='height: 70vh; min-height: 480px;'>

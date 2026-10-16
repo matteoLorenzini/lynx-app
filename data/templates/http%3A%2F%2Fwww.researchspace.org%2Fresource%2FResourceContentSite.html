@@ -1,0 +1,215 @@
+<semantic-search
+  search-profile='{
+    "categories": [
+      {
+        "iri": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "label": "Stratigraphic Unit",
+        "thumbnail": "../assets/images/icons/rs-icons/place.svg"
+      },
+      {
+        "iri": "<http://www.cidoc-crm.org/cidoc-crm/E55_Type>",
+        "label": "Unit Type",
+        "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
+      },
+      {
+        "iri": "<http://www.cidoc-crm.org/cidoc-crm/E42_Identifier>",
+        "label": "Global ID",
+        "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
+      },
+      {
+        "iri": "<http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State>",
+        "label": "Condition",
+        "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
+      },
+      {
+        "iri": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>",
+        "label": "Excavation Place",
+        "thumbnail": "../assets/images/icons/rs-icons/place.svg"
+      },
+      {
+        "iri": "<http://www.ics.forth.gr/isl/CRMsci/S9_Property_Type>",
+        "label": "Feature",
+        "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
+      },
+      {
+        "iri": "<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>",
+        "label": "Inorganic Component",
+        "thumbnail": "../assets/images/icons/rs-icons/place.svg"
+      },
+      {
+        "iri": "<http://www.cidoc-crm.org/cidoc-crm/E20_Biological_Object>",
+        "label": "Organic Component",
+        "thumbnail": "../assets/images/icons/rs-icons/place.svg"
+      }
+    ],
+    "relations": [
+      {
+        "iri": "<http://www.lynx.com/resource/field/global_id>",
+        "label": "Global ID",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E42_Identifier>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/unit_type>",
+        "label": "Unit Type",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E55_Type>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/condition>",
+        "label": "Condition",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/consistency>",
+        "label": "Consistency",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.ics.forth.gr/isl/CRMsci/S9_Property_Type>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/color>",
+        "label": "Color",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.ics.forth.gr/isl/CRMsci/S9_Property_Type>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/component>",
+        "label": "Component",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/organic_component>",
+        "label": "Organic Component",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E20_Biological_Object>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/excavation_place>",
+        "label": "Excavation Place",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
+      }
+    ]
+  }'
+  relations='{
+    "<http://www.lynx.com/resource/field/global_id>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crm:P1_is_identified_by ?__value__ . ?__value__ a crm:E42_Identifier ; crm:P2_has_type <http://www.lynx.com/resource/global-id> .}"
+    }],
+    "<http://www.lynx.com/resource/field/unit_type>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crm:P2_has_type ?__value__ . ?__value__ a crm:E55_Type .}"
+    }],
+    "<http://www.lynx.com/resource/field/condition>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crm:P44_has_condition ?__value__ . ?__value__ a crm:E3_Condition_State .}"
+    }],
+    "<http://www.lynx.com/resource/field/consistency>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crm:P130_shows_features_of ?__value__ . ?__value__ a crmsci:S9_Property_Type ; crm:P2_has_type <http://www.lynx.com/resource/consistenza> .}"
+    }],
+    "<http://www.lynx.com/resource/field/color>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crm:P130_shows_features_of ?__value__ . ?__value__ a crmsci:S9_Property_Type ; crm:P2_has_type <http://www.lynx.com/resource/colore> .}"
+    }],
+    "<http://www.lynx.com/resource/field/component>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP21_contains ?__value__ . ?__value__ a crm:E18_Physical_Thing .}"
+    }],
+    "<http://www.lynx.com/resource/field/organic_component>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP21_contains ?__value__ . ?__value__ a crm:E20_Biological_Object .}"
+    }],
+    "<http://www.lynx.com/resource/field/excavation_place>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation . ?excavation crm:P7_took_place_at ?site . ?site a crm:E27_Site ; crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> .}"
+    }]
+  }'
+  >
+  <semantic-search-query-keyword domain='<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>' query='
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+
+    SELECT DISTINCT ?subject
+    WHERE {
+      ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+               crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
+      ?excavation crm:P7_took_place_at <[[this]]> .
+      {
+        ?subject crm:P1_is_identified_by ?identifier .
+        ?identifier a crm:E42_Identifier ;
+                    crm:P2_has_type <http://www.lynx.com/resource/global-id> ;
+                    rdfs:label ?label .
+      }
+      UNION
+      {
+        ?subject crm:P67i_is_referred_to_by ?description .
+        FILTER(isLiteral(?description))
+        BIND(STR(?description) AS ?label)
+      }
+      UNION
+      {
+        ?subject crm:P67i_is_referred_to_by ?description .
+        ?description a crm:E33_Linguistic_Object ;
+                     rdfs:label ?label .
+      }
+      FILTER REGEX(STR(?label), ?__token__, "i")
+    }
+  ' default-query='
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+
+    SELECT DISTINCT ?subject
+    WHERE {
+      ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+               crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
+      ?excavation crm:P7_took_place_at <[[this]]> .
+    }
+  ' debounce=500></semantic-search-query-keyword>
+
+  <div data-flex-layout="row stretch-stretch">
+    <div data-flex-self="size-1of3" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
+      <semantic-search-facet></semantic-search-facet>
+    </div>
+
+    <semantic-search-result-holder>
+      <div data-flex-self="md-full">
+        <semantic-search-result id='result-count'>
+          <mp-sparql-result-counts id='query-count' query="SELECT DISTINCT * {}" template='{{#if hasLimit}} <bs-alert bs-style="warning">
+            Showing {{numberOfResults}} of {{totalNumberOfResults}} matches. <strong>Please, refine your search.</strong> </bs-alert>
+            {{else}}<span> found {{numberOfResults}} stratigraphic units </span>{{/if}}'>
+          </mp-sparql-result-counts>
+        </semantic-search-result>
+
+        <semantic-search-result id='map-result-wrapper'>
+          <div style='height: 70vh; min-height: 480px;'>
+            <semantic-map id='map-result' query='
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+            PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+
+            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
+              ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+                       crm:P1_is_identified_by <http://www.lynx.com/resource/us-number> ;
+                       rdfs:label ?usLabel ;
+                       crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
+              ?excavation crm:P7_took_place_at ?site .
+              FILTER(?site = <[[this]]>)
+              ?site crm:P168_place_is_defined_by ?literal .
+              ?literal rdfs:label ?coords .
+              BIND(CONCAT("US ", STR(?usLabel)) AS ?label)
+            }
+            ' tuple-template='{{> template }}'>
+              <template id='template'>
+                <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+              </template>
+            </semantic-map>
+          </div>
+        </semantic-search-result>
+      </div>
+    </semantic-search-result-holder>
+  </div>
+</semantic-search>

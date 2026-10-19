@@ -1,45 +1,47 @@
 [[#if (urlParam "frame")]]
 <style>
-  .rs-application .page.page-local-overwrite {
-    padding-top: 0;
-  }
+  .rs-application .page.page-local-overwrite { padding-top: 0; }
 </style>
 <div class="page page-local-overwrite">
-    [[> rsp:ResourceContent]]
+    [[> crm:E53_Place]]
 </div>
 
 [[else]]
-[[!-- Breadcrumb --]]
+[[!-- Breadcrumb: Home > Area > Sito  (ramo [INV] da togliere quando il mapping avra sito P89 area) --]]
 <ol class="page-breadcrumb">
-    <li>
-        <mp-link title="Home" url="/">Home</mp-link>
-    </li>
-
-   [[#block "activeBreadcrumb"]]
-  <semantic-query query='PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT  ?type ?label
-WHERE {
-    <[[this]]> a base:E18_Physical_Thing ;
-            base:P2_has_type ?type.
-    ?type base:P2_has_type <http://www.lynx.com/resource/classification> ;
-            rdfs:label ?label .
-}'
-    template='{{> breadcrumbTmpl}}'>
-    <template id='breadcrumbTmpl'>
-      <li class="active">
-        {{#each bindings}}
-          {{type.value}}: {{label.value}}{{#if @last}}{{else}}; {{/if}}
-        {{/each}}
-      </li>
+  <li><mp-link title="Home" url="/">Home</mp-link></li>
+  [[#block "activeBreadcrumb"]]
+  <semantic-query query='
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    SELECT ?area ?areaLabel ?siteLabel WHERE {
+      OPTIONAL {
+        { <[[this]]> crm:P89_falls_within ?area } UNION { ?area crm:P89_falls_within <[[this]]> }
+        ?area crm:P2_has_type ?at .
+        FILTER(?at IN (<http://www.lynx.com/resource/cultural-heritage-place/place>,
+                       <http://www.lynx.com/resource/cultural-heritage-place>))
+        OPTIONAL { ?area crm:P1_is_identified_by ?aap . ?aap a crm:E41_Appellation .
+                   OPTIONAL { ?aap rdfs:label ?al1 } OPTIONAL { ?aap skos:prefLabel ?al2 } }
+      }
+      OPTIONAL { <[[this]]> rdfs:label ?sl1 }
+      OPTIONAL { <[[this]]> crm:P1_is_identified_by ?sap . ?sap a crm:E41_Appellation .
+                 OPTIONAL { ?sap rdfs:label ?sl2 } OPTIONAL { ?sap skos:prefLabel ?sl3 } }
+      BIND(COALESCE(?al1, ?al2, "Area") AS ?areaLabel)
+      BIND(COALESCE(?sl1, ?sl2, ?sl3, "Sito") AS ?siteLabel)
+    } LIMIT 1'
+    template='{{> bc}}'>
+    <template id='bc'>
+      {{#with bindings.[0]}}
+        {{#if area.value}}<li><semantic-link iri="{{area.value}}">{{areaLabel.value}}</semantic-link></li>{{/if}}
+        <li class="active">{{siteLabel.value}}</li>
+      {{/with}}
     </template>
-   </semantic-query>
-   [[/block]]
+  </semantic-query>
+  [[/block]]
 </ol>
 
-[[!-- Resource Page --]]
 <div class="page">
-  [[> rsp:ResourceContent]]
+  [[> crm:E53_Place]]
 </div>
 [[/if]]

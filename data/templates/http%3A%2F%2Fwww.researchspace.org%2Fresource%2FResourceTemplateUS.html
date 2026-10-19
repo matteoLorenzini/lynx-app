@@ -1,44 +1,52 @@
 [[#if (urlParam "frame")]]
 <style>
-  .rs-application .page.page-local-overwrite {
-    padding-top: 0;
-  }
+  .rs-application .page.page-local-overwrite { padding-top: 0; }
 </style>
 <div class="page page-local-overwrite">
     [[> rsp:ResourceContentUS]]
 </div>
 
 [[else]]
-[[!-- Breadcrumb --]]
+[[!-- Breadcrumb: Home > Area > Sito > US --]]
 <ol class="page-breadcrumb">
-    <li>
-        <mp-link title="Home" url="/">Home</mp-link>
-    </li>
-
-   [[#block "activeBreadcrumb"]]
-  <semantic-query query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT ?label
-WHERE {
-    <[[this]]> a crmarchaeo:A2_Stratigraphic_Volume_Unit;
-    crm:P1_is_identified_by <http://www.lynx.com/resource/us-number>;
-    rdfs:label ?label .
-}'
-    template='{{> breadcrumbTmpl}}'>
-    <template id='breadcrumbTmpl'>
-      <li class="active">
-        {{#each bindings}}
-          US {{label.value}}
-        {{/each}}
-      </li>
+  <li><mp-link title="Home" url="/">Home</mp-link></li>
+  [[#block "activeBreadcrumb"]]
+  <semantic-query query='
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    SELECT ?area ?areaLabel ?site ?siteLabel ?usLabel WHERE {
+      OPTIONAL {
+        <[[this]]> crmarchaeo:AP5i_was_partially_or_totally_removed_by ?exc .
+        ?exc crm:P7_took_place_at ?site .
+        OPTIONAL { ?site crm:P1_is_identified_by ?sap . ?sap a crm:E41_Appellation ; rdfs:label ?sl }
+        OPTIONAL {
+          { ?site crm:P89_falls_within ?area } UNION { ?area crm:P89_falls_within ?site }
+          ?area crm:P2_has_type ?at .
+          FILTER(?at IN (<http://www.lynx.com/resource/cultural-heritage-place/place>,
+                         <http://www.lynx.com/resource/cultural-heritage-place>))
+          OPTIONAL { ?area crm:P1_is_identified_by ?aap . ?aap a crm:E41_Appellation .
+                     OPTIONAL { ?aap rdfs:label ?al1 } OPTIONAL { ?aap skos:prefLabel ?al2 } }
+        }
+      }
+      OPTIONAL { <[[this]]> rdfs:label ?ul }
+      BIND(COALESCE(?al1, ?al2, "Area") AS ?areaLabel)
+      BIND(COALESCE(?sl, "Sito") AS ?siteLabel)
+      BIND(COALESCE(?ul, "") AS ?usLabel)
+    } LIMIT 1'
+    template='{{> bc}}'>
+    <template id='bc'>
+      {{#with bindings.[0]}}
+        {{#if area.value}}<li><semantic-link iri="{{area.value}}">{{areaLabel.value}}</semantic-link></li>{{/if}}
+        {{#if site.value}}<li><semantic-link iri="{{site.value}}">{{siteLabel.value}}</semantic-link></li>{{/if}}
+        <li class="active">US {{usLabel.value}}</li>
+      {{/with}}
     </template>
-   </semantic-query>
-   [[/block]]
+  </semantic-query>
+  [[/block]]
 </ol>
 
-[[!-- Resource Page --]]
 <div class="page">
   [[> rsp:ResourceContentUS]]
 </div>

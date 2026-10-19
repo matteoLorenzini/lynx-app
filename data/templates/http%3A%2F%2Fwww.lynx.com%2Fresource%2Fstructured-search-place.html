@@ -63,9 +63,6 @@
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 
             SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
-              ?subject a crm:E53_Place ;
-                       crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> ;
-                       rdfs:label ?label .
               {
                 ?subject crm:P168_place_is_defined_by ?literal .
                 ?literal rdfs:label ?coords .
@@ -76,6 +73,8 @@
                       crm:P168_place_is_defined_by ?siteLiteral .
                 ?siteLiteral rdfs:label ?coords .
               }
+              OPTIONAL { ?subject rdfs:label ?areaLabel }
+              BIND(COALESCE(?areaLabel, STR(?subject)) AS ?label)
             }
             ' tuple-template='{{> template }}'>
               <template id='template'>

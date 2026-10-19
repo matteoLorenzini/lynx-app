@@ -1,130 +1,390 @@
-[[#*inline "resource"]]
-<with-types fixed-key='resource-[[this]]' iri='[[this]]' template='{{> page}}' [[> rsp:TypeMappings]]>
-  <template id='page'>
-    <div class="rs-resource-container">
-      <div class="rs-resource-header {{getValueByKey entityBgColor allTypes 'rs-entity-bg-thing'}}" style="min-height: 400px;">
-        <div class="rs-resource-header-topContainer">
-          <div class="rs-resource-header-topButtons">
-            <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='knowledge-map' urlqueryparam-resource='[[this]]'>
-              <button type="button" title="Author Resource in Knowledge Map">
-                <rs-icon icon-type="round" icon-name="account_tree"></rs-icon>
-              </button>
-            </semantic-link-container>
-            <mp-event-trigger id='details-view-trigger' type='Component.TemplateUpdate' data='{"iri": "{{iri}}"}' targets='["details-view", "open-details-sidebar"]'>
-              <button type="button" title="Resource Details">
-                <rs-icon icon-type="rounded" icon-name="info" symbol="true"></rs-icon>
-              </button>
-            </mp-event-trigger>
-            <semantic-link-container uri='http://www.researchspace.org/resource/ResourceContentEditE18' urlqueryparam-resource='[[this]]'>
-              <button type="button" title="Author Resource in Form">
-                <rs-icon icon-type="rounded" icon-name="edit_note" symbol="true"></rs-icon>
-              </button>
-            </semantic-link-container>
-          </div>
-        </div>
-        <div class="rs-resource-header-content-container">
-          <div class="rs-resource-header--image-container" style="min-height: 350px; flex: 1.5;">
-            <semantic-if
-              query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P168_place_is_defined_by> ?coords }'
-              then='{{> mapBlock}}' else='{{> noMapBlock}}'>
-              <template id='mapBlock'>
-                <div style="height: 350px; width: 100%;">
-                  <semantic-map
-                    id='place-map-result-[[this]]'
-                    query='
-                      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                      PREFIX crmgeo: <http://www.ics.forth.gr/isl/CRMgeo/>
-                      PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                      PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                      
-                      SELECT (CONCAT("Point(", STR(?label), ")") AS ?wkt) ?label ?subject WHERE {
-                        BIND(<[[this]]> AS ?subject)
-                        ?subject a crm:E53_Place;
-                                 crm:P168_place_is_defined_by ?coordinates.
-                        ?coordinates rdfs:label ?label
-                      }
-                    '
-                    tuple-template='{{> mapTupleTemplate}}'>
-                    <template id='mapTupleTemplate'>
-                      <semantic-link iri="{{subject.value}}">
-                        <mp-label iri="{{subject.value}}"></mp-label>
-                      </semantic-link>
-                    </template>
-                  </semantic-map>
-                </div>
-              </template>
-              <template id='noMapBlock'>
-                <div class="object-representations__image--focused">
-                  <span class="rs-icon {{getValueByKey typeToImage allTypes 'rs-icon-entity_no-image'}} {{getValueByKey entityIconColor allTypes 'rs-icon-entity_no-image'}}"></span>
-                </div>
-              </template>
-            </semantic-if>
-          </div>
-          <div style="padding: 1.8% 1.5% 1.5% 5%; flex: 1;">
-            <div class="rs-resource-header--singletitle">
-              <div class="rs-resource-header--title" style="text-transform: capitalize;">
-                <mp-label iri='[[this]]'></mp-label>
-              </div>
-              <div style="display: flex;">
-                <mp-copy-to-clipboard text='[[this]]'>
-                  <div class="rs-copy-IRI">Copy IRI</div>
-                </mp-copy-to-clipboard>
-                <div class="statements">Statements</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div>
-          <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="place-description">
-            <div>
-              <bs-nav bs-style="tabs">
-                <bs-nav-item event-key="place-description">Place Description</bs-nav-item>
-              </bs-nav>
-              <bs-tab-content animation="true">
-                <bs-tab-pane event-key="place-description">
-                  <div class="rs-resource-tab-container">
-                    <div>
-                      <hr class="rs-resource-section--headerLine">
-                      <span class="h1 rs-resource-section--header">Place Information</span>
-                    </div>
-                    <div class="rs-resource-data-table">
-                      <mp-field-visualization
-                        subject='[[this]]'
-                        fields='[[fieldDefinitions fallswithin="http://www.lynx-platform.com/field/fallswithin"]]'
-                        template='{{> template}}'>
-                        <template id="template">{{> rsp:ResourceFieldBasedVisualization subject="[[this]]"}}</template>
-                      </mp-field-visualization>
-                    </div>
-                  </div>
-                </bs-tab-pane>
-              </bs-tab-content>
-            </div>
-          </bs-tab-container>
+[[!--
+  E53_Place - pagina unica per AREA DI INDAGINE e SITO (v2, allineata a E18.rdf / E53.rdf / sample_us.rdf)
+  -----------------------------------------------------------------------------------------------------
+  Un sito ha SEMPRE la stessa pagina. Il tipo di indagine cambia solo le sezioni visibili.
+
+  Pattern usati (allineati ai dati attuali):
+    SITO      : a crm:E27_Site  OPPURE  P2_has_type .../cultural-heritage-place/site  OPPURE  P2_has_type lynx:sito-archeologico
+    AREA      : P2_has_type .../cultural-heritage-place/place  OPPURE  P2_has_type lynx:cultural-heritage-place
+    SITO-AREA : P89_falls_within in ENTRAMBE le direzioni
+                TEMPORANEO: E53.rdf scrive area P89 sito, sample_us.rdf scrive sito P89 area.
+                Quando il mapping sara corretto (sito P89 area) togliere il ramo inverso marcato [INV].
+    ETICHETTE : rdfs:label diretta, altrimenti E41_Appellation con rdfs:label o skos:prefLabel
+    MANUFATTI : P53_has_former_or_current_location <sito>, oppure contenuti (AP21) in una US del sito
+    US        : AP5i_was_partially_or_totally_removed_by / P7_took_place_at <sito>
+
+  Nelle query non usare apostrofi: gli attributi query sono tra apici singoli.
+--]]
+
+[[#*inline "titleOf"]]
+<semantic-query
+  query='
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    SELECT ?label WHERE {
+      BIND(<[[this]]> AS ?x)
+      OPTIONAL { ?x rdfs:label ?l1 }
+      OPTIONAL { ?x crm:P1_is_identified_by ?ap . ?ap a crm:E41_Appellation .
+                 OPTIONAL { ?ap rdfs:label ?l2 } OPTIONAL { ?ap skos:prefLabel ?l3 } }
+      BIND(COALESCE(?l1, ?l2, ?l3, STR(?x)) AS ?label)
+    } LIMIT 1'
+  template='{{> t}}'>
+  <template id='t'><div class="rs-resource-header--title">{{bindings.[0].label.value}}</div></template>
+</semantic-query>
+[[/inline]]
+
+
+[[#*inline "sitePage"]]
+<style>
+  .lx-head { display:flex; flex-wrap:wrap; gap:24px; padding:20px; }
+  .lx-map { flex:1.4; min-width:320px; height:340px; }
+  .lx-info { flex:1; min-width:280px; }
+  .lx-kind { display:inline-block; margin:8px 0 14px; padding:4px 10px; border-radius:12px; background:#1a4e8a; color:#fff; font-size:.85rem; }
+  .lx-counters { display:flex; gap:12px; flex-wrap:wrap; }
+  .lx-counter { border:1px solid #d8d8d8; border-radius:6px; padding:10px 14px; background:#fff; min-width:120px; }
+  .lx-counter .n { display:block; font-size:1.6rem; font-weight:600; line-height:1.1; }
+  .lx-section { padding:8px 20px 24px; }
+  .lx-section-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .lx-card { border:1px solid #ddd; border-radius:6px; background:#fff; padding:10px; }
+  .lx-card img { width:100%; height:140px; object-fit:cover; border-radius:4px; }
+  .lx-card .t { display:block; margin-top:6px; font-weight:600; }
+  .lx-card .s { display:block; color:#666; font-size:.85rem; }
+</style>
+
+<div class="rs-resource-container">
+
+  <!-- ============ INTESTAZIONE ============ -->
+  <div class="rs-resource-header rs-entity-bg-thing">
+    <div class="rs-resource-header-topContainer">
+      <div class="rs-resource-header-topButtons">
+        <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='knowledge-map' urlqueryparam-resource='[[this]]'>
+          <button type="button" title="Author Resource in Knowledge Map"><rs-icon icon-type="round" icon-name="account_tree"></rs-icon></button>
+        </semantic-link-container>
+        <mp-has-permission permission="api:ldp:*">
+          <semantic-link-container uri='http://www.researchspace.org/resource/ResourceContentEditE18' urlqueryparam-resource='[[this]]'>
+            <button type="button" title="Author Resource in Form"><rs-icon icon-type="rounded" icon-name="edit_note" symbol="true"></rs-icon></button>
+          </semantic-link-container>
+        </mp-has-permission>
       </div>
     </div>
-  </template>
-</with-types>
-[[/inline]]
-[[!-- E53_Place covers both Place and Site; branch on P2_has_type since rdf:type alone can't tell them apart --]]
-<semantic-if
-  query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> <http://www.lynx.com/resource/cultural-heritage-place/site> }'
-  then='{{> siteMap}}' else='{{> placePage}}'>
-  <template id='siteMap'>
-    <semantic-if
-      query='ASK { ?excavation <http://www.cidoc-crm.org/cidoc-crm/P7_took_place_at> <[[this]]> }'
-      then='{{> usSite}}' else='{{> objectSite}}'>
-      <template id='usSite'>[[> rsp:ResourceContentSite]]</template>
-      <template id='objectSite'>
-        <div style="padding: 30px; text-align: center;">
-          <semantic-link iri="http://www.lynx.com/resource/structuredSearch" class="btn btn-primary btn-lg">
-            Cerca i manufatti (structuredSearch)
-          </semantic-link>
+
+    <div class="lx-head">
+      <div class="lx-map">
+        <semantic-map id='site-map-[[this]]'
+          query='
+            PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?subject WHERE {
+              BIND(<[[this]]> AS ?subject)
+              ?subject crm:P168_place_is_defined_by ?lit .
+              ?lit rdfs:label ?coords .
+            } LIMIT 1'
+          tuple-template='{{> m}}'>
+          <template id='m'><span>Sito</span></template>
+        </semantic-map>
+      </div>
+
+      <div class="lx-info">
+        [[> titleOf]]
+
+        <!-- Area di appartenenza -->
+        <semantic-query
+          query='
+            PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT ?area (SAMPLE(?lab) AS ?label) WHERE {
+              { <[[this]]> crm:P89_falls_within ?area }
+              UNION { ?area crm:P89_falls_within <[[this]]> }   # [INV]
+              ?area crm:P2_has_type ?at .
+              FILTER(?at IN (<http://www.lynx.com/resource/cultural-heritage-place/place>,
+                             <http://www.lynx.com/resource/cultural-heritage-place>))
+              OPTIONAL { ?area rdfs:label ?l1 }
+              OPTIONAL { ?area crm:P1_is_identified_by ?ap . ?ap a crm:E41_Appellation .
+                         OPTIONAL { ?ap rdfs:label ?l2 } OPTIONAL { ?ap skos:prefLabel ?l3 } }
+              BIND(COALESCE(?l1, ?l2, ?l3, STR(?area)) AS ?lab)
+            }
+            GROUP BY ?area'
+          template='{{> area}}' no-result-template=' '>
+          <template id='area'>
+            <div>Area di indagine:
+              {{#each bindings}}<semantic-link iri="{{area.value}}">{{label.value}}</semantic-link>{{#unless @last}}, {{/unless}}{{/each}}
+            </div>
+          </template>
+        </semantic-query>
+
+        <!-- Tipo di indagine + contatori -->
+        <semantic-query
+          query='
+            PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+            PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+            PREFIX lynx: <http://www.lynx.com/resource/>
+            SELECT ?nUs ?nObj ?kind WHERE {
+              { SELECT (COUNT(DISTINCT ?us) AS ?nUs) WHERE {
+                  ?us crmarchaeo:AP5i_was_partially_or_totally_removed_by ?exc .
+                  ?exc crm:P7_took_place_at <[[this]]> .
+              } }
+              { SELECT (COUNT(DISTINCT ?obj) AS ?nObj) WHERE {
+                  ?obj a crm:E18_Physical_Thing ; crm:P2_has_type lynx:archaeological-object .
+                  { ?obj crm:P53_has_former_or_current_location <[[this]]> }
+                  UNION { ?u crmarchaeo:AP21_contains ?obj ;
+                             crmarchaeo:AP5i_was_partially_or_totally_removed_by ?e .
+                          ?e crm:P7_took_place_at <[[this]]> }
+              } }
+              BIND(IF(?nUs > 0,
+                      IF(?nObj > 0, "Scavo stratigrafico e studio dei materiali", "Scavo stratigrafico"),
+                      "Studio dei materiali") AS ?kind)
+            }'
+          template='{{> counters}}'>
+          <template id='counters'>
+            {{#with bindings.[0]}}
+              <span class="lx-kind">{{kind.value}}</span>
+              <div class="lx-counters">
+                <div class="lx-counter"><span class="n">{{nUs.value}}</span>unita stratigrafiche</div>
+                <div class="lx-counter"><span class="n">{{nObj.value}}</span>manufatti</div>
+              </div>
+            {{/with}}
+          </template>
+        </semantic-query>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCAVO STRATIGRAFICO (solo se esistono US) ============ -->
+  <semantic-if
+    query='
+      PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+      PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+      ASK { ?us crmarchaeo:AP5i_was_partially_or_totally_removed_by ?exc . ?exc crm:P7_took_place_at <[[this]]> }'
+    then='{{> scavo}}' else=' '>
+    <template id='scavo'>
+      <div class="lx-section">
+        <hr class="rs-resource-section--headerLine">
+        <div class="lx-section-head">
+          <span class="h1 rs-resource-section--header">Scavo stratigrafico</span>
+          <mp-overlay-dialog title="WebGIS di scavo" type="modal" class="modal-xlSize">
+            <mp-overlay-dialog-trigger>
+              <button type="button" class="btn btn-primary">Apri il WebGIS di scavo</button>
+            </mp-overlay-dialog-trigger>
+            <mp-overlay-dialog-content>
+              <mp-page-loader iri='http://www.researchspace.org/resource/ResourceContentSite' context='[[this]]'></mp-page-loader>
+            </mp-overlay-dialog-content>
+          </mp-overlay-dialog>
         </div>
+
+        <semantic-table
+          query='
+            PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+            PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX lynx: <http://www.lynx.com/resource/>
+            SELECT ?us (SAMPLE(?l) AS ?label)
+                   (GROUP_CONCAT(DISTINCT ?t; separator=", ") AS ?tipo)
+                   (SAMPLE(?d) AS ?definizione) WHERE {
+              ?us a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+                  crmarchaeo:AP5i_was_partially_or_totally_removed_by ?exc .
+              ?exc crm:P7_took_place_at <[[this]]> .
+              OPTIONAL { ?us rdfs:label ?l }
+              OPTIONAL { ?us crm:P2_has_type ?ty . FILTER(?ty != lynx:stratigraphic-unit) ?ty rdfs:label ?t }
+              OPTIONAL { ?us crm:P67i_is_referred_to_by ?dn . ?dn crm:P2_has_type lynx:definizione ; rdfs:label ?d }
+            }
+            GROUP BY ?us
+            ORDER BY ?label'
+          column-configuration='[
+            {"displayName": "US", "cellTemplate": "<semantic-link iri=\"{{us.value}}\">US {{label.value}}</semantic-link>"},
+            {"displayName": "Tipologia", "cellTemplate": "<div>{{tipo.value}}</div>"},
+            {"displayName": "Definizione", "cellTemplate": "<div>{{definizione.value}}</div>"}
+          ]'
+          options='{"showFilter":true, "resultsPerPage":10}'>
+        </semantic-table>
+      </div>
+    </template>
+  </semantic-if>
+
+  <!-- ============ MATERIALI ============ -->
+  <div class="lx-section">
+    <hr class="rs-resource-section--headerLine">
+    <span class="h1 rs-resource-section--header">Materiali</span>
+    <semantic-table
+      prefetch-labels="false"
+      query='
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX lynx: <http://www.lynx.com/resource/>
+        PREFIX pico: <http://data.cochrane.org/ontologies/pico/>
+        PREFIX rs: <http://www.researchspace.org/ontology/>
+        SELECT ?obj ?id ?iid ?tipo ?thumb WHERE {
+          {
+            SELECT ?obj (SAMPLE(?id_) AS ?id) (SAMPLE(?iid_) AS ?iid) (SAMPLE(?t_) AS ?tipo) (MIN(?f_) AS ?file) WHERE {
+              ?obj a crm:E18_Physical_Thing ; crm:P2_has_type lynx:archaeological-object .
+              { ?obj crm:P53_has_former_or_current_location <[[this]]> }
+              UNION { ?u crmarchaeo:AP21_contains ?obj ;
+                         crmarchaeo:AP5i_was_partially_or_totally_removed_by ?e .
+                      ?e crm:P7_took_place_at <[[this]]> }
+              OPTIONAL {
+                ?obj crm:P1_is_identified_by ?gid .
+                ?gid crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/general-id> ;
+                     rdfs:label ?id_ .
+              }
+              OPTIONAL {
+                ?obj crm:P1_is_identified_by ?iidn .
+                ?iidn crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-object/identifier/internal-id> ;
+                      rdfs:label ?iid_ .
+              }
+              OPTIONAL { ?obj crm:P2_has_type ?c . ?c crm:P2_has_type lynx:classification ; rdfs:label ?t_ . }
+              OPTIONAL {
+                ?obj crm:P70i_is_documented_in ?doc . ?doc pico:preview ?img .
+                OPTIONAL { ?img rs:PX_has_file_name ?fn }
+                BIND(COALESCE(STR(?fn), IF(REGEX(STR(?img), "/resource/EX_File/", "i"), REPLACE(STR(?img), "^.*/EX_File/", ""), "")) AS ?f_)
+              }
+            }
+            GROUP BY ?obj
+          }
+          BIND(IF(BOUND(?file) && STRLEN(?file) > 0,
+                  CONCAT("/proxy/IIIF/2/", ENCODE_FOR_URI(?file), "/full/!400,280/0/default.jpg"), "") AS ?thumb)
+        }
+        ORDER BY ?id'
+      tuple-template='{{> card}}'
+      number-of-displayed-rows="12"
+      no-result-template='<div style="color:#666;">Nessun manufatto collegato a questo sito.</div>'
+      options='{"showFilter":false}'>
+      <template id='card'>
+        <bs-col sm="3" style="margin-bottom:14px;">
+          <div class="lx-card">
+            <semantic-link iri="{{obj.value}}">
+              {{#if thumb.value}}
+                <img src="{{thumb.value}}" alt="{{id.value}}" loading="lazy"
+                     onerror="this.onerror=null;this.src='../assets/images/icons/rs-icons/place.svg';" />
+              {{else}}
+                <img src="../assets/images/icons/rs-icons/place.svg" alt="" style="object-fit:contain;" />
+              {{/if}}
+              <span class="t">{{id.value}}{{#if iid.value}} ({{iid.value}}){{/if}}</span>
+            </semantic-link>
+            <span class="s">{{tipo.value}}</span>
+          </div>
+        </bs-col>
       </template>
-    </semantic-if>
-  </template>
-  <template id='placePage'>[[> resource]]</template>
+    </semantic-table>
+  </div>
+
+  <!-- ============ DOCUMENTI ============ -->
+  <div class="lx-section">
+    <hr class="rs-resource-section--headerLine">
+    <span class="h1 rs-resource-section--header">Documenti</span>
+    <semantic-table
+      query='
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT DISTINCT ?doc ?label WHERE {
+          { <[[this]]> crm:P70i_is_documented_in ?doc }
+          UNION { ?us crmarchaeo:AP5i_was_partially_or_totally_removed_by ?e .
+                  ?e crm:P7_took_place_at <[[this]]> .
+                  ?us crm:P70i_is_documented_in ?doc }
+          ?doc a crm:E31_Document .
+          OPTIONAL { ?doc rdfs:label ?l }
+          BIND(COALESCE(?l, STR(?doc)) AS ?label)
+        }
+        ORDER BY ?label'
+      column-configuration='[
+        {"displayName": "Documento", "cellTemplate": "<semantic-link iri=\"{{doc.value}}\">{{label.value}}</semantic-link>"}
+      ]'
+      no-result-template='<div style="color:#666;">Nessun documento collegato a questo sito.</div>'
+      options='{"showFilter":true, "resultsPerPage":10}'>
+    </semantic-table>
+  </div>
+
+</div>
+[[/inline]]
+
+
+[[#*inline "areaPage"]]
+<div class="rs-resource-container">
+  <div class="rs-resource-header rs-entity-bg-thing">
+    <div style="display:flex; flex-wrap:wrap; gap:24px; padding:20px;">
+      <div style="flex:1.5; min-width:320px; height:380px;">
+        <!-- Mappa dei SITI dell area: ogni marker apre la scheda del sito -->
+        <semantic-map id='area-map-[[this]]'
+          query='
+            PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX lynx: <http://www.lynx.com/resource/>
+            SELECT ?subject (SAMPLE(?w) AS ?wkt) (SAMPLE(?lab) AS ?label) WHERE {
+              { ?subject crm:P89_falls_within <[[this]]> }
+              UNION { <[[this]]> crm:P89_falls_within ?subject }   # [INV]
+              { ?subject a crm:E27_Site }
+              UNION { ?subject crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+              UNION { ?subject crm:P2_has_type lynx:sito-archeologico }
+              ?subject crm:P168_place_is_defined_by ?lit .
+              ?lit rdfs:label ?coords .
+              BIND(CONCAT("Point(", STR(?coords), ")") AS ?w)
+              OPTIONAL { ?subject rdfs:label ?l1 }
+              OPTIONAL { ?subject crm:P1_is_identified_by ?ap . ?ap a crm:E41_Appellation .
+                         OPTIONAL { ?ap rdfs:label ?l2 } OPTIONAL { ?ap skos:prefLabel ?l3 } }
+              BIND(COALESCE(?l1, ?l2, ?l3, STR(?subject)) AS ?lab)
+            }
+            GROUP BY ?subject'
+          tuple-template='{{> m}}'>
+          <template id='m'><semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link></template>
+        </semantic-map>
+      </div>
+      <div style="flex:1; min-width:280px;">
+        [[> titleOf]]
+        <div style="margin:6px 0 14px; color:#555;">Area di indagine</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:8px 20px 24px;">
+    <hr class="rs-resource-section--headerLine">
+    <span class="h1 rs-resource-section--header">Siti in quest area</span>
+    <semantic-table
+      query='
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX lynx: <http://www.lynx.com/resource/>
+        SELECT ?site (SAMPLE(?lab) AS ?label) (SAMPLE(?k) AS ?kind) WHERE {
+          { ?site crm:P89_falls_within <[[this]]> }
+          UNION { <[[this]]> crm:P89_falls_within ?site }   # [INV]
+          { ?site a crm:E27_Site }
+          UNION { ?site crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+          UNION { ?site crm:P2_has_type lynx:sito-archeologico }
+          OPTIONAL { ?site rdfs:label ?l1 }
+          OPTIONAL { ?site crm:P1_is_identified_by ?ap . ?ap a crm:E41_Appellation .
+                     OPTIONAL { ?ap rdfs:label ?l2 } OPTIONAL { ?ap skos:prefLabel ?l3 } }
+          BIND(COALESCE(?l1, ?l2, ?l3, STR(?site)) AS ?lab)
+          BIND(IF(EXISTS { ?us crmarchaeo:AP5i_was_partially_or_totally_removed_by ?e . ?e crm:P7_took_place_at ?site },
+                  "Scavo stratigrafico", "Studio dei materiali") AS ?k)
+        }
+        GROUP BY ?site
+        ORDER BY ?label'
+      column-configuration='[
+        {"displayName": "Sito", "cellTemplate": "<semantic-link iri=\"{{site.value}}\">{{label.value}}</semantic-link>"},
+        {"displayName": "Tipo di indagine", "cellTemplate": "<div>{{kind.value}}</div>"}
+      ]'
+      no-result-template='<div style="color:#666;">Nessun sito registrato in questa area.</div>'
+      options='{"showFilter":true, "resultsPerPage":10}'>
+    </semantic-table>
+  </div>
+</div>
+[[/inline]]
+
+
+[[!-- Smistamento: sito oppure area --]]
+<semantic-if
+  query='
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    ASK {
+      { <[[this]]> a crm:E27_Site }
+      UNION { <[[this]]> crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+      UNION { <[[this]]> crm:P2_has_type <http://www.lynx.com/resource/sito-archeologico> }
+    }'
+  then='{{> s}}' else='{{> a}}'>
+  <template id='s'>[[> sitePage]]</template>
+  <template id='a'>[[> areaPage]]</template>
 </semantic-if>

@@ -103,8 +103,7 @@
                     BIND("Unita stratigrafica" AS ?typelabel)
                   } UNION {
                     # Aree di indagine
-                    ?resource a crm:E53_Place ;
-                              crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> ;
+                    ?resource a crm:E27_Site ;
                               rdfs:label ?label .
                     BIND("Area di indagine" AS ?typelabel)
                   } UNION {
@@ -199,12 +198,11 @@
                    # TODO: IRI della ricerca strutturata sui documenti
                    BIND(<http://www.lynx.com/resource/structured-search-document> AS ?link)
                  } UNION {
-                   ?r a crm:E53_Place ;
-                      crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> .
+                   ?r a crm:E27_Site .
                    BIND(4 AS ?ord)
                    BIND("Aree di indagine" AS ?name)
-                   BIND("Aree archeologiche indagate, con mappa" AS ?desc)
-                   BIND(<http://www.lynx.com/resource/structured-search-place> AS ?link)
+                   BIND("Siti archeologici indagati, con mappa" AS ?desc)
+                   BIND(<http://www.lynx.com/resource/structured-search-site> AS ?link)
                  }
                }
                GROUP BY ?ord ?name ?desc ?link

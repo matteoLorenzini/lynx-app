@@ -117,7 +117,13 @@
       query='ASK { ?excavation <http://www.cidoc-crm.org/cidoc-crm/P7_took_place_at> <[[this]]> }'
       then='{{> usSite}}' else='{{> objectSite}}'>
       <template id='usSite'>[[> rsp:ResourceContentSite]]</template>
-      <template id='objectSite'>[[> rsp:ResourceContentSiteObjects]]</template>
+      <template id='objectSite'>
+        <div style="padding: 30px; text-align: center;">
+          <semantic-link iri="http://www.lynx.com/resource/structuredSearch" class="btn btn-primary btn-lg">
+            Cerca i manufatti (structuredSearch)
+          </semantic-link>
+        </div>
+      </template>
     </semantic-if>
   </template>
   <template id='placePage'>[[> resource]]</template>

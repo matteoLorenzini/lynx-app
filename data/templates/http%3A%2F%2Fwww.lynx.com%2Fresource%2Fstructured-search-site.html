@@ -1,3 +1,31 @@
+[[!--
+  Ricerca siti con filtro per tipo di indagine e marker colorati.
+  Filtro: parametro nell URL letto lato server (come urlParam "frame" nei tuoi template)
+    ?scavo=1      -> solo siti con scavo stratigrafico (esiste un evento con P7_took_place_at il sito)
+    ?materiali=1  -> solo siti senza scavo (studio dei materiali)
+    nessun param  -> tutti
+  Colore: ?color nella query della mappa. Il tipo e scritto anche nell etichetta del marker.
+--]]
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 14px;">
+  <strong style="margin-right: 4px;">Tipo di indagine:</strong>
+
+  <semantic-link iri="http://www.lynx.com/resource/structured-search-site"
+    class="btn btn-sm [[#if (urlParam "scavo")]]btn-default[[else]][[#if (urlParam "materiali")]]btn-default[[else]]btn-primary[[/if]][[/if]]">
+    Tutti
+  </semantic-link>
+
+  <semantic-link iri="http://www.lynx.com/resource/structured-search-site" urlqueryparam-scavo="1"
+    class="btn btn-sm [[#if (urlParam "scavo")]]btn-primary[[else]]btn-default[[/if]]">
+    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#c0392b; margin-right:6px;"></span>Indagine stratigrafica
+  </semantic-link>
+
+  <semantic-link iri="http://www.lynx.com/resource/structured-search-site" urlqueryparam-materiali="1"
+    class="btn btn-sm [[#if (urlParam "materiali")]]btn-primary[[else]]btn-default[[/if]]">
+    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#2471a3; margin-right:6px;"></span>Studio dei materiali
+  </semantic-link>
+</div>
+
 <semantic-search
   search-profile='{
     "categories": [
@@ -37,6 +65,8 @@
       { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
       { ?subject rdfs:label ?label } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?label }
       FILTER REGEX(STR(?label), ?__token__, "i")
+      [[#if (urlParam "scavo")]]FILTER EXISTS { ?excavation crm:P7_took_place_at ?subject }[[/if]]
+      [[#if (urlParam "materiali")]]FILTER NOT EXISTS { ?excavation crm:P7_took_place_at ?subject }[[/if]]
     }
   ' default-query='
     PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
@@ -44,6 +74,8 @@
     SELECT DISTINCT ?subject
     WHERE {
       { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+      [[#if (urlParam "scavo")]]FILTER EXISTS { ?excavation crm:P7_took_place_at ?subject }[[/if]]
+      [[#if (urlParam "materiali")]]FILTER NOT EXISTS { ?excavation crm:P7_took_place_at ?subject }[[/if]]
     }
   ' debounce=500></semantic-search-query-keyword>
 
@@ -60,12 +92,15 @@
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 
-            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
+            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject ?color WHERE {
               { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
               ?subject crm:P168_place_is_defined_by ?literal .
               ?literal rdfs:label ?coords .
               OPTIONAL { { ?subject rdfs:label ?siteLabel } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?siteLabel } }
-              BIND(COALESCE(?siteLabel, STR(?subject)) AS ?label)
+              BIND(EXISTS { ?excavation crm:P7_took_place_at ?subject } AS ?hasExcavation)
+              BIND(IF(?hasExcavation, "#c0392b", "#2471a3") AS ?color)
+              BIND(IF(?hasExcavation, "Indagine stratigrafica", "Studio dei materiali") AS ?kind)
+              BIND(CONCAT(COALESCE(?siteLabel, STR(?subject)), " - ", ?kind) AS ?label)
             }
             ' tuple-template='{{> template }}'>
               <template id='template'>

@@ -24,7 +24,7 @@
   relations='{
     "<http://www.lynx.com/resource/field/falls_within_area>": [{
       "kind": "resource",
-      "queryPattern": "{$subject a crm:E27_Site ; crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> .}"
+      "queryPattern": "{ { $subject a crm:E27_Site } UNION { $subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> } $subject crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type ?areaType . FILTER(?areaType IN (<http://www.lynx.com/resource/cultural-heritage-place>, <http://www.lynx.com/resource/cultural-heritage-place/place>))}"
     }]
   }'
   >
@@ -34,8 +34,8 @@
 
     SELECT DISTINCT ?subject
     WHERE {
-      ?subject a crm:E27_Site ;
-               rdfs:label ?label .
+      { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+      { ?subject rdfs:label ?label } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?label }
       FILTER REGEX(STR(?label), ?__token__, "i")
     }
   ' default-query='
@@ -43,7 +43,7 @@
 
     SELECT DISTINCT ?subject
     WHERE {
-      ?subject a crm:E27_Site .
+      { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
     }
   ' debounce=500></semantic-search-query-keyword>
 
@@ -61,10 +61,10 @@
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 
             SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
-              ?subject a crm:E27_Site ;
-                       crm:P168_place_is_defined_by ?literal .
+              { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+              ?subject crm:P168_place_is_defined_by ?literal .
               ?literal rdfs:label ?coords .
-              OPTIONAL { ?subject rdfs:label ?siteLabel }
+              OPTIONAL { { ?subject rdfs:label ?siteLabel } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?siteLabel } }
               BIND(COALESCE(?siteLabel, STR(?subject)) AS ?label)
             }
             ' tuple-template='{{> template }}'>

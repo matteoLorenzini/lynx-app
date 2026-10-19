@@ -103,8 +103,8 @@
                     BIND("Unita stratigrafica" AS ?typelabel)
                   } UNION {
                     # Aree di indagine
-                    ?resource a crm:E27_Site ;
-                              rdfs:label ?label .
+                    { ?resource a crm:E27_Site } UNION { ?resource a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+                    { ?resource rdfs:label ?label } UNION { ?resource crm:P1_is_identified_by/rdfs:label ?label }
                     BIND("Area di indagine" AS ?typelabel)
                   } UNION {
                     # Tipologie di manufatto
@@ -198,7 +198,7 @@
                    # TODO: IRI della ricerca strutturata sui documenti
                    BIND(<http://www.lynx.com/resource/structured-search-document> AS ?link)
                  } UNION {
-                   ?r a crm:E27_Site .
+                   { ?r a crm:E27_Site } UNION { ?r a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
                    BIND(4 AS ?ord)
                    BIND("Aree di indagine" AS ?name)
                    BIND("Siti archeologici indagati, con mappa" AS ?desc)

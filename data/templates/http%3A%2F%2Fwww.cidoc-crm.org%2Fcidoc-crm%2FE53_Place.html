@@ -112,6 +112,13 @@
 <semantic-if
   query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> <http://www.lynx.com/resource/cultural-heritage-place/site> }'
   then='{{> siteMap}}' else='{{> placePage}}'>
-  <template id='siteMap'>[[> rsp:ResourceContentSite]]</template>
+  <template id='siteMap'>
+    <semantic-if
+      query='ASK { ?excavation <http://www.cidoc-crm.org/cidoc-crm/P7_took_place_at> <[[this]]> }'
+      then='{{> usSite}}' else='{{> objectSite}}'>
+      <template id='usSite'>[[> rsp:ResourceContentSite]]</template>
+      <template id='objectSite'>[[> rsp:ResourceContentSiteObjects]]</template>
+    </semantic-if>
+  </template>
   <template id='placePage'>[[> resource]]</template>
 </semantic-if>

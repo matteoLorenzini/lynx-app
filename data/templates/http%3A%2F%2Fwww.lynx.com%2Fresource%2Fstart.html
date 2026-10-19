@@ -102,21 +102,11 @@
                     BIND(CONCAT("US ", STR(?uidLabel)) AS ?label)
                     BIND("Unita stratigrafica" AS ?typelabel)
                   } UNION {
-                    # Luoghi
+                    # Aree di indagine
                     ?resource a crm:E53_Place ;
-                              crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> ;
-                              crm:P1_is_identified_by ?appellation .
-                    ?appellation a crm:E41_Appellation ;
-                                 rdfs:label ?label .
-                    BIND("Luogo" AS ?typelabel)
-                  } UNION {
-                    # Siti
-                    ?resource a crm:E53_Place ;
-                              crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
-                              crm:P1_is_identified_by ?siteAppellation .
-                    ?siteAppellation a crm:E41_Appellation ;
-                                     rdfs:label ?label .
-                    BIND("Sito" AS ?typelabel)
+                              crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> ;
+                              rdfs:label ?label .
+                    BIND("Area di indagine" AS ?typelabel)
                   } UNION {
                     # Tipologie di manufatto
                     ?resource a crm:E55_Type ;
@@ -140,7 +130,7 @@
                 }
                 LIMIT 10'
               template='<span style="color: blue;" title="{{resource.value}}">{{label.value}} <em style="color: #999;">({{typelabel.value}})</em></span>'
-              input-placeholder='Cerca manufatti, unita stratigrafiche, luoghi, siti, tipologie, persone, documenti...'
+              input-placeholder='Cerca manufatti, unita stratigrafiche, aree di indagine, tipologie, persone, documenti...'
             >
             </semantic-simple-search>
         </div>
@@ -160,7 +150,7 @@
   <div class="cl-boxes">
     <label class="cl-box" for="t-arch">
       <span class="cl-box-title">Archeologia</span>
-      <span class="cl-box-desc">Manufatti, documentazione di scavo, siti e luoghi.</span>
+      <span class="cl-box-desc">Manufatti, documentazione di scavo e aree di indagine.</span>
     </label>
     <label class="cl-box" for="t-arte">
       <span class="cl-box-title">Arte</span>
@@ -210,17 +200,10 @@
                    BIND(<http://www.lynx.com/resource/structured-search-document> AS ?link)
                  } UNION {
                    ?r a crm:E53_Place ;
-                      crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> .
+                      crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> .
                    BIND(4 AS ?ord)
-                   BIND("Siti" AS ?name)
-                   BIND("Siti archeologici" AS ?desc)
-                   BIND(<http://www.lynx.com/resource/structured-search-site> AS ?link)
-                 } UNION {
-                   ?r a crm:E53_Place ;
-                      crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/place> .
-                   BIND(5 AS ?ord)
-                   BIND("Luoghi" AS ?name)
-                   BIND("Localita di rinvenimento" AS ?desc)
+                   BIND("Aree di indagine" AS ?name)
+                   BIND("Aree archeologiche indagate, con mappa" AS ?desc)
                    BIND(<http://www.lynx.com/resource/structured-search-place> AS ?link)
                  }
                }

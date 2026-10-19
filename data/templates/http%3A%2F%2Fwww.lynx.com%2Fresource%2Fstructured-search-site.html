@@ -47,7 +47,7 @@
   ' debounce=500></semantic-search-query-keyword>
 
   <div data-flex-layout="row stretch-stretch">
-    <div data-flex-self="size-1of3" style="flex: 0 0 20px;">
+    <div data-flex-self="size-1of3" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
       <semantic-search-facet></semantic-search-facet>
     </div>
 
@@ -60,7 +60,32 @@
           </mp-sparql-result-counts>
         </semantic-search-result>
 
-        <bs-tabs unmount-on-exit=true id='search-results' animation=false>
+        <bs-tabs unmount-on-exit=true id='search-results' animation=false default-active-key="4">
+          <bs-tab event-key="4" title="Map">
+            <semantic-search-result id='map-result-wrapper'>
+              <div style='height: 70vh; min-height: 480px;'>
+                <semantic-map id='map-result' query='
+                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+
+                SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
+                  ?subject a crm:E53_Place ;
+                           crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
+                           crm:P1_is_identified_by ?appellation ;
+                           crm:P168_place_is_defined_by ?literal .
+                  ?appellation a crm:E41_Appellation ;
+                               rdfs:label ?label .
+                  ?literal rdfs:label ?coords .
+                }
+                ' tuple-template='{{> template }}'>
+                <template id='template'>
+                  <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+                </template>
+              </semantic-map>
+            </div>
+          </semantic-search-result>
+        </bs-tab>
+
           <bs-tab event-key="2" title="Grid">
             <semantic-search-result id='grid-result'>
               <div class="card-container">
@@ -72,24 +97,21 @@
                     PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                     PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
 
-                    SELECT ?subject ?value ?places ?usCount ?coords WHERE {
+                    SELECT ?subject ?value ?places ?usCount WHERE {
                       {
                         SELECT ?subject
                           (SAMPLE(?value_) AS ?value)
                           (GROUP_CONCAT(DISTINCT ?place_; separator=", ") AS ?places)
                           (COUNT(DISTINCT ?us) AS ?usCount)
-                          (SAMPLE(?coords_) AS ?coords)
                         WHERE {
-                          ?subject a crm:E27_Site .
-                          OPTIONAL { ?subject rdfs:label ?siteLabel }
-                          BIND(COALESCE(?siteLabel, STR(?subject)) AS ?value_)
+                          ?subject a crm:E53_Place ;
+                                   crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
+                                   crm:P1_is_identified_by ?appellation .
+                          ?appellation a crm:E41_Appellation ;
+                                       rdfs:label ?value_ .
                           OPTIONAL {
                             ?subject crm:P89_falls_within ?placeResource .
                             ?placeResource rdfs:label ?place_ .
-                          }
-                          OPTIONAL {
-                            ?subject crm:P168_place_is_defined_by ?literal .
-                            ?literal rdfs:label ?coords_ .
                           }
                           OPTIONAL {
                             ?us crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
@@ -107,33 +129,11 @@
                   options='{"showFilter":false,"pageSizeSelection":[6,12,24,48]}'>
                   <template id="cardTemplate">
                     <bs-col sm="4" style="margin-bottom: 20px;">
-                      <div class="panel panel-default" style="height: 300px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
+                      <div class="panel panel-default" style="height: 260px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 15px;">
-                          <div style="height: 110px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center;">
-                            {{#if coords.value}}
-                              <semantic-map
-                                id="site-map-{{subject.value}}"
-                                query='
-                                  PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-                                  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-                                  SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?site WHERE {
-                                    BIND(<{{subject.value}}> AS ?site)
-                                    ?site a crm:E27_Site ;
-                                          crm:P168_place_is_defined_by ?literal .
-                                    ?literal rdfs:label ?coords .
-                                    OPTIONAL { ?site rdfs:label ?siteLabel }
-                                    BIND(COALESCE(?siteLabel, STR(?site)) AS ?label)
-                                  }'
-                                tuple-template='{{> siteMarker}}'>
-                                <template id='siteMarker'>
-                                  <semantic-link iri="{{site.value}}">{{label.value}}</semantic-link>
-                                </template>
-                              </semantic-map>
-                            {{else}}
-                              <img src="../assets/images/icons/rs-icons/place.svg" alt="Site"
-                                   style="width: 72px; height: 72px; object-fit: contain;" />
-                            {{/if}}
+                          <div style="height: 90px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                            <img src="../assets/images/icons/rs-icons/place.svg" alt="Site"
+                                 style="width: 72px; height: 72px; object-fit: contain;" />
                           </div>
 
                           <h4 style="margin: 0 0 10px 0; color: #337ab7;">
@@ -141,7 +141,6 @@
                           </h4>
 
                           <div style="font-size: 12px;">
-                            {{#if coords.value}}<div><strong>Coordinates:</strong> {{coords.value}}</div>{{/if}}
                             {{#if places.value}}<div><strong>Falls within:</strong> {{places.value}}</div>{{/if}}
                             <div><strong>Stratigraphic units:</strong> {{usCount.value}}</div>
                           </div>
@@ -192,30 +191,7 @@
             </semantic-search-result>
           </bs-tab>
 
-          <bs-tab event-key="4" title="Map">
-            <semantic-search-result id='map-result-wrapper'>
-              <div style='height: 30vw;'>
-                <semantic-map id='map-result' query='
-                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 
-                SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
-                  ?subject a crm:E53_Place ;
-                           crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> ;
-                           crm:P1_is_identified_by ?appellation ;
-                           crm:P168_place_is_defined_by ?literal .
-                  ?appellation a crm:E41_Appellation ;
-                               rdfs:label ?label .
-                  ?literal rdfs:label ?coords .
-                }
-                ' tuple-template='{{> template }}'>
-                <template id='template'>
-                  <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
-                </template>
-              </semantic-map>
-            </div>
-          </semantic-search-result>
-        </bs-tab>
         </bs-tabs>
 
         <bs-panel>

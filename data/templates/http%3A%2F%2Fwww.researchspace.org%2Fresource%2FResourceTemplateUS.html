@@ -9,13 +9,37 @@
 </div>
 
 [[else]]
-[[!-- Breadcrumb --]]
+[[!-- Breadcrumb: Home > Sito > US --]]
 <ol class="page-breadcrumb">
     <li>
         <mp-link title="Home" url="/">Home</mp-link>
     </li>
 
    [[#block "activeBreadcrumb"]]
+  [[!-- Sito: stessa query della mappa in ResourceContentUS, qui usata solo per il link --]]
+  <semantic-query query='
+                  PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                  PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+                  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+                  SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?site WHERE {
+                    <[[this]]> crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
+                    ?excavation crm:P7_took_place_at ?site .
+                    ?site a crm:E27_Site ;
+                          crm:P168_place_is_defined_by ?literal .
+                    ?literal rdfs:label ?coords .
+                    OPTIONAL { ?site rdfs:label ?siteLabel }
+                    BIND(COALESCE(?siteLabel, STR(?site)) AS ?label)
+                  }'
+    template='{{> siteCrumb}}'
+    no-result-template='<span></span>'>
+    <template id='siteCrumb'>
+      {{#each bindings}}
+        <li><semantic-link iri="{{site.value}}"></semantic-link></li>
+      {{/each}}
+    </template>
+  </semantic-query>
+
   <semantic-query query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

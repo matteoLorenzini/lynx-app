@@ -166,14 +166,14 @@ ORDER BY ?label
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 
-            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject ?color ?kind WHERE {
+            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject ?badge ?kind WHERE {
               { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
               ?subject crm:P168_place_is_defined_by ?literal .
               ?literal rdfs:label ?coords .
               OPTIONAL { { ?subject rdfs:label ?siteLabel } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?siteLabel } }
               
               BIND(EXISTS { ?excavation crm:P7_took_place_at ?subject } AS ?hasExcavation)
-              BIND(IF(?hasExcavation, "#c0392b", "#2471a3") AS ?color)
+              BIND(IF(?hasExcavation, "label-danger", "label-primary") AS ?badge)
               BIND(IF(?hasExcavation, "Indagine Stratigrafica", "Studio dei Materiali") AS ?kind)
               BIND(COALESCE(?siteLabel, STR(?subject)) AS ?label)
             }
@@ -184,7 +184,7 @@ ORDER BY ?label
                     <mp-label iri="{{subject.value}}"></mp-label>
                   </h4>
                   <p style="margin: 0 0 8px 0;">
-                    <span class="label" style="background-color: {{color.value}}; color:#fff; font-size:10px;">
+                    <span class="label {{badge.value}}">
                       {{kind.value}}
                     </span>
                   </p>

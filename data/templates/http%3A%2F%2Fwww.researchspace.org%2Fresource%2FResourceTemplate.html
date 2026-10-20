@@ -9,61 +9,72 @@
 </div>
 
 [[else]]
-[[!-- Breadcrumb: Home > Sito > Manufatto --]]
 <ol class="page-breadcrumb">
-    <li>
-        <mp-link title="Home" url="/">Home</mp-link>
-    </li>
+  <li>
+    <mp-link title="Home" url="/">Home</mp-link>
+  </li>
 
-   [[#block "activeBreadcrumb"]]
-  [[!-- Sito di rinvenimento: stessa query della mappa in ResourceContent, qui usata solo per il link --]]
+  [[#block "activeBreadcrumb"]]
+  <!-- BREADCRUMB 1: For Artifacts (E18_Physical_Thing) -->
   <semantic-query query='
-                        PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
-                        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-                        SELECT (CONCAT("Point(", STR(?label), ")") AS ?wkt) ?site ?label WHERE {
-                          BIND(<[[this]]> AS ?subject)
-                          ?subject a crm:E18_Physical_Thing ;
-                                   crm:P53_has_former_or_current_location ?site.
-                          ?site a crm:E53_Place;
-                                crm:P2_has_type <http://www.lynx.com/resource/site-of-discovery>;
-                                crm:P168_place_is_defined_by ?literal.
-                          ?literal rdfs:label ?label
-                        }
-                      '
-    template='{{> siteCrumb}}'
-    no-result-template='<span></span>'>
-    <template id='siteCrumb'>
+    SELECT DISTINCT ?site ?label WHERE {
+      BIND(<[[this]]> AS ?subject)
+      ?subject a crm:E18_Physical_Thing ;
+               crm:P53_has_former_or_current_location ?site .
+      ?site a crm:E53_Place ;
+            crm:P2_has_type <http://www.lynx.com/resource/site-of-discovery> .
+      OPTIONAL { ?site rdfs:label ?siteLabel }
+      BIND(COALESCE(?siteLabel, STR(?site)) AS ?label)
+    } LIMIT 1'
+    template='{{> artifactCrumb}}'>
+    <template id='artifactCrumb'>
       {{#each bindings}}
-        <li><semantic-link iri="{{site.value}}"></semantic-link></li>
+        <li><semantic-link iri="{{site.value}}">{{label.value}}</semantic-link></li>
       {{/each}}
     </template>
   </semantic-query>
 
-  <semantic-query query='PREFIX base: <http://www.cidoc-crm.org/cidoc-crm/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  <!-- BREADCRUMB 2: For Stratigraphic Units (crmarchaeo:A2_Stratigraphic_Volume_Unit) -->
+  <semantic-query query='
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+    PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT  ?type ?label
-WHERE {
-    <[[this]]> a base:E18_Physical_Thing ;
-            base:P2_has_type ?type.
-    ?type base:P2_has_type <http://www.lynx.com/resource/classification> ;
-            rdfs:label ?label .
-}'
-    template='{{> breadcrumbTmpl}}'>
-    <template id='breadcrumbTmpl'>
-      <li class="active">
-        {{#each bindings}}
-          {{type.value}}: {{label.value}}{{#if @last}}{{else}}; {{/if}}
-        {{/each}}
-      </li>
+    SELECT DISTINCT ?site ?siteLabel ?area ?areaLabel WHERE {
+      BIND(<[[this]]> AS ?subject)
+      ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
+               crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
+      ?excavation crm:P7_took_place_at ?site .
+      OPTIONAL { ?site rdfs:label ?siteLabel }
+      OPTIONAL { 
+        ?site crm:P89_falls_within ?area . 
+        ?area a crm:E53_Place .
+        OPTIONAL { ?area rdfs:label ?areaLabel }
+      }
+    } LIMIT 1'
+    template='{{> usCrumb}}'>
+    <template id='usCrumb'>
+      {{#each bindings}}
+        {{#if area}}
+          <li><semantic-link iri="{{area.value}}">{{#if areaLabel}}{{areaLabel.value}}{{else}}Area{{/if}}</semantic-link></li>
+        {{/if}}
+        {{#if site}}
+          <li><semantic-link iri="{{site.value}}">{{#if siteLabel}}{{siteLabel.value}}{{else}}Site{{/if}}</semantic-link></li>
+        {{/if}}
+      {{/each}}
     </template>
-   </semantic-query>
-   [[/block]]
+  </semantic-query>
+
+  <!-- CURRENT RESOURCE LABEL -->
+  <li class="active">
+    <mp-label iri="[[this]]"></mp-label>
+  </li>
+  [[/block]]
 </ol>
 
-[[!-- Resource Page --]]
 <div class="page">
   [[> rsp:ResourceContent]]
 </div>

@@ -28,25 +28,6 @@
 </style>
 
 <div class="gis-toolbar">
-  <div style="display: flex; align-items: center; gap: 8px;">
-    <strong>Tipo di indagine:</strong>
-
-    <semantic-link iri="http://www.lynx.com/resource/structured-search-site"
-      class="btn btn-sm [[#if (urlParam "scavo")]]btn-default[[else]][[#if (urlParam "materiali")]]btn-default[[else]]btn-primary[[/if]][[/if]]">
-      Tutti
-    </semantic-link>
-
-    <semantic-link iri="http://www.lynx.com/resource/structured-search-site" urlqueryparam-scavo="1"
-      class="btn btn-sm [[#if (urlParam "scavo")]]btn-primary[[else]]btn-default[[/if]]">
-      Indagine Stratigrafica
-    </semantic-link>
-
-    <semantic-link iri="http://www.lynx.com/resource/structured-search-site" urlqueryparam-materiali="1"
-      class="btn btn-sm [[#if (urlParam "materiali")]]btn-primary[[else]]btn-default[[/if]]">
-      Studio dei Materiali
-    </semantic-link>
-  </div>
-
   <div>
     <span class="gis-legend-item">
       <span class="gis-marker-dot" style="background:#c0392b;"></span> Indagine Stratigrafica
@@ -74,7 +55,7 @@
     "relations": [
       {
         "iri": "<http://www.lynx.com/resource/field/falls_within_area>",
-        "label": "Area of investigation",
+                "label": "Referring place",
         "hasDomain": "<http://www.cidoc-crm.org/cidoc-crm/E27_Site>",
         "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
       }
@@ -87,28 +68,14 @@
     }]
   }'
   >
-  <semantic-search-query-keyword domain='<http://www.cidoc-crm.org/cidoc-crm/E27_Site>' query='
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  <semantic-search-query-constant query='
     PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 
     SELECT DISTINCT ?subject
     WHERE {
       { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
-      { ?subject rdfs:label ?label } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?label }
-      FILTER REGEX(STR(?label), ?__token__, "i")
-      [[#if (urlParam "scavo")]]FILTER EXISTS { ?excavation crm:P7_took_place_at ?subject }[[/if]]
-      [[#if (urlParam "materiali")]]FILTER NOT EXISTS { ?excavation crm:P7_took_place_at ?subject }[[/if]]
     }
-  ' default-query='
-    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-
-    SELECT DISTINCT ?subject
-    WHERE {
-      { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
-      [[#if (urlParam "scavo")]]FILTER EXISTS { ?excavation crm:P7_took_place_at ?subject }[[/if]]
-      [[#if (urlParam "materiali")]]FILTER NOT EXISTS { ?excavation crm:P7_took_place_at ?subject }[[/if]]
-    }
-  ' debounce=500></semantic-search-query-keyword>
+  '></semantic-search-query-constant>
 
   <div data-flex-layout="row stretch-stretch">
     <div data-flex-self="size-1of4" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
@@ -117,6 +84,82 @@
 
     <semantic-search-result-holder>
       <div data-flex-self="md-full">
+        <semantic-search-result id='result-count'>
+          <mp-sparql-result-counts id='query-count' query="SELECT DISTINCT * {}" template='{{#if hasLimit}} <bs-alert bs-style="warning">Showing {{numberOfResults}} of {{totalNumberOfResults}} matches. <strong>Please, refine your search.</strong></bs-alert>{{else}}<span> found {{numberOfResults}} matches </span>{{/if}}'>
+          </mp-sparql-result-counts>
+        </semantic-search-result>
+
+        <bs-tabs unmount-on-exit=true id='search-results' animation=false>
+          <bs-tab event-key="1" title="Grid">
+            <semantic-search-result id='grid-result'>
+              <div class="card-container">
+                <semantic-table id="grid-table" prefetch-labels="false" query='
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+SELECT ?subject ?label ?place ?kind WHERE {
+  {
+    SELECT ?subject (SAMPLE(?siteLabel) AS ?label) (GROUP_CONCAT(DISTINCT ?placeLabel; separator=", ") AS ?place) (SAMPLE(?kind_) AS ?kind) WHERE {
+      { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+      OPTIONAL { { ?subject rdfs:label ?siteLabel } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?siteLabel } }
+      OPTIONAL { ?subject crm:P89_falls_within ?area . ?area rdfs:label ?placeLabel }
+      BIND(IF(EXISTS { ?excavation crm:P7_took_place_at ?subject }, "Indagine Stratigrafica", "Studio dei Materiali") AS ?kind_)
+    }
+    GROUP BY ?subject
+  }
+}
+ORDER BY ?label
+                ' tuple-template="{{> cardTemplate}}" number-of-displayed-rows="12"
+                  no-result-template='<bs-panel class="info">No matches found</bs-panel>'
+                  options='{"showFilter":false,"pageSizeSelection":[6,12,24,48]}'>
+                  <template id="cardTemplate">
+                    <bs-col sm="4" style="margin-bottom: 20px;">
+                      <div class="panel panel-default" style="box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div class="panel-body">
+                          <div style="text-align:center; margin-bottom:10px;">
+                            <img src="../assets/images/icons/rs-icons/place.svg" alt="Site" style="width: 64px; height: 64px;" />
+                          </div>
+                          <h4 style="margin: 0 0 10px 0;"><semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link></h4>
+                          {{#if place.value}}<p style="margin: 5px 0;"><strong>Place:</strong> {{place.value}}</p>{{/if}}
+                          <p style="margin: 5px 0;"><span class="label label-default">{{kind.value}}</span></p>
+                        </div>
+                      </div>
+                    </bs-col>
+                  </template>
+                </semantic-table>
+              </div>
+            </semantic-search-result>
+          </bs-tab>
+
+          <bs-tab event-key="2" title="Table">
+            <semantic-search-result id='table-result-wrapper'>
+              <semantic-table id='table-result' query='
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+SELECT ?subject ?label ?place ?kind WHERE {
+  {
+    SELECT ?subject (SAMPLE(?siteLabel) AS ?label) (GROUP_CONCAT(DISTINCT ?placeLabel; separator=", ") AS ?place) (SAMPLE(?kind_) AS ?kind) WHERE {
+      { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
+      OPTIONAL { { ?subject rdfs:label ?siteLabel } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?siteLabel } }
+      OPTIONAL { ?subject crm:P89_falls_within ?area . ?area rdfs:label ?placeLabel }
+      BIND(IF(EXISTS { ?excavation crm:P7_took_place_at ?subject }, "Indagine Stratigrafica", "Studio dei Materiali") AS ?kind_)
+    }
+    GROUP BY ?subject
+  }
+}
+ORDER BY ?label
+              ' number-of-displayed-rows="25"
+                no-result-template='<bs-panel class="info">No matches found</bs-panel>'
+                column-configuration='[
+                  {"variableName":"subject","displayName":"Site","cellTemplate":"<semantic-link iri=&#39;{{subject.value}}&#39;></semantic-link>"},
+                  {"variableName":"place","displayName":"Referring place"},
+                  {"variableName":"kind","displayName":"Investigation type"}
+                ]'
+                options='{"showFilter":false}'>
+              </semantic-table>
+            </semantic-search-result>
+          </bs-tab>
+
+          <bs-tab event-key="3" title="Map">
         <semantic-search-result id='map-result-wrapper'>
           <div style='height: 75vh; min-height: 500px; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;'>
             <semantic-map id='map-result' query='
@@ -153,6 +196,8 @@
             </semantic-map>
           </div>
         </semantic-search-result>
+          </bs-tab>
+        </bs-tabs>
       </div>
     </semantic-search-result-holder>
   </div>

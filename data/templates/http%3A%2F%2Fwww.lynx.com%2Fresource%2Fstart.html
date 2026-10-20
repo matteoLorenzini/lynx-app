@@ -1,18 +1,5 @@
 <!--
-  Landing page digital library - v2
-  Struttura:
-    1. Ricerca full text su tutte le classi mappate
-    2. Box dei temi (Archeologia, Arte, Fotografia, Persone)
-    3. Al click su un tema compare il pannello con i filtri del tema (Manufatti, Documenti, ...)
-       Ogni filtro porta alla ricerca strutturata gia filtrata.
-
-  La selezione del tema usa solo CSS (radio button nascosti), senza JavaScript.
-
-  Archeologia e collegata ai dati reali (E18.rdf, sample_us.rdf, E53.rdf).
-  Arte, Fotografia e Persone sono segnaposto "in arrivo": quando i dati saranno modellati,
-  si sostituisce il blocco statico con una query come quella di Archeologia.
-
-  Nelle query SPARQL non usare apostrofi: gli attributi query sono delimitati da apici singoli.
+  Landing page digital library - v2 (UX WebGIS & Archeologia Aggiornata)
 -->
 
 <style>
@@ -55,7 +42,6 @@
   .cl-filter .cl-f-desc { display:block; margin-top:4px; color:#555; font-size:.88rem; line-height:1.3; }
   .cl-filter.cl-soon { background:#f3f3f3; border-style:dashed; color:#777; padding:14px; }
   .cl-filter.cl-soon .cl-f-name { color:#555; }
-  .cl-soon-note { color:#666; margin-top:12px; font-size:.9rem; }
 </style>
 
 <div class="cl-wrap">
@@ -73,7 +59,6 @@
 
                 SELECT DISTINCT ?resource ?label ?typelabel WHERE {
                   {
-                    # Manufatti: id generale + tipologia + id interno (tutti cercabili)
                     ?resource a crm:E18_Physical_Thing ;
                               crm:P2_has_type lynx:archaeological-object ;
                               crm:P1_is_identified_by ?gid .
@@ -94,32 +79,27 @@
                                 COALESCE(CONCAT(" (", STR(?iidLabel), ")"), "")) AS ?label)
                     BIND("Manufatto" AS ?typelabel)
                   } UNION {
-                    # Unita stratigrafiche: "US " + global-id
                     ?resource crm:P2_has_type lynx:stratigraphic-unit ;
                               crm:P1_is_identified_by ?uid .
                     ?uid crm:P2_has_type lynx:global-id ;
                          rdfs:label ?uidLabel .
                     BIND(CONCAT("US ", STR(?uidLabel)) AS ?label)
-                    BIND("Unita stratigrafica" AS ?typelabel)
+                    BIND("Unità stratigrafica" AS ?typelabel)
                   } UNION {
-                    # Aree di indagine
                     { ?resource a crm:E27_Site } UNION { ?resource a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
                     { ?resource rdfs:label ?label } UNION { ?resource crm:P1_is_identified_by/rdfs:label ?label }
-                    BIND("Area di indagine" AS ?typelabel)
+                    BIND("Sito / Area di indagine" AS ?typelabel)
                   } UNION {
-                    # Tipologie di manufatto
                     ?resource a crm:E55_Type ;
                               crm:P2_has_type lynx:classification ;
                               rdfs:label ?label .
                     BIND("Tipologia" AS ?typelabel)
                   } UNION {
-                    # Persone ed enti
                     VALUES ?agentClass { crm:E21_Person crm:E74_Group }
                     ?resource a ?agentClass ;
                               rdfs:label ?label .
                     BIND("Persona o ente" AS ?typelabel)
                   } UNION {
-                    # Documenti
                     ?resource a crm:E31_Document ;
                               rdfs:label ?label .
                     BIND("Documento" AS ?typelabel)
@@ -129,7 +109,7 @@
                 }
                 LIMIT 10'
               template='<span style="color: blue;" title="{{resource.value}}">{{label.value}} <em style="color: #999;">({{typelabel.value}})</em></span>'
-              input-placeholder='Cerca manufatti, unita stratigrafiche, aree di indagine, tipologie, persone, documenti...'
+              input-placeholder='Cerca manufatti, unità stratigrafiche, aree di indagine, tipologie, persone, documenti...'
             >
             </semantic-simple-search>
         </div>
@@ -149,7 +129,7 @@
   <div class="cl-boxes">
     <label class="cl-box" for="t-arch">
       <span class="cl-box-title">Archeologia</span>
-      <span class="cl-box-desc">Manufatti, documentazione di scavo e aree di indagine.</span>
+      <span class="cl-box-desc">Manufatti, WebGIS di scavo e aree di indagine.</span>
     </label>
     <label class="cl-box" for="t-arte">
       <span class="cl-box-title">Arte</span>
@@ -167,10 +147,11 @@
 
   <div class="cl-panels">
 
-    <!-- ---- Archeologia: dati reali ---- -->
+    <!-- ---- Archeologia ---- -->
     <section class="cl-panel" id="p-arch">
-      <h3>Archeologia</h3>
-      <p class="cl-hint">Scegli che cosa vuoi cercare.</p>
+      <h3>Archeologia & Esplorazione Territoriale</h3>
+      <p class="cl-hint">Scegli come accedere ai dati e alla mappa:</p>
+
       <semantic-query
         query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                PREFIX lynx: <http://www.lynx.com/resource/>
@@ -186,22 +167,20 @@
                  } UNION {
                    ?r crm:P2_has_type lynx:stratigraphic-unit .
                    BIND(2 AS ?ord)
-                   BIND("Unita stratigrafiche" AS ?name)
+                   BIND("Unità stratigrafiche" AS ?name)
                    BIND("Schede di scavo e relazioni stratigrafiche" AS ?desc)
-                   # TODO: IRI della ricerca strutturata sulle US
                    BIND(<http://www.lynx.com/resource/structuredSearch_US> AS ?link)
                  } UNION {
                    ?r a crm:E31_Document .
                    BIND(3 AS ?ord)
                    BIND("Documenti" AS ?name)
                    BIND("Documentazione collegata a manufatti e scavi" AS ?desc)
-                   # TODO: IRI della ricerca strutturata sui documenti
                    BIND(<http://www.lynx.com/resource/structured-search-document> AS ?link)
                  } UNION {
                    { ?r a crm:E27_Site } UNION { ?r a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
                    BIND(4 AS ?ord)
-                   BIND("Aree di indagine" AS ?name)
-                   BIND("Siti archeologici indagati, con mappa" AS ?desc)
+                   BIND("WebGIS Siti Archeologici" AS ?name)
+                   BIND("Mappa interattiva e filtri per tipo di indagine" AS ?desc)
                    BIND(<http://www.lynx.com/resource/structured-search-site> AS ?link)
                  }
                }
@@ -221,7 +200,6 @@
         <div class="cl-filter cl-soon"><span class="cl-f-name">Documenti</span><span class="cl-f-desc">In arrivo</span></div>
         <div class="cl-filter cl-soon"><span class="cl-f-name">Artisti</span><span class="cl-f-desc">In arrivo</span></div>
       </div>
-      <!-- TODO: sostituire con una semantic-query come quella di Archeologia quando i dati d arte saranno modellati -->
     </section>
 
     <!-- ---- Fotografia: segnaposto ---- -->
@@ -233,7 +211,6 @@
         <div class="cl-filter cl-soon"><span class="cl-f-name">Fondi fotografici</span><span class="cl-f-desc">In arrivo</span></div>
         <div class="cl-filter cl-soon"><span class="cl-f-name">Fotografi</span><span class="cl-f-desc">In arrivo</span></div>
       </div>
-      <!-- TODO: idem -->
     </section>
 
     <!-- ---- Persone: segnaposto ---- -->
@@ -245,7 +222,6 @@
         <div class="cl-filter cl-soon"><span class="cl-f-name">Enti</span><span class="cl-f-desc">In arrivo</span></div>
         <div class="cl-filter cl-soon"><span class="cl-f-name">Archivi personali</span><span class="cl-f-desc">In arrivo</span></div>
       </div>
-      <!-- TODO: idem -->
     </section>
 
   </div>

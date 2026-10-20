@@ -1,29 +1,60 @@
-[[!--
-  Ricerca siti con filtro per tipo di indagine e marker colorati.
-  Filtro: parametro nell URL letto lato server (come urlParam "frame" nei tuoi template)
-    ?scavo=1      -> solo siti con scavo stratigrafico (esiste un evento con P7_took_place_at il sito)
-    ?materiali=1  -> solo siti senza scavo (studio dei materiali)
-    nessun param  -> tutti
-  Colore: ?color nella query della mappa. Il tipo e scritto anche nell etichetta del marker.
---]]
+<!-- WebGIS Search & Interactive Explorer -->
 
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 14px;">
-  <strong style="margin-right: 4px;">Tipo di indagine:</strong>
+<style>
+  .gis-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    padding: 10px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 14px;
+  }
+  .gis-legend-item {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 15px;
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+  .gis-marker-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 6px;
+    display: inline-block;
+  }
+</style>
 
-  <semantic-link iri="http://www.lynx.com/resource/structured-search-site"
-    class="btn btn-sm [[#if (urlParam "scavo")]]btn-default[[else]][[#if (urlParam "materiali")]]btn-default[[else]]btn-primary[[/if]][[/if]]">
-    Tutti
-  </semantic-link>
+<div class="gis-toolbar">
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <strong>Tipo di indagine:</strong>
 
-  <semantic-link iri="http://www.lynx.com/resource/structured-search-site" urlqueryparam-scavo="1"
-    class="btn btn-sm [[#if (urlParam "scavo")]]btn-primary[[else]]btn-default[[/if]]">
-    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#c0392b; margin-right:6px;"></span>Indagine stratigrafica
-  </semantic-link>
+    <semantic-link iri="http://www.lynx.com/resource/structured-search-site"
+      class="btn btn-sm [[#if (urlParam "scavo")]]btn-default[[else]][[#if (urlParam "materiali")]]btn-default[[else]]btn-primary[[/if]][[/if]]">
+      Tutti
+    </semantic-link>
 
-  <semantic-link iri="http://www.lynx.com/resource/structured-search-site" urlqueryparam-materiali="1"
-    class="btn btn-sm [[#if (urlParam "materiali")]]btn-primary[[else]]btn-default[[/if]]">
-    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#2471a3; margin-right:6px;"></span>Studio dei materiali
-  </semantic-link>
+    <semantic-link iri="http://www.lynx.com/resource/structured-search-site" urlqueryparam-scavo="1"
+      class="btn btn-sm [[#if (urlParam "scavo")]]btn-primary[[else]]btn-default[[/if]]">
+      Indagine Stratigrafica
+    </semantic-link>
+
+    <semantic-link iri="http://www.lynx.com/resource/structured-search-site" urlqueryparam-materiali="1"
+      class="btn btn-sm [[#if (urlParam "materiali")]]btn-primary[[else]]btn-default[[/if]]">
+      Studio dei Materiali
+    </semantic-link>
+  </div>
+
+  <div>
+    <span class="gis-legend-item">
+      <span class="gis-marker-dot" style="background:#c0392b;"></span> Indagine Stratigrafica
+    </span>
+    <span class="gis-legend-item">
+      <span class="gis-marker-dot" style="background:#2471a3;"></span> Studio dei Materiali
+    </span>
+  </div>
 </div>
 
 <semantic-search
@@ -80,31 +111,44 @@
   ' debounce=500></semantic-search-query-keyword>
 
   <div data-flex-layout="row stretch-stretch">
-    <div data-flex-self="size-1of3" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
+    <div data-flex-self="size-1of4" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
       <semantic-search-facet></semantic-search-facet>
     </div>
 
     <semantic-search-result-holder>
       <div data-flex-self="md-full">
         <semantic-search-result id='map-result-wrapper'>
-          <div style='height: 70vh; min-height: 480px;'>
+          <div style='height: 75vh; min-height: 500px; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;'>
             <semantic-map id='map-result' query='
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 
-            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject ?color WHERE {
+            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject ?color ?kind WHERE {
               { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
               ?subject crm:P168_place_is_defined_by ?literal .
               ?literal rdfs:label ?coords .
               OPTIONAL { { ?subject rdfs:label ?siteLabel } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?siteLabel } }
+              
               BIND(EXISTS { ?excavation crm:P7_took_place_at ?subject } AS ?hasExcavation)
               BIND(IF(?hasExcavation, "#c0392b", "#2471a3") AS ?color)
-              BIND(IF(?hasExcavation, "Indagine stratigrafica", "Studio dei materiali") AS ?kind)
-              BIND(CONCAT(COALESCE(?siteLabel, STR(?subject)), " - ", ?kind) AS ?label)
+              BIND(IF(?hasExcavation, "Indagine Stratigrafica", "Studio dei Materiali") AS ?kind)
+              BIND(COALESCE(?siteLabel, STR(?subject)) AS ?label)
             }
-            ' tuple-template='{{> template }}'>
-              <template id='template'>
-                <semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link>
+            ' tuple-template='{{> popupTemplate }}'>
+              <template id='popupTemplate'>
+                <div style="padding: 4px; min-width: 180px;">
+                  <h4 style="margin:0 0 6px 0; font-size:1.05rem; color:#1a4e8a;">
+                    <mp-label iri="{{subject.value}}"></mp-label>
+                  </h4>
+                  <p style="margin: 0 0 8px 0;">
+                    <span class="label" style="background-color: {{color.value}}; color:#fff; font-size:10px;">
+                      {{kind.value}}
+                    </span>
+                  </p>
+                  <semantic-link iri="{{subject.value}}" class="btn btn-primary btn-xs btn-block">
+                    Apri Scheda Sito & WebGIS
+                  </semantic-link>
+                </div>
               </template>
             </semantic-map>
           </div>

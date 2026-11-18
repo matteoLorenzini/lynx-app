@@ -1,6 +1,6 @@
 # lynx-app
 
-A ResearchSpace platform app (extension), deployed as a docker container volume alongside the platform.
+A ResearchSpace platform app, deployed as a docker container volume alongside the platform.
 
 ## Structure
 

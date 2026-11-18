@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, Windows]
+    runs-on: [self-hosted, Linux]
     timeout-minutes: 5
 
     steps:
@@ -15,125 +15,75 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set paths
-        shell: pwsh
+        shell: bash
         run: |
-          $composeRoot = if ($env:RESEARCHSPACE_COMPOSE_ROOT) {
-            $env:RESEARCHSPACE_COMPOSE_ROOT
-          } else {
-            Join-Path $env:USERPROFILE 'researchspace-docker-desktop-main'
-          }
-          $runtimeTarget = Join-Path $composeRoot 'researchspace/runtime-data'
+          compose_root="${RESEARCHSPACE_COMPOSE_ROOT:-/home/matteo/researchspace-docker-desktop-main}"
 
-          "COMPOSE_ROOT=$composeRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "RUNTIME_TARGET=$runtimeTarget" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          'SERVICE_NAME=researchspace' | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "COMPOSE_ROOT=$compose_root"                          >> "$GITHUB_ENV"
+          echo "RUNTIME_TARGET=$compose_root/researchspace/runtime-data" >> "$GITHUB_ENV"
+          echo "SERVICE_NAME=researchspace"                          >> "$GITHUB_ENV"
 
       - name: Sync changed files only
-        shell: pwsh
+        shell: bash
         run: |
-          $target = $env:RUNTIME_TARGET
+          set -euo pipefail
+          target="$RUNTIME_TARGET"
 
-          Write-Output '========================================'
-          Write-Output 'ResearchSpace deployment'
-          Write-Output "Source: $PWD"
-          Write-Output "Target: $target"
-          Write-Output '========================================'
+          echo '========================================'
+          echo 'ResearchSpace deployment'
+          echo "Source: $PWD"
+          echo "Target: $target"
+          echo '========================================'
 
-          if (-not (Test-Path -LiteralPath $target -PathType Container)) {
-            throw "Runtime directory not found: $target"
-          }
+          [[ -d "$target" ]] || { echo "::error::Runtime directory not found: $target"; exit 1; }
+          command -v rsync >/dev/null || { echo "::error::rsync not installed (sudo dnf install rsync)"; exit 1; }
 
-          function Sync-Directory {
-            param([string]$Source, [string]$Destination)
-
-            if (-not (Test-Path -LiteralPath $Source -PathType Container)) {
-              Write-Output "Skipping missing directory: $Source"
+          # --checksum: copy only files whose content changed. A fresh checkout gives
+          #             every file a new timestamp, so comparing dates would copy everything.
+          # no --delete: files in the runtime that are not in the repo are left alone.
+          sync() {
+            local src="$1" dst="$2"
+            if [[ ! -e "$src" ]]; then
+              echo "Skipping missing: $src"
               return
-            }
-
-            New-Item -ItemType Directory -Path $Destination -Force | Out-Null
-
-            Write-Output ''
-            Write-Output 'Syncing directory:'
-            Write-Output "  $Source"
-            Write-Output "  -> $Destination"
-
-            $sourceRoot = (Get-Item -LiteralPath $Source).FullName
-            Get-ChildItem -LiteralPath $sourceRoot -File -Recurse | ForEach-Object {
-              $relativePath = $_.FullName.Substring($sourceRoot.Length).TrimStart('\', '/')
-              $destinationPath = Join-Path $Destination $relativePath
-              $destinationParent = Split-Path -Parent $destinationPath
-              New-Item -ItemType Directory -Path $destinationParent -Force | Out-Null
-
-              $isNewer = -not (Test-Path -LiteralPath $destinationPath) -or
-                $_.LastWriteTimeUtc -gt (Get-Item -LiteralPath $destinationPath).LastWriteTimeUtc
-              if ($isNewer) {
-                Copy-Item -LiteralPath $_.FullName -Destination $destinationPath -Force
-                Write-Output "  Updated: $relativePath"
-              }
-            }
+            fi
+            echo
+            echo "Syncing: $src"
+            echo "  -> $dst"
+            if [[ -d "$src" ]]; then
+              mkdir -p "$dst"
+              rsync -r --checksum --out-format='  Updated: %n' "$src"/ "$dst"/
+            else
+              mkdir -p "$(dirname "$dst")"
+              rsync --checksum --out-format='  Updated: %n' "$src" "$dst"
+            fi
           }
 
-          function Sync-File {
-            param([string]$Source, [string]$Destination)
+          # Files/directories deployed to ResearchSpace runtime-data
+          sync plugin.properties "$target/plugin.properties"
+          for dir in assets config data images lib; do
+            sync "$dir" "$target/$dir"
+          done
 
-            if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
-              Write-Output "Skipping missing file: $Source"
-              return
-            }
-
-            $destinationParent = Split-Path -Parent $Destination
-            New-Item -ItemType Directory -Path $destinationParent -Force | Out-Null
-
-            Write-Output ''
-            Write-Output 'Syncing file:'
-            Write-Output "  $Source"
-            Write-Output "  -> $Destination"
-
-            $isNewer = -not (Test-Path -LiteralPath $Destination) -or
-              (Get-Item -LiteralPath $Source).LastWriteTimeUtc -gt (Get-Item -LiteralPath $Destination).LastWriteTimeUtc
-            if ($isNewer) {
-              Copy-Item -LiteralPath $Source -Destination $Destination -Force
-              Write-Output '  Updated'
-            }
-          }
-
-          # Files/directories deployed to ResearchSpace runtime-data.
-          Sync-File (Join-Path $PWD 'plugin.properties') (Join-Path $target 'plugin.properties')
-
-          Sync-Directory (Join-Path $PWD 'assets') (Join-Path $target 'assets')
-          Sync-Directory (Join-Path $PWD 'config') (Join-Path $target 'config')
-          Sync-Directory (Join-Path $PWD 'data') (Join-Path $target 'data')
-          Sync-Directory (Join-Path $PWD 'images') (Join-Path $target 'images')
-          Sync-Directory (Join-Path $PWD 'lib') (Join-Path $target 'lib')
-
-          Write-Output ''
-          Write-Output '========================================'
-          Write-Output 'Sync complete'
-          Write-Output 'Only changed files were updated.'
-          Write-Output 'No files were deleted from the runtime.'
-          Write-Output '========================================'
+          echo
+          echo '========================================'
+          echo 'Sync complete'
+          echo 'Only changed files were updated.'
+          echo 'No files were deleted from the runtime.'
+          echo '========================================'
 
       - name: Verify deployment
-        shell: pwsh
+        shell: bash
         run: |
-          $url = 'http://localhost:10214/'
+          url='http://localhost:10214/'
+          echo "Checking ResearchSpace at $url"
 
-          Write-Output "Checking ResearchSpace at $url"
+          code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$url" || true)"
 
-          $statusCode = 0
-          try {
-            $response = Invoke-WebRequest -Uri $url -TimeoutSec 5 -UseBasicParsing
-            $statusCode = [int]$response.StatusCode
-          } catch {
-            if ($_.Exception.Response) {
-              $statusCode = [int]$_.Exception.Response.StatusCode
-            }
-          }
-
-          if ($statusCode -ge 100 -and $statusCode -lt 500) {
-            Write-Output "Service is responding (HTTP $statusCode)"
-            Write-Output 'Deployment successful - files updated without restart'
-          } else {
-            throw "Service is not responding at $url (HTTP $statusCode)"
-          }
+          if [[ "$code" =~ ^[0-9]+$ ]] && (( code >= 100 && code < 500 )); then
+            echo "Service is responding (HTTP $code)"
+            echo 'Deployment successful - files updated without restart'
+          else
+            echo "::error::Service is not responding at $url (HTTP ${code:-none})"
+            exit 1
+          fi

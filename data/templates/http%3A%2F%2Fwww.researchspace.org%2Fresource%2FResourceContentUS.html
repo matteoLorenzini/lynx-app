@@ -84,21 +84,20 @@
           <div style="padding: 1.8% 1.5% 1.5% 5%;">
             [[> resourceHeaderData image=true]]
             <div style="margin-top: 8px; height: 200px; width: 100%;">
-              <semantic-map
+                <semantic-map
                 id='us-site-map-[[this]]'
                 query='
                   PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                   PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-                  SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?site WHERE {
+                  SELECT DISTINCT ?wkt ?label ?site WHERE {
                     <[[this]]> crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
                     ?excavation crm:P7_took_place_at ?site .
-                    ?site a crm:E27_Site ;
-                          crm:P168_place_is_defined_by ?literal .
-                    ?literal rdfs:label ?coords .
-                    OPTIONAL { ?site rdfs:label ?siteLabel }
-                    BIND(COALESCE(?siteLabel, STR(?site)) AS ?label)
+                    ?site crm:P168_place_is_defined_by ?wkt .
+                    OPTIONAL { ?site crm:P1_is_identified_by/(rdfs:label|skos:prefLabel) ?name }
+                    BIND(COALESCE(?name, STR(?site)) AS ?label)
                   }'
                 tuple-template='{{> siteMarker}}'>
                 <template id='siteMarker'>

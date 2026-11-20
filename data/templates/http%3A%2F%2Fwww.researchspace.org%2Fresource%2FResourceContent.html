@@ -174,14 +174,15 @@ ORDER BY ?subject LIMIT 1' template='{{> headerPreview}}'>
                         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-                        SELECT (CONCAT("Point(", STR(?label), ")") AS ?wkt) ?site ?label WHERE {
+                        SELECT ?wkt ?site ?label WHERE {
                           BIND(<[[this]]> AS ?subject)
                           ?subject a crm:E18_Physical_Thing ;
                                    crm:P53_has_former_or_current_location ?site.
                           ?site a crm:E53_Place;
                                 crm:P2_has_type <http://www.lynx.com/resource/site-of-discovery>;
-                                crm:P168_place_is_defined_by ?literal.
-                          ?literal rdfs:label ?label
+                                crm:P168_place_is_defined_by ?wkt.
+                          OPTIONAL { ?site crm:P1_is_identified_by/(rdfs:label|skos:prefLabel) ?name }
+                          BIND(COALESCE(?name, STR(?site)) AS ?label)
                         }
                       '
                       tuple-template='{{> mapTupleTemplate }}'>

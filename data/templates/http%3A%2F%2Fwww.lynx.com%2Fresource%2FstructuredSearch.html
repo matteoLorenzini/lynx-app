@@ -393,13 +393,14 @@
                 PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 
-                SELECT DISTINCT (CONCAT("Point(", STR(?label), ")") AS ?wkt) ?label ?subject WHERE {
+                SELECT DISTINCT ?wkt ?label ?subject WHERE {
                   ?subject a crm:E18_Physical_Thing ;
                            crm:P53_has_former_or_current_location ?site .
                   ?site a crm:E53_Place ;
                         crm:P2_has_type <http://www.lynx.com/resource/site-of-discovery> ;
-                        crm:P168_place_is_defined_by ?literal .
-                  ?literal rdfs:label ?label
+                        crm:P168_place_is_defined_by ?wkt .
+                  OPTIONAL { ?site crm:P1_is_identified_by/(rdfs:label|skos:prefLabel) ?name }
+                  BIND(COALESCE(?name, STR(?site)) AS ?label)
                 }
                 ' tuple-template='{{> template }}'>
                 <template id='template'>

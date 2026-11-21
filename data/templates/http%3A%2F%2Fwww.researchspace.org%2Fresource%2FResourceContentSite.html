@@ -225,17 +225,8 @@
     }
   ' debounce=500></semantic-search-query-keyword>
 
-  <style>
-    .webgis-dark { background: #0f1412; color: #d7e3dc; border-radius: 6px; overflow: hidden; border: 1px solid #2c3a33; }
-    .webgis-dark .webgis-header { padding: 10px 14px; background: #17201c; border-bottom: 1px solid #2c3a33; font-family: monospace; letter-spacing: .08em; text-transform: uppercase; font-size: 13px; color: #9fd3a8; }
-    .webgis-dark .webgis-sidebar { background: #131b17; color: #d7e3dc; padding: 8px; }
-    .webgis-dark .webgis-map { filter: invert(1) hue-rotate(180deg) brightness(.9) contrast(1.05); }
-    .webgis-dark a { color: #9fd3a8; }
-  </style>
-  <div class="webgis-dark">
-  <div class="webgis-header">WebGIS &middot; Unità Stratigrafiche (US)</div>
   <div data-flex-layout="row stretch-stretch">
-    <div class="webgis-sidebar" data-flex-self="size-1of3" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
+    <div data-flex-self="size-1of3" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
       <semantic-search-facet></semantic-search-facet>
     </div>
 
@@ -244,7 +235,7 @@
         <!-- map only -->
 
         <semantic-search-result id='map-result-wrapper'>
-          <div class="webgis-map" style='height: 70vh; min-height: 480px;'>
+          <div style='height: 70vh; min-height: 480px;'>
             <semantic-map id='map-result' query='
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
@@ -269,6 +260,5 @@
         </semantic-search-result>
       </div>
     </semantic-search-result-holder>
-  </div>
   </div>
 </semantic-search>

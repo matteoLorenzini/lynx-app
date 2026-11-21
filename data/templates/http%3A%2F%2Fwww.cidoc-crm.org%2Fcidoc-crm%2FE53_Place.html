@@ -232,7 +232,13 @@
 
 [[!-- Smistamento: Sito con Scavo vs Sito senza Scavo --]]
 <semantic-if
-  query='ASK { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> <http://www.lynx.com/resource/cultural-heritage-place/site> }'
+  query='ASK {
+    { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> <http://www.lynx.com/resource/cultural-heritage-place/site> }
+    UNION
+    { <[[this]]> <http://www.cidoc-crm.org/cidoc-crm/P2_has_type> <http://www.lynx.com/resource/place/site> }
+    UNION
+    { ?excavation <http://www.cidoc-crm.org/cidoc-crm/P7_took_place_at> <[[this]]> }
+  }'
   then='{{> siteMap}}' else='{{> placePage}}'>
   <template id='siteMap'>
     <semantic-if

@@ -2,7 +2,7 @@
 <with-types fixed-key='resource-[[this]]' iri='[[this]]' template='{{> page}}' [[> rsp:TypeMappings]]>
   <template id='page'>
     <div class="rs-resource-container">
-      <div class="rs-resource-header {{getValueByKey entityBgColor allTypes 'rs-entity-bg-thing'}}" style="min-height: 300px;">
+      <div class="rs-resource-header {{getValueByKey entityBgColor allTypes 'rs-entity-bg-thing'}}" style="min-height: 400px;">
         <div class="rs-resource-header-topContainer">
           <div class="rs-resource-header-topButtons">
             <semantic-link-container uri='[[resolvePrefix "rsp:ThinkingFrames"]]' urlqueryparam-view='knowledge-map' urlqueryparam-resource='[[this]]'>
@@ -23,12 +23,12 @@
           </div>
         </div>
         <div class="rs-resource-header-content-container">
-          <div class="rs-resource-header--image-container" style="min-height: 260px; flex: 1;">
+          <div class="rs-resource-header--image-container" style="min-height: 350px; flex: 1.5;">
             <div class="object-representations__image--focused">
               <span class="rs-icon {{getValueByKey typeToImage allTypes 'rs-icon-entity_no-image'}} {{getValueByKey entityIconColor allTypes 'rs-icon-entity_no-image'}}"></span>
             </div>
           </div>
-          <div style="padding: 1.8% 1.5% 1.5% 5%; flex: 1.5;">
+          <div style="padding: 1.8% 1.5% 1.5% 5%; flex: 1;">
             <div class="rs-resource-header--singletitle">
               <div class="rs-resource-header--title" style="text-transform: capitalize;">
                 <mp-label iri='[[this]]'></mp-label>

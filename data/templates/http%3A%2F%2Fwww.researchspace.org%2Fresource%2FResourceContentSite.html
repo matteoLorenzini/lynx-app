@@ -186,15 +186,14 @@
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
             PREFIX crmarchaeo: <http://www.cidoc-crm.org/extensions/crmarchaeo/>
 
-            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject WHERE {
+            SELECT DISTINCT ?wkt ?label ?subject WHERE {
               ?subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ;
                        crm:P1_is_identified_by <http://www.lynx.com/resource/us-number> ;
                        rdfs:label ?usLabel ;
                        crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation .
               ?excavation crm:P7_took_place_at ?site .
               FILTER(?site = <[[this]]>)
-              ?site crm:P168_place_is_defined_by ?literal .
-              ?literal rdfs:label ?coords .
+              ?site crm:P168_place_is_defined_by ?wkt .
               BIND(CONCAT("US ", STR(?usLabel)) AS ?label)
             }
             ' tuple-template='{{> template }}'>

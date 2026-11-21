@@ -38,11 +38,11 @@
                       PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
                       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-                      SELECT (CONCAT("Point(", STR(?label), ")") AS ?wkt) ?label ?subject WHERE {
+                      SELECT ?wkt ?label ?subject WHERE {
                         BIND(<[[this]]> AS ?subject)
                         ?subject a crm:E53_Place;
-                                 crm:P168_place_is_defined_by ?coordinates.
-                        ?coordinates rdfs:label ?label
+                                 crm:P168_place_is_defined_by ?wkt.
+                        OPTIONAL { ?subject rdfs:label ?label }
                       }
                     '
                     tuple-template='{{> mapTupleTemplate}}'>

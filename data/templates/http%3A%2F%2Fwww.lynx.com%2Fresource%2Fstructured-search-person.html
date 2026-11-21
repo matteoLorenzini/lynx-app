@@ -1,0 +1,101 @@
+<!-- Ricerca persone -->
+
+<semantic-search
+  search-profile='{
+    "categories": [
+      {
+        "iri": "<http://www.cidoc-crm.org/cidoc-crm/E21_Person>",
+        "label": "Person",
+        "thumbnail": "../assets/images/icons/rs-icons/person.svg"
+      }
+    ],
+    "relations": []
+  }'
+  >
+  <semantic-search-query-keyword domain='<http://www.cidoc-crm.org/cidoc-crm/E21_Person>' query='
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+
+    SELECT DISTINCT ?subject
+    WHERE {
+      ?subject a crm:E21_Person .
+      {
+        ?subject rdfs:label ?label .
+      } UNION {
+        ?subject crm:P1_is_identified_by/skos:prefLabel ?label .
+      }
+      FILTER REGEX(STR(?label), ?__token__, "i")
+    }
+  ' default-query='
+    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+
+    SELECT DISTINCT ?subject
+    WHERE {
+      ?subject a crm:E21_Person .
+    }
+  ' debounce=500></semantic-search-query-keyword>
+
+  <div data-flex-layout="row stretch-stretch">
+    <div data-flex-self="size-1of4" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
+      <semantic-search-facet></semantic-search-facet>
+    </div>
+
+    <semantic-search-result-holder>
+      <div data-flex-self="md-full">
+        <semantic-search-result id='result-count'>
+          <mp-sparql-result-counts id='query-count' query="SELECT DISTINCT * {}" template='{{#if hasLimit}} <bs-alert bs-style="warning">Showing {{numberOfResults}} of {{totalNumberOfResults}} matches. <strong>Please, refine your search.</strong></bs-alert>{{else}}<span> found {{numberOfResults}} matches </span>{{/if}}'>
+          </mp-sparql-result-counts>
+        </semantic-search-result>
+
+        <semantic-search-result id='grid-result'>
+          <div class="card-container">
+            <semantic-table id="person-grid-table" prefetch-labels="false" query='
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+SELECT ?subject ?label ?occupation ?birthDate WHERE {
+  {
+    SELECT ?subject (SAMPLE(?name_) AS ?label) (GROUP_CONCAT(DISTINCT ?occupationLabel; separator=", ") AS ?occupation) (SAMPLE(?birthDate_) AS ?birthDate) WHERE {
+      ?subject a crm:E21_Person .
+      OPTIONAL {
+        { ?subject rdfs:label ?name_ } UNION { ?subject crm:P1_is_identified_by/skos:prefLabel ?name_ }
+      }
+      OPTIONAL {
+        ?subject crm:P2_has_type ?occupationType .
+        ?occupationType a crm:E55_Type ;
+                        rdfs:label ?occupationLabel .
+        FILTER(CONTAINS(STR(?occupationType), "/type/occupation/"))
+      }
+      OPTIONAL {
+        ?subject crm:P98i_was_born/crm:P4_has_time-span/rdfs:label ?birthDate_ .
+      }
+    }
+    GROUP BY ?subject
+  }
+}
+ORDER BY ?label
+              ' tuple-template="{{> cardTemplate}}" number-of-displayed-rows="12"
+                no-result-template='<bs-panel class="info">No matches found</bs-panel>'
+                options='{"showFilter":false,"pageSizeSelection":[6,12,24,48]}'>
+              <template id="cardTemplate">
+                <bs-col sm="4" style="margin-bottom: 20px;">
+                  <div class="panel panel-default" style="box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="panel-body">
+                      <div style="text-align:center; margin-bottom:10px;">
+                        <img src="../assets/images/icons/rs-icons/person.svg" alt="Person" style="width: 64px; height: 64px;" />
+                      </div>
+                      <h4 style="margin: 0 0 10px 0;"><semantic-link iri="{{subject.value}}">{{label.value}}</semantic-link></h4>
+                      {{#if occupation.value}}<p style="margin: 5px 0;"><strong>Occupation:</strong> {{occupation.value}}</p>{{/if}}
+                      {{#if birthDate.value}}<p style="margin: 5px 0;"><strong>Born:</strong> {{birthDate.value}}</p>{{/if}}
+                    </div>
+                  </div>
+                </bs-col>
+              </template>
+            </semantic-table>
+          </div>
+        </semantic-search-result>
+      </div>
+    </semantic-search-result-holder>
+  </div>
+</semantic-search>

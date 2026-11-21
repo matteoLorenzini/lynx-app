@@ -166,10 +166,9 @@ ORDER BY ?label
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
 
-            SELECT DISTINCT (CONCAT("Point(", STR(?coords), ")") AS ?wkt) ?label ?subject ?badge ?kind WHERE {
+            SELECT DISTINCT ?wkt ?label ?subject ?badge ?kind WHERE {
               { ?subject a crm:E27_Site } UNION { ?subject a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place/site> }
-              ?subject crm:P168_place_is_defined_by ?literal .
-              ?literal rdfs:label ?coords .
+              ?subject crm:P168_place_is_defined_by ?wkt .
               OPTIONAL { { ?subject rdfs:label ?siteLabel } UNION { ?subject crm:P1_is_identified_by/rdfs:label ?siteLabel } }
               
               BIND(EXISTS { ?excavation crm:P7_took_place_at ?subject } AS ?hasExcavation)

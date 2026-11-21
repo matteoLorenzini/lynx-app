@@ -40,6 +40,11 @@
         "iri": "<http://www.cidoc-crm.org/cidoc-crm/E20_Biological_Object>",
         "label": "Organic Component",
         "thumbnail": "../assets/images/icons/rs-icons/place.svg"
+      },
+      {
+        "iri": "<http://www.cidoc-crm.org/cidoc-crm/E83_Type_Creation>",
+        "label": "Formation Mode",
+        "thumbnail": "../assets/images/icons/rs-icons/concept.svg"
       }
     ],
     "relations": [
@@ -90,6 +95,36 @@
         "label": "Excavation Place",
         "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
         "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/sector>",
+        "label": "Sector (Settore)",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/trench>",
+        "label": "Trench (Saggio)",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/square>",
+        "label": "Square (Quadrato)",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/formation_mode>",
+        "label": "Formation Mode",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E83_Type_Creation>"
+      },
+      {
+        "iri": "<http://www.lynx.com/resource/field/status>",
+        "label": "Status",
+        "hasDomain": "<http://www.cidoc-crm.org/extensions/crmarchaeo/A2_Stratigraphic_Volume_Unit>",
+        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E55_Type>"
       }
     ]
   }'
@@ -125,6 +160,26 @@
     "<http://www.lynx.com/resource/field/excavation_place>": [{
       "kind": "resource",
       "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation . ?excavation crm:P7_took_place_at ?site . ?site a crm:E27_Site ; crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/cultural-heritage-place> .}"
+    }],
+    "<http://www.lynx.com/resource/field/sector>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation . ?excavation crm:P7_took_place_at ?site . ?site a crm:E27_Site ; crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/settore> .}"
+    }],
+    "<http://www.lynx.com/resource/field/trench>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation . ?excavation crm:P7_took_place_at ?site . ?site a crm:E27_Site ; crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/saggio> .}"
+    }],
+    "<http://www.lynx.com/resource/field/square>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crmarchaeo:AP5i_was_partially_or_totally_removed_by ?excavation . ?excavation crm:P7_took_place_at ?site . ?site a crm:E27_Site ; crm:P89_falls_within ?__value__ . ?__value__ a crm:E53_Place ; crm:P2_has_type <http://www.lynx.com/resource/quadrato> .}"
+    }],
+    "<http://www.lynx.com/resource/field/formation_mode>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crm:P136i_supported_type_creation ?__value__ . ?__value__ a crm:E83_Type_Creation .}"
+    }],
+    "<http://www.lynx.com/resource/field/status>": [{
+      "kind": "resource",
+      "queryPattern": "{$subject a crmarchaeo:A2_Stratigraphic_Volume_Unit ; crm:P2_has_type ?__value__ . ?__value__ crm:P2_has_type <http://www.lynx.com/resource/status> .}"
     }]
   }'
   >
@@ -170,8 +225,17 @@
     }
   ' debounce=500></semantic-search-query-keyword>
 
+  <style>
+    .webgis-dark { background: #0f1412; color: #d7e3dc; border-radius: 6px; overflow: hidden; border: 1px solid #2c3a33; }
+    .webgis-dark .webgis-header { padding: 10px 14px; background: #17201c; border-bottom: 1px solid #2c3a33; font-family: monospace; letter-spacing: .08em; text-transform: uppercase; font-size: 13px; color: #9fd3a8; }
+    .webgis-dark .webgis-sidebar { background: #131b17; color: #d7e3dc; padding: 8px; }
+    .webgis-dark .webgis-map { filter: invert(1) hue-rotate(180deg) brightness(.9) contrast(1.05); }
+    .webgis-dark a { color: #9fd3a8; }
+  </style>
+  <div class="webgis-dark">
+  <div class="webgis-header">WebGIS &middot; Unità Stratigrafiche (US)</div>
   <div data-flex-layout="row stretch-stretch">
-    <div data-flex-self="size-1of3" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
+    <div class="webgis-sidebar" data-flex-self="size-1of3" style="flex: 0 0 260px; max-height: 80vh; overflow-y: auto;">
       <semantic-search-facet></semantic-search-facet>
     </div>
 
@@ -180,7 +244,7 @@
         <!-- map only -->
 
         <semantic-search-result id='map-result-wrapper'>
-          <div style='height: 70vh; min-height: 480px;'>
+          <div class="webgis-map" style='height: 70vh; min-height: 480px;'>
             <semantic-map id='map-result' query='
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
@@ -205,5 +269,6 @@
         </semantic-search-result>
       </div>
     </semantic-search-result-holder>
+  </div>
   </div>
 </semantic-search>

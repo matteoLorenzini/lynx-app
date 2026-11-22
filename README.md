@@ -23,32 +23,29 @@ lynx-app/
 ## Deployment
 
 On every push to `main` (or from **Run workflow**), [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
-runs on the configured self-hosted Linux runner and syncs this app into the ResearchSpace
-runtime data directory.
+runs on a self-hosted Linux runner and syncs this app into the ResearchSpace runtime data
+directory. It updates changed files in `plugin.properties`, `assets/`, `config/`, `data/`,
+`images/`, and `lib/`. It does not delete files from the runtime or restart ResearchSpace.
 
-### Runner path configuration
+### Runner configuration
 
-The workflow expects the ResearchSpace checkout to be available on the runner machine at a
-runner-specific location:
+Set `RESEARCHSPACE_COMPOSE_ROOT` in the runner environment to the directory containing the
+`researchspace/` checkout. If unset, the workflow uses its configured default, which may be
+specific to the runner.
 
-```text
-<RESEARCHSPACE_CHECKOUT>
-```
-
-The workflow derives the deployment target from that checkout:
+The deployment target is derived from that directory:
 
 ```text
-<RESEARCHSPACE_CHECKOUT>/researchspace/runtime-data
+/path/to/compose-root/researchspace/runtime-data
 ```
 
-Set `compose_root` in [.github/workflows/deploy.yml](.github/workflows/deploy.yml) to the
-checkout path configured for the self-hosted runner. Keep this value runner-specific and avoid
-documenting personal home directories in project files.
+The runner user must have write access to the target directory. Override the workflow's
+default path with `RESEARCHSPACE_COMPOSE_ROOT` rather than editing the workflow for a
+runner-specific location.
 
 ### Runner requirements
 
-- `rsync` is recommended on the runner machine. The workflow falls back to `cp -ru` if `rsync` is unavailable.
-- The runner user must have write access to the `researchspace/runtime-data` directory.
-- The service must be reachable at `http://localhost:10214/` for the verification step to pass.
+- `rsync` must be installed on the runner.
+- The service must respond at `http://localhost:10214/` for the verification step to pass.
 
 

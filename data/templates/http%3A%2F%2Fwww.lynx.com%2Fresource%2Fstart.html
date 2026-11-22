@@ -95,10 +95,17 @@
                               rdfs:label ?label .
                     BIND("Tipologia" AS ?typelabel)
                   } UNION {
-                    VALUES ?agentClass { crm:E21_Person crm:E74_Group }
-                    ?resource a ?agentClass ;
+                    ?resource a crm:E21_Person .
+                    { ?resource rdfs:label ?label }
+                    UNION
+                    { ?resource crm:P1_is_identified_by ?app .
+                      ?app a crm:E41_Appellation ;
+                           <http://www.w3.org/2004/02/skos/core#prefLabel> ?label . }
+                    BIND("Persona" AS ?typelabel)
+                  } UNION {
+                    ?resource a crm:E74_Group ;
                               rdfs:label ?label .
-                    BIND("Persona o ente" AS ?typelabel)
+                    BIND("Ente" AS ?typelabel)
                   } UNION {
                     ?resource a crm:E31_Document ;
                               rdfs:label ?label .
@@ -213,15 +220,26 @@
       </div>
     </section>
 
-    <!-- ---- Persone: segnaposto ---- -->
+    <!-- ---- Persone ---- -->
     <section class="cl-panel" id="p-pers">
       <h3>Persone</h3>
       <p class="cl-hint">Scegli che cosa vuoi cercare.</p>
-      <div class="cl-filters">
-        <div class="cl-filter cl-soon"><span class="cl-f-name">Persone</span><span class="cl-f-desc">In arrivo</span></div>
-        <div class="cl-filter cl-soon"><span class="cl-f-name">Enti</span><span class="cl-f-desc">In arrivo</span></div>
-        <div class="cl-filter cl-soon"><span class="cl-f-name">Archivi personali</span><span class="cl-f-desc">In arrivo</span></div>
-      </div>
+
+      <!-- Il link deve corrispondere all'IRI della pagina in cui hai salvato la ricerca strutturata Person -->
+      <semantic-query
+        query='PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+
+               SELECT ?ord ?name ?desc ?link (COUNT(DISTINCT ?r) AS ?num) WHERE {
+                 ?r a crm:E21_Person .
+                 BIND(1 AS ?ord)
+                 BIND("Persone" AS ?name)
+                 BIND("Biografie, formazione, carriera, scavi e pubblicazioni" AS ?desc)
+                 BIND(<http://www.lynx.com/resource/structured-search-person> AS ?link)
+               }
+               GROUP BY ?ord ?name ?desc ?link
+               ORDER BY ?ord'
+        template='<div class="cl-filters">{{#each bindings}}<div class="cl-filter"><semantic-link iri="{{link.value}}"><span class="cl-f-num">{{num.value}}</span><span class="cl-f-name">{{name.value}}</span><span class="cl-f-desc">{{desc.value}}</span></semantic-link></div>{{/each}}<div class="cl-filter cl-soon"><span class="cl-f-name">Enti</span><span class="cl-f-desc">In arrivo</span></div><div class="cl-filter cl-soon"><span class="cl-f-name">Archivi personali</span><span class="cl-f-desc">In arrivo</span></div></div>'
+      ></semantic-query>
     </section>
 
   </div>

@@ -9,30 +9,7 @@
         "thumbnail": "../assets/images/icons/rs-icons/person.svg"
       }
     ],
-    "relations": [
-      {
-        "iri": "<http://www.lynx.com/resource/field/person_occupation>",
-        "label": "Occupation",
-        "hasDomain": "<http://www.cidoc-crm.org/cidoc-crm/E21_Person>",
-        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E55_Type>"
-      },
-      {
-        "iri": "<http://www.lynx.com/resource/field/person_birth_place>",
-        "label": "Birth place",
-        "hasDomain": "<http://www.cidoc-crm.org/cidoc-crm/E21_Person>",
-        "hasRange": "<http://www.cidoc-crm.org/cidoc-crm/E53_Place>"
-      }
-    ]
-  }'
-  relations='{
-    "<http://www.lynx.com/resource/field/person_occupation>": [{
-      "kind": "resource",
-      "queryPattern": "{ $subject crm:P2_has_type ?__value__ . ?__value__ a crm:E55_Type . FILTER(CONTAINS(STR(?__value__), \"/type/occupation/\")) }"
-    }],
-    "<http://www.lynx.com/resource/field/person_birth_place>": [{
-      "kind": "resource",
-      "queryPattern": "{ $subject crm:P98i_was_born/crm:P7_took_place_at ?__value__ . ?__value__ a crm:E53_Place }"
-    }]
+    "relations": []
   }'
   >
   <semantic-search-query-keyword domain='<http://www.cidoc-crm.org/cidoc-crm/E21_Person>' query='

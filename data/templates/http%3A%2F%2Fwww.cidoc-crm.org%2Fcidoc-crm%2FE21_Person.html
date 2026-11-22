@@ -44,12 +44,10 @@
         </div>
       </div>
 
-      <!-- Tabs: own layout, no rs-resource-tabs class (its CSS expects the default RS markup) -->
-      <bs-tab-container id="person-tabs" default-active-key="person-identification">
-        <div style="display: flex; align-items: flex-start; gap: 24px; width: 100%; padding: 24px 2%; box-sizing: border-box;">
-
-          <div style="flex: 0 0 230px; position: sticky; top: 16px;">
-            <bs-nav bs-style="pills" stacked=true>
+      <div>
+        <bs-tab-container id="tab-container" class="rs-resource-tabs" default-active-key="person-identification">
+          <div>
+            <bs-nav bs-style="tabs">
               <bs-nav-item event-key="person-identification">Identification</bs-nav-item>
               <bs-nav-item event-key="person-biography">Biography</bs-nav-item>
               <bs-nav-item event-key="person-education">Education</bs-nav-item>
@@ -57,10 +55,7 @@
               <bs-nav-item event-key="person-research">Excavations &amp; Publications</bs-nav-item>
               <bs-nav-item event-key="person-timeline">Timeline</bs-nav-item>
             </bs-nav>
-          </div>
-
-          <div style="flex: 1 1 auto; min-width: 0;">
-            <bs-tab-content animation=false mount-on-enter=true>
+            <bs-tab-content animation="true">
 
               <bs-tab-pane event-key="person-identification">
                 <div class="rs-resource-tab-container">
@@ -166,8 +161,8 @@
 
             </bs-tab-content>
           </div>
-        </div>
-      </bs-tab-container>
+        </bs-tab-container>
+      </div>
     </div>
   </template>
 </with-types>

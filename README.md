@@ -25,7 +25,8 @@ lynx-app/
 On every push to `main` (or from **Run workflow**), [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
 runs on a self-hosted Linux runner and syncs this app into the ResearchSpace runtime data
 directory. It updates changed files in `plugin.properties`, `assets/`, `config/`, `data/`,
-`images/`, and `lib/`. It does not delete files from the runtime or restart ResearchSpace.
+`images/`, and `lib/`. It does not delete files from the runtime. After syncing, it restarts
+the `researchspace` Docker Compose service and waits for it to respond.
 
 ### Runner configuration
 
@@ -46,6 +47,8 @@ runner-specific location.
 ### Runner requirements
 
 - `rsync` must be installed on the runner.
+- Docker Compose must be available to the runner user. They need permission to
+  restart the `researchspace` service.
 - The service must respond at `http://localhost:10214/` for the verification step to pass.
 
 

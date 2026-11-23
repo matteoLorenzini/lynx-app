@@ -72,18 +72,35 @@ jobs:
           echo 'No files were deleted from the runtime.'
           echo '========================================'
 
+      - name: Restart ResearchSpace
+        shell: bash
+        run: |
+          set -euo pipefail
+          compose_file="$COMPOSE_ROOT/docker-compose.yml"
+
+          [[ -f "$compose_file" ]] || { echo "::error::Docker Compose file not found: $compose_file"; exit 1; }
+          command -v docker >/dev/null || { echo "::error::Docker is not installed on the runner"; exit 1; }
+
+          docker compose --project-directory "$COMPOSE_ROOT" -f "$compose_file" restart "$SERVICE_NAME"
+
       - name: Verify deployment
         shell: bash
         run: |
           url='http://localhost:10214/'
-          echo "Checking ResearchSpace at $url"
+          echo "Waiting for ResearchSpace at $url"
 
-          code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$url" || true)"
+          for ((attempt = 1; attempt <= 24; attempt++)); do
+            code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$url" || true)"
 
-          if [[ "$code" =~ ^[0-9]+$ ]] && (( code >= 100 && code < 500 )); then
-            echo "Service is responding (HTTP $code)"
-            echo 'Deployment successful - files updated without restart'
-          else
-            echo "::error::Service is not responding at $url (HTTP ${code:-none})"
-            exit 1
-          fi
+            if [[ "$code" =~ ^[0-9]+$ ]] && (( code >= 100 && code < 500 )); then
+              echo "Service is responding (HTTP $code)"
+              echo 'Deployment successful - ResearchSpace was restarted'
+              exit 0
+            fi
+
+            echo "Attempt $attempt/24: service not ready yet (HTTP ${code:-none})"
+            sleep 5
+          done
+
+          echo "::error::Service did not become ready at $url"
+          exit 1

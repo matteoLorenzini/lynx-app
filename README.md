@@ -14,7 +14,7 @@ lynx-app/
   data/
     templates/                # *.html templates, hot-reloaded (no restart needed)
   assets/                      # static assets, hot-reloaded (no restart needed)
-  images/                      # app images
+  images/                      # app images (server?)
   lib/                          # custom *.jar artefacts (custom services, JDBC drivers, etc.)
 ```
 

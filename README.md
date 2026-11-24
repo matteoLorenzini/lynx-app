@@ -44,7 +44,7 @@ The runner user must have write access to the target directory. Override the wor
 default path with `RESEARCHSPACE_COMPOSE_ROOT` rather than editing the workflow for a
 runner-specific location.
 
-### Runner requirements (TBD)
+### Runner requirements 
 
 - `rsync` must be installed on the runner.
 - Docker Compose must be available to the runner user. They need permission to

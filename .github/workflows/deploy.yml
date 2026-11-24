@@ -37,6 +37,11 @@ jobs:
 
           [[ -d "$target" ]] || { echo "::error::Runtime directory not found: $target"; exit 1; }
           command -v rsync >/dev/null || { echo "::error::rsync not installed (sudo apt install rsync)"; exit 1; }
+          sudo -n rsync --version >/dev/null 2>&1 || { echo "::error::'sudo rsync' not allowed without password (see /etc/sudoers.d/github-runner-rsync)"; exit 1; }
+
+          # Owner of runtime-data (the ResearchSpace container user), e.g. 100:0
+          RUNTIME_OWNER="$(stat -c '%u:%g' "$target")"
+          echo "Runtime owner: $RUNTIME_OWNER"
 
           # --checksum: copy only files whose content changed. A fresh checkout gives
           #             every file a new timestamp, so comparing dates would copy everything.
@@ -50,12 +55,14 @@ jobs:
             echo
             echo "Syncing: $src"
             echo "  -> $dst"
+            # sudo rsync: runtime-data belongs to the container user (UID 100, GID 0).
+            # --chown keeps that owner, --mkpath creates missing parent folders.
             if [[ -d "$src" ]]; then
-              mkdir -p "$dst"
-              rsync -r --checksum --out-format='  Updated: %n' "$src"/ "$dst"/
+              sudo -n rsync -r --checksum --mkpath --chown="$RUNTIME_OWNER" \
+                --out-format='  Updated: %n' "$src"/ "$dst"/
             else
-              mkdir -p "$(dirname "$dst")"
-              rsync --checksum --out-format='  Updated: %n' "$src" "$dst"
+              sudo -n rsync --checksum --mkpath --chown="$RUNTIME_OWNER" \
+                --out-format='  Updated: %n' "$src" "$dst"
             fi
           }
 

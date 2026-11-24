@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, Linux]
+    runs-on: [self-hosted, Linux, vps]
     timeout-minutes: 5
 
     steps:
@@ -17,7 +17,7 @@ jobs:
       - name: Set paths
         shell: bash
         run: |
-          compose_root="${RESEARCHSPACE_COMPOSE_ROOT:-/home/matteo/researchspace-docker-desktop-main}"
+          compose_root="${RESEARCHSPACE_COMPOSE_ROOT:-/opt/researchspace}"
 
           echo "COMPOSE_ROOT=$compose_root"                          >> "$GITHUB_ENV"
           echo "RUNTIME_TARGET=$compose_root/researchspace/runtime-data" >> "$GITHUB_ENV"
@@ -36,7 +36,7 @@ jobs:
           echo '========================================'
 
           [[ -d "$target" ]] || { echo "::error::Runtime directory not found: $target"; exit 1; }
-          command -v rsync >/dev/null || { echo "::error::rsync not installed (sudo dnf install rsync)"; exit 1; }
+          command -v rsync >/dev/null || { echo "::error::rsync not installed (sudo apt install rsync)"; exit 1; }
 
           # --checksum: copy only files whose content changed. A fresh checkout gives
           #             every file a new timestamp, so comparing dates would copy everything.
